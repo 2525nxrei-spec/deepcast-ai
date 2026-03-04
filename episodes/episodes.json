@@ -8,7 +8,7 @@
     "tags": ["生活", "脳科学"],
     "duration": "5:12",
     "free": true,
-    "audio": "episodes/ep020.mp3"
+    "audio": "episodes/ep020.wav"
   },
   {
     "id": 19,
@@ -19,7 +19,7 @@
     "tags": ["行動経済学", "マーケティング"],
     "duration": "4:48",
     "free": true,
-    "audio": "episodes/ep019.mp3"
+    "audio": "episodes/ep019.wav"
   },
   {
     "id": 18,
@@ -30,7 +30,7 @@
     "tags": ["心理学", "仕事"],
     "duration": "5:05",
     "free": true,
-    "audio": "episodes/ep018.mp3"
+    "audio": "episodes/ep018.wav"
   },
   {
     "id": 17,
@@ -41,7 +41,7 @@
     "tags": ["経済", "日本"],
     "duration": "5:22",
     "free": true,
-    "audio": "episodes/ep017.mp3"
+    "audio": "episodes/ep017.wav"
   },
   {
     "id": 16,
@@ -52,7 +52,7 @@
     "tags": ["睡眠", "健康"],
     "duration": "4:55",
     "free": false,
-    "audio": "episodes/ep016.mp3"
+    "audio": "episodes/ep016.wav"
   },
   {
     "id": 15,
@@ -63,7 +63,7 @@
     "tags": ["AI", "ライフハック"],
     "duration": "5:18",
     "free": true,
-    "audio": "episodes/ep015.mp3"
+    "audio": "episodes/ep015.wav"
   },
   {
     "id": 14,
@@ -74,7 +74,7 @@
     "tags": ["脳科学", "エンタメ"],
     "duration": "4:42",
     "free": true,
-    "audio": "episodes/ep014.mp3"
+    "audio": "episodes/ep014.wav"
   },
   {
     "id": 13,
@@ -85,7 +85,7 @@
     "tags": ["キャリア", "お金"],
     "duration": "5:35",
     "free": true,
-    "audio": "episodes/ep013.mp3"
+    "audio": "episodes/ep013.wav"
   },
   {
     "id": 12,
@@ -96,7 +96,7 @@
     "tags": ["行動経済学", "心理学"],
     "duration": "5:15",
     "free": false,
-    "audio": "episodes/ep012.mp3"
+    "audio": "episodes/ep012.wav"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@
     "tags": ["ビジネス", "経済"],
     "duration": "4:58",
     "free": true,
-    "audio": "episodes/ep011.mp3"
+    "audio": "episodes/ep011.wav"
   },
   {
     "id": 10,
@@ -118,7 +118,7 @@
     "tags": ["遺伝学", "生活"],
     "duration": "5:08",
     "free": true,
-    "audio": "episodes/ep010.mp3"
+    "audio": "episodes/ep010.wav"
   },
   {
     "id": 9,
@@ -129,7 +129,7 @@
     "tags": ["脳科学", "SNS"],
     "duration": "5:22",
     "free": true,
-    "audio": "episodes/ep009.mp3"
+    "audio": "episodes/ep009.wav"
   },
   {
     "id": 8,
@@ -140,7 +140,7 @@
     "tags": ["AI", "キャリア"],
     "duration": "5:45",
     "free": false,
-    "audio": "episodes/ep008.mp3"
+    "audio": "episodes/ep008.wav"
   },
   {
     "id": 7,
@@ -151,7 +151,7 @@
     "tags": ["お金", "不動産"],
     "duration": "5:33",
     "free": true,
-    "audio": "episodes/ep007.mp3"
+    "audio": "episodes/ep007.wav"
   },
   {
     "id": 6,
@@ -162,7 +162,7 @@
     "tags": ["脳科学", "健康"],
     "duration": "4:38",
     "free": true,
-    "audio": "episodes/ep006.mp3"
+    "audio": "episodes/ep006.wav"
   },
   {
     "id": 5,
@@ -173,7 +173,7 @@
     "tags": ["経済", "働き方"],
     "duration": "5:28",
     "free": true,
-    "audio": "episodes/ep005.mp3"
+    "audio": "episodes/ep005.wav"
   },
   {
     "id": 4,
@@ -184,7 +184,7 @@
     "tags": ["投資", "お金"],
     "duration": "5:42",
     "free": false,
-    "audio": "episodes/ep004.mp3"
+    "audio": "episodes/ep004.wav"
   },
   {
     "id": 3,
@@ -195,7 +195,7 @@
     "tags": ["心理学", "コミュニケーション"],
     "duration": "4:52",
     "free": true,
-    "audio": "episodes/ep003.mp3"
+    "audio": "episodes/ep003.wav"
   },
   {
     "id": 2,
@@ -206,7 +206,7 @@
     "tags": ["心理学", "マーケティング"],
     "duration": "4:45",
     "free": true,
-    "audio": "episodes/ep002.mp3"
+    "audio": "episodes/ep002.wav"
   },
   {
     "id": 1,
@@ -217,6 +217,6 @@
     "tags": ["脳科学", "生産性"],
     "duration": "5:15",
     "free": true,
-    "audio": "episodes/ep001.mp3"
+    "audio": "episodes/ep001.wav"
   }
 ]

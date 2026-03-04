@@ -345,37 +345,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.getElementById('signupForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    e.target.innerHTML = `
-      <div style="text-align:center;padding:24px 0">
-        <div style="font-size:24px;margin-bottom:8px">&#10003;</div>
-        <h3 style="font-size:17px;font-weight:600;margin-bottom:4px">登録完了</h3>
-        <p style="color:var(--text-secondary);font-size:13px">${email} に確認メールを送信しました。</p>
-      </div>`;
-    setTimeout(closeModal, 3000);
-  });
+  // Signup form submits to formsubmit.co — no JS override needed
 
 
   // ===== Request Form =====
-  const reqForm = document.getElementById('requestForm');
-  if (reqForm) {
-    reqForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const topic = document.getElementById('requestTopic').value;
-      const email = document.getElementById('requestEmail').value;
-      reqForm.innerHTML = `
-        <div style="text-align:center;padding:28px 0">
-          <div style="font-size:24px;margin-bottom:8px">&#10003;</div>
-          <h3 style="font-size:17px;font-weight:600;margin-bottom:4px">リクエスト受付完了</h3>
-          <p style="color:var(--text-secondary);font-size:13px;line-height:1.6">
-            「${topic.substring(0, 40)}${topic.length > 40 ? '...' : ''}」を受け付けました。<br>
-            完成次第 ${email} にお届けします。
-          </p>
-        </div>`;
-    });
-  }
+  // Form submits to formsubmit.co — no JS override needed
 
   document.querySelectorAll('.popular-tag').forEach(tag => {
     tag.addEventListener('click', () => {

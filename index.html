@@ -74,11 +74,10 @@
         </div>
         <h1 class="hero-title">
           <span class="hero-title-sub">AIが生み出す</span>
-          <span class="hero-title-main">5分間の<br>深い洞察</span>
+          <span class="hero-title-main">あなたの<br>わからないを<br>一瞬でポッドキャスト化</span>
         </h1>
         <p class="hero-desc">
-          Gemini Deep Thinkの圧倒的な分析力で、あなたが知りたいテーマを5分間のポッドキャストに凝縮。<br>
-          「これが知りたい」をリクエスト &mdash; あなた専用の深い洞察をお届け。
+          知りたいテーマを送るだけ。Gemini Deep Thinkが5分間のポッドキャストに凝縮してお届けします。
         </p>
         <div class="hero-actions">
           <a href="#episodes" class="btn btn-primary btn-lg">
@@ -272,15 +271,19 @@
       <div class="request-layout">
         <!-- Request Form -->
         <div class="request-form-card">
-          <form class="request-form" id="requestForm">
+          <form class="request-form" id="requestForm" action="https://formsubmit.co/2525nxrei@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="DeepCast AI 新規リクエスト">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_next" value="https://deepcast-ai.pages.dev/#request">
+            <input type="text" name="_honey" style="display:none">
             <div class="form-group">
               <label for="requestTopic">知りたいテーマ・質問 <span class="required">*</span></label>
-              <textarea id="requestTopic" rows="3" placeholder="例：「2026年に個人開発者が月100万円稼ぐための最新戦略を知りたい」「量子コンピュータは実際いつ実用化されるのか？根拠を交えて解説してほしい」" required></textarea>
+              <textarea id="requestTopic" name="topic" rows="3" placeholder="例：「なぜ日本の物価は急に上がったのか」「副業で月10万稼ぐ現実的な方法」" required></textarea>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label for="requestCategory">カテゴリ</label>
-                <select id="requestCategory">
+                <select id="requestCategory" name="category">
                   <option value="tech">テクノロジー</option>
                   <option value="business">ビジネス</option>
                   <option value="science">サイエンス</option>
@@ -290,7 +293,7 @@
               </div>
               <div class="form-group">
                 <label for="requestDepth">深掘り度</label>
-                <select id="requestDepth">
+                <select id="requestDepth" name="depth">
                   <option value="standard">スタンダード（5分）</option>
                   <option value="deep">ディープ（10分）</option>
                   <option value="expert">エキスパート（15分）</option>
@@ -299,11 +302,11 @@
             </div>
             <div class="form-group">
               <label for="requestDetail">補足・知りたいポイント（任意）</label>
-              <textarea id="requestDetail" rows="2" placeholder="特に知りたい角度や比較対象があれば"></textarea>
+              <textarea id="requestDetail" name="detail" rows="2" placeholder="特に知りたい角度や比較対象があれば"></textarea>
             </div>
             <div class="form-group">
               <label for="requestEmail">メールアドレス <span class="required">*</span></label>
-              <input type="email" id="requestEmail" placeholder="完成通知の送信先" required>
+              <input type="email" id="requestEmail" name="email" placeholder="完成通知の送信先" required>
             </div>
             <button type="submit" class="btn btn-primary btn-block btn-lg">
               リクエストを送信
@@ -509,44 +512,44 @@
     </div>
   </section>
 
-  <!-- ===== TESTIMONIALS ===== -->
+  <!-- ===== USE CASES ===== -->
   <section class="section testimonials">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">TESTIMONIALS</span>
-        <h2 class="section-title">ユーザーの声</h2>
+        <span class="section-tag">USE CASES</span>
+        <h2 class="section-title">こんな使い方ができます</h2>
       </div>
       <div class="testimonial-grid">
         <div class="testimonial-card">
-          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text">「"Rustの今後" をリクエストしたら、まさに自分が知りたかった深さで返ってきた。5分でこの密度は凄い。」</p>
+          <div class="testimonial-stars">&#128218;</div>
+          <p class="testimonial-text">「最近話題のニュースをサクッと理解したい」 &mdash; 通勤中の5分で、今知るべきトピックの本質がわかる。</p>
           <div class="testimonial-author">
-            <div class="author-avatar">T.S</div>
+            <div class="author-avatar">&#127911;</div>
             <div class="author-info">
-              <span class="author-name">田中 翔太</span>
-              <span class="author-role">ソフトウェアエンジニア</span>
+              <span class="author-name">通勤・移動中に</span>
+              <span class="author-role">ながら聴きで知識アップデート</span>
             </div>
           </div>
         </div>
         <div class="testimonial-card">
-          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text">「新人研修のテーマをリクエストして社内教育に活用中。毎月10本制作してもらい、研修コストが1/5に。」</p>
+          <div class="testimonial-stars">&#128161;</div>
+          <p class="testimonial-text">「気になるテーマを深掘りしたい」 &mdash; リクエストを送るだけで、あなた専用のポッドキャストを制作。</p>
           <div class="testimonial-author">
-            <div class="author-avatar">M.K</div>
+            <div class="author-avatar">&#9997;</div>
             <div class="author-info">
-              <span class="author-name">鈴木 美咲</span>
-              <span class="author-role">人事マネージャー</span>
+              <span class="author-name">リクエストで</span>
+              <span class="author-role">知りたいことをピンポイントで</span>
             </div>
           </div>
         </div>
         <div class="testimonial-card">
-          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text">「単発で1本試したら品質に驚いてBusinessプランに。今は毎週テーマをリクエストしてオウンドメディアに活用。」</p>
+          <div class="testimonial-stars">&#127970;</div>
+          <p class="testimonial-text">「社内研修や教育コンテンツを効率化したい」 &mdash; 法人プランで毎月テーマ指定のポッドキャストを量産。</p>
           <div class="testimonial-author">
-            <div class="author-avatar">K.Y</div>
+            <div class="author-avatar">&#128188;</div>
             <div class="author-info">
-              <span class="author-name">山田 健一</span>
-              <span class="author-role">マーケティング責任者</span>
+              <span class="author-name">法人利用で</span>
+              <span class="author-role">研修・教育コンテンツに</span>
             </div>
           </div>
         </div>
@@ -651,9 +654,6 @@
           </a>
           <p class="footer-desc">AIが生み出す、5分間の深い洞察。<br>あなたの知識を毎日アップデート。</p>
           <div class="footer-social">
-            <a href="#" class="social-link" aria-label="X (Twitter)">&#120143;</a>
-            <a href="#" class="social-link" aria-label="YouTube">&#9654;</a>
-            <a href="#" class="social-link" aria-label="Note">N</a>
           </div>
         </div>
         <div class="footer-links-group">
@@ -669,9 +669,7 @@
           <h4>サポート</h4>
           <ul>
             <li><a href="#faq">よくある質問</a></li>
-            <li><a href="#">お問い合わせ</a></li>
-            <li><a href="#">ヘルプセンター</a></li>
-            <li><a href="#">ステータスページ</a></li>
+            <li><a href="#request">お問い合わせ</a></li>
           </ul>
         </div>
         <div class="footer-links-group">
@@ -698,23 +696,18 @@
         <h3 class="modal-title" id="modalTitle">無料で始める</h3>
         <p class="modal-desc" id="modalDesc">メールアドレスで簡単登録</p>
       </div>
-      <form class="modal-form" id="signupForm">
+      <form class="modal-form" id="signupForm" action="https://formsubmit.co/2525nxrei@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="DeepCast AI 新規会員登録">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://deepcast-ai.pages.dev/">
+        <input type="text" name="_honey" style="display:none">
         <div class="form-group">
           <label for="email">メールアドレス</label>
-          <input type="email" id="email" placeholder="you@example.com" required>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required>
         </div>
-        <div class="form-group">
-          <label for="password">パスワード</label>
-          <input type="password" id="password" placeholder="8文字以上" required minlength="8">
-        </div>
-        <button type="submit" class="btn btn-primary btn-block btn-lg">登録する</button>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">無料で登録する</button>
         <p class="form-note">登録することで<a href="terms.html">利用規約</a>と<a href="privacy.html">プライバシーポリシー</a>に同意します。</p>
       </form>
-      <div class="modal-divider"><span>または</span></div>
-      <button class="btn btn-social btn-block">
-        <span class="social-icon">G</span>
-        Googleで登録
-      </button>
     </div>
   </div>
 
