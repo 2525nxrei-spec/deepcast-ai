@@ -1,0 +1,222 @@
+[
+  {
+    "id": 20,
+    "title": "人間の体は\"サバンナ仕様\"のまま — 現代社会とのミスマッチ病",
+    "description": "進化医学の視点から、肥満・不眠・慢性ストレスの根本原因を解き明かす。なぜ人間の体は現代に適応できないのか。",
+    "date": "2026.03.04",
+    "category": "science",
+    "tags": ["進化医学", "サイエンス"],
+    "duration": "5:24",
+    "free": true,
+    "audio": "episodes/ep020.mp3"
+  },
+  {
+    "id": 19,
+    "title": "フェルミのパラドックスの最も恐ろしい解 — \"大フィルター\"は未来にあるのか",
+    "description": "宇宙に知的生命体がいるはずなのに見つからない。その最も恐ろしい説明とは何か。暗い森理論と文明の自滅確率。",
+    "date": "2026.03.04",
+    "category": "science",
+    "tags": ["宇宙", "サイエンス"],
+    "duration": "5:45",
+    "free": true,
+    "audio": "episodes/ep019.mp3"
+  },
+  {
+    "id": 18,
+    "title": "トロッコ問題をAIに解かせたら、文化によって答えが違った",
+    "description": "MITのモラル・マシン実験が暴いた衝撃の結果。功利主義vs義務論、そして文化が倫理を決めるという不都合な真実。",
+    "date": "2026.03.03",
+    "category": "society",
+    "tags": ["AI倫理", "哲学"],
+    "duration": "5:18",
+    "free": false,
+    "audio": "episodes/ep018.mp3"
+  },
+  {
+    "id": 17,
+    "title": "歴史上、すべてのバブルは\"今回は違う\"と言われていた",
+    "description": "チューリップ狂、南海泡沫事件、ドットコムバブル、暗号通貨。400年分のバブルに共通する人間心理のパターン。",
+    "date": "2026.03.03",
+    "category": "business",
+    "tags": ["経済史", "心理学"],
+    "duration": "5:33",
+    "free": true,
+    "audio": "episodes/ep017.mp3"
+  },
+  {
+    "id": 16,
+    "title": "なぜ\"あと5分だけ\"のつもりがNetflixで3時間溶けるのか",
+    "description": "可変報酬スケジュール、側坐核、ダークパターンUI。脳科学とUXデザインが仕掛ける時間泥棒のメカニズム。",
+    "date": "2026.03.03",
+    "category": "science",
+    "tags": ["脳科学", "テクノロジー"],
+    "duration": "4:52",
+    "free": true,
+    "audio": "episodes/ep016.mp3"
+  },
+  {
+    "id": 15,
+    "title": "量子コンピュータが完成した瞬間、暗号通貨は全滅するのか",
+    "description": "量子超越性とRSA暗号の破綻。ポスト量子暗号は間に合うのか。ビットコインの存亡をかけた技術的タイムリミット。",
+    "date": "2026.03.02",
+    "category": "tech",
+    "tags": ["量子コンピュータ", "暗号通貨"],
+    "duration": "5:41",
+    "free": false,
+    "audio": "episodes/ep015.mp3"
+  },
+  {
+    "id": 14,
+    "title": "海底ケーブルを切断すれば国が滅ぶ — インターネットの地政学的脆弱性",
+    "description": "世界のデータの99%が海底ケーブルを通る。その脆弱性を突くサイバー戦争と海洋安全保障の最前線。",
+    "date": "2026.03.02",
+    "category": "tech",
+    "tags": ["地政学", "テクノロジー"],
+    "duration": "5:09",
+    "free": true,
+    "audio": "episodes/ep014.mp3"
+  },
+  {
+    "id": 13,
+    "title": "ビットコインは\"デジタルゴールド\"か\"チューリップバブル\"か — 両方正しい理由",
+    "description": "貨幣の歴史、ネットワーク効果、集団心理学。3つの視点からビットコインの本質的価値を検証する。",
+    "date": "2026.03.02",
+    "category": "business",
+    "tags": ["暗号通貨", "経済学"],
+    "duration": "5:27",
+    "free": true,
+    "audio": "episodes/ep013.mp3"
+  },
+  {
+    "id": 12,
+    "title": "なぜ人は\"確実に損する\"とわかっている宝くじを買い続けるのか",
+    "description": "プロスペクト理論、ドーパミン経済学、貧困の心理学。人間の非合理的な行動の裏にある進化的メカニズム。",
+    "date": "2026.03.01",
+    "category": "business",
+    "tags": ["行動経済学", "心理学"],
+    "duration": "5:15",
+    "free": false,
+    "audio": "episodes/ep012.mp3"
+  },
+  {
+    "id": 11,
+    "title": "AIが裁判官になったら冤罪は増えるのか減るのか",
+    "description": "司法アルゴリズムのバイアスと、人間の裁判官のバイアスを比較。データが示す意外な結論。",
+    "date": "2026.03.01",
+    "category": "society",
+    "tags": ["AI", "法律"],
+    "duration": "5:38",
+    "free": true,
+    "audio": "episodes/ep011.mp3"
+  },
+  {
+    "id": 10,
+    "title": "AI、遺伝子編集、宇宙進出 — 21世紀は人類史上最も危険でエキサイティングな世紀",
+    "description": "3つの革命的技術が同時に来る21世紀。実存リスクと技術的特異点、文明のボトルネックを総括する。",
+    "date": "2026.03.01",
+    "category": "tech",
+    "tags": ["未来予測", "テクノロジー"],
+    "duration": "6:02",
+    "free": true,
+    "audio": "episodes/ep010.mp3"
+  },
+  {
+    "id": 9,
+    "title": "なぜ陰謀論を信じる人は\"頭が悪い\"わけではないのか",
+    "description": "パターン認識過剰、比例バイアス、認知的閉鎖欲求。陰謀論にハマる脳のメカニズムは実は高度な認知機能の暴走だった。",
+    "date": "2026.02.28",
+    "category": "society",
+    "tags": ["社会心理学", "認知科学"],
+    "duration": "5:22",
+    "free": true,
+    "audio": "episodes/ep009.mp3"
+  },
+  {
+    "id": 8,
+    "title": "AIに\"意識\"があるかどうかを証明することは、原理的に不可能である",
+    "description": "哲学的ゾンビ、中国語の部屋、統合情報理論。AI意識論争の核心にある根本的な認識論の壁。",
+    "date": "2026.02.28",
+    "category": "tech",
+    "tags": ["AI", "哲学"],
+    "duration": "5:48",
+    "free": false,
+    "audio": "episodes/ep008.mp3"
+  },
+  {
+    "id": 7,
+    "title": "\"印刷機\"と\"AI\"の類似性 — グーテンベルクが引き起こした500年の混乱",
+    "description": "印刷機は宗教改革と戦争を引き起こした。AIは同じパターンを辿るのか。情報革命の歴史から未来を読む。",
+    "date": "2026.02.27",
+    "category": "society",
+    "tags": ["歴史", "AI"],
+    "duration": "5:35",
+    "free": true,
+    "audio": "episodes/ep007.mp3"
+  },
+  {
+    "id": 6,
+    "title": "ローマ帝国の崩壊とアメリカの現在が不気味に一致している件",
+    "description": "通貨堕落、エリートの過剰生産、帝国衰退のパターン。2000年前の歴史が現代アメリカに警告すること。",
+    "date": "2026.02.27",
+    "category": "society",
+    "tags": ["歴史", "地政学"],
+    "duration": "5:56",
+    "free": true,
+    "audio": "episodes/ep006.mp3"
+  },
+  {
+    "id": 5,
+    "title": "スマホを見た瞬間に集中力が死ぬ科学的メカニズム — 回復に23分かかる理由",
+    "description": "注意の神経科学とコンテキストスイッチングの研究が示す衝撃のデータ。デジタルミニマリズムの科学的根拠。",
+    "date": "2026.02.26",
+    "category": "science",
+    "tags": ["脳科学", "生産性"],
+    "duration": "4:58",
+    "free": true,
+    "audio": "episodes/ep005.mp3"
+  },
+  {
+    "id": 4,
+    "title": "半導体チップ1枚が核兵器より強い時代 — TSMCをめぐる第三次世界大戦のシナリオ",
+    "description": "台湾海峡の緊張と半導体サプライチェーン。TSMCが世界の運命を握る理由と、それが引き起こす地政学リスク。",
+    "date": "2026.02.26",
+    "category": "tech",
+    "tags": ["半導体", "地政学"],
+    "duration": "5:44",
+    "free": false,
+    "audio": "episodes/ep004.mp3"
+  },
+  {
+    "id": 3,
+    "title": "なぜ独裁国家ほどAI開発に積極的なのか",
+    "description": "監視技術、国家統治、民主主義の構造的弱点。AIが権威主義体制にとって最強のツールになる理由。",
+    "date": "2026.02.25",
+    "category": "society",
+    "tags": ["AI", "政治"],
+    "duration": "5:19",
+    "free": true,
+    "audio": "episodes/ep003.mp3"
+  },
+  {
+    "id": 2,
+    "title": "\"AIに仕事を奪われる\"は嘘 — 本当に消えるのは\"仕事\"ではなく\"中間層\"",
+    "description": "技術的失業論の200年の歴史と所得格差の構造。ベーシックインカムは解決策になるのか。",
+    "date": "2026.02.25",
+    "category": "business",
+    "tags": ["AI", "経済学"],
+    "duration": "5:31",
+    "free": true,
+    "audio": "episodes/ep002.mp3"
+  },
+  {
+    "id": 1,
+    "title": "AIが\"平均的な人間\"を超えた世界で、\"普通に生きる\"とは何か",
+    "description": "AGI時代の労働、アイデンティティ、生存戦略を哲学と経済学の交差点から読む。第1回にふさわしい根源的テーマ。",
+    "date": "2026.02.24",
+    "category": "tech",
+    "tags": ["AI", "哲学"],
+    "duration": "6:15",
+    "free": true,
+    "audio": "episodes/ep001.mp3"
+  }
+]
