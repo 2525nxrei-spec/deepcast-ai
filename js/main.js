@@ -345,11 +345,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Signup form submits to formsubmit.co — no JS override needed
+  // Signup form — Ajax submit
+  document.getElementById('signupForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const emailVal = document.getElementById('email').value;
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.textContent = '登録中...';
+    btn.disabled = true;
+    fetch('https://formsubmit.co/ajax/2525nxrei@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email: emailVal, _subject: 'DeepCast AI 新規会員登録', _captcha: 'false' })
+    })
+    .then(r => r.json())
+    .then(() => {
+      e.target.innerHTML = `
+        <div style="text-align:center;padding:24px 0">
+          <div style="font-size:24px;margin-bottom:8px">&#10003;</div>
+          <h3 style="font-size:17px;font-weight:600;margin-bottom:4px">登録完了</h3>
+          <p style="color:var(--text-secondary);font-size:13px">${emailVal} で登録しました。</p>
+        </div>`;
+      setTimeout(closeModal, 3000);
+    })
+    .catch(() => {
+      btn.textContent = '登録に失敗しました';
+      setTimeout(() => { btn.textContent = '無料で登録する'; btn.disabled = false; }, 2000);
+    });
+  });
 
 
   // ===== Request Form =====
-  // Form submits to formsubmit.co — no JS override needed
+  const reqForm = document.getElementById('requestForm');
+  if (reqForm) {
+    reqForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const data = new FormData(reqForm);
+      const body = {
+        topic: data.get('topic'),
+        category: data.get('category'),
+        depth: data.get('depth'),
+        detail: data.get('detail'),
+        email: data.get('email'),
+        _subject: 'DeepCast AI 新規リクエスト',
+        _captcha: 'false'
+      };
+      const btn = reqForm.querySelector('button[type="submit"]');
+      const origText = btn.textContent;
+      btn.textContent = '送信中...';
+      btn.disabled = true;
+      fetch('https://formsubmit.co/ajax/2525nxrei@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      .then(r => r.json())
+      .then(() => {
+        btn.textContent = '送信完了!';
+        setTimeout(() => {
+          reqForm.reset();
+          btn.textContent = origText;
+          btn.disabled = false;
+        }, 2000);
+      })
+      .catch(() => {
+        btn.textContent = '送信に失敗しました';
+        setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000);
+      });
+    });
+  }
 
   document.querySelectorAll('.popular-tag').forEach(tag => {
     tag.addEventListener('click', () => {
