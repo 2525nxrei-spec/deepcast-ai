@@ -400,12 +400,14 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(r => r.json())
       .then(() => {
-        btn.textContent = '送信完了!';
+        btn.textContent = '受付完了!';
+        btn.style.background = '#3a8a44';
         setTimeout(() => {
           reqForm.reset();
           btn.textContent = origText;
+          btn.style.background = '';
           btn.disabled = false;
-        }, 2000);
+        }, 3000);
       })
       .catch(() => {
         btn.textContent = '送信に失敗しました';
