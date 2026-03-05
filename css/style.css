@@ -195,14 +195,19 @@ input, textarea, select { font: inherit; }
 }
 .hero-content { display: flex; flex-direction: column; align-items: center; }
 .hero-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 13px; color: var(--text-muted); margin-bottom: 28px;
-  letter-spacing: 0.03em;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 14px; color: var(--text-secondary); margin-bottom: 28px;
+  letter-spacing: 0.03em; font-weight: 500;
+  padding: 6px 16px;
+  background: rgba(58, 138, 68, 0.06);
+  border: 1px solid rgba(58, 138, 68, 0.15);
+  border-radius: var(--radius-full);
 }
 .badge-dot {
-  width: 5px; height: 5px; border-radius: 50%;
+  width: 8px; height: 8px; border-radius: 50%;
   background: var(--green);
-  animation: dotPulse 3s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(58, 138, 68, 0.5);
+  animation: dotPulse 2s ease-in-out infinite;
 }
 @keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 .hero-title { margin-bottom: 20px; }
