@@ -25,6 +25,30 @@
   </style>
 </head>
 <body>
+  <!-- NAVIGATION -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">&#9678;</span>
+        <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html#episodes">エピソード</a></li>
+        <li><a href="index.html#request">リクエスト</a></li>
+        <li><a href="index.html#services">サービス</a></li>
+        <li><a href="index.html#pricing">料金プラン</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="index.html#pricing" class="btn btn-outline btn-sm">無料で始める</a>
+        <a href="index.html#pricing" class="btn btn-primary btn-sm">Pro登録</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
   <div class="legal-page">
     <a href="index.html" class="legal-back">&larr; トップに戻る</a>
     <h1>著作権について</h1>
@@ -103,5 +127,59 @@
     <h2>7. 免責事項</h2>
     <p>AI生成コンテンツの性質上、意図せず既存の著作物と類似する表現が含まれる可能性があります。そのような事例を発見された場合は、速やかにご連絡いただけますようお願いいたします。確認のうえ、適切に対応いたします。</p>
   </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-icon">&#9678;</span>
+            <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+          </a>
+          <p class="footer-desc">AIが生み出す、5分間の深い洞察。<br>あなたの知識を毎日アップデート。</p>
+        </div>
+        <div class="footer-links-group">
+          <h4>サービス</h4>
+          <ul>
+            <li><a href="index.html#episodes">エピソード一覧</a></li>
+            <li><a href="index.html#request">トピックリクエスト</a></li>
+            <li><a href="index.html#services">サービス紹介</a></li>
+            <li><a href="index.html#pricing">料金プラン</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>サポート</h4>
+          <ul>
+            <li><a href="index.html#faq">よくある質問</a></li>
+            <li><a href="index.html#request">お問い合わせ</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>法的情報</h4>
+          <ul>
+            <li><a href="terms.html">利用規約</a></li>
+            <li><a href="privacy.html">プライバシーポリシー</a></li>
+            <li><a href="tokushoho.html">特定商取引法に基づく表示</a></li>
+            <li><a href="copyright.html">著作権について</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    if (hamburger && navLinks) {
+      hamburger.addEventListener('click', () => navLinks.classList.toggle('active'));
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => navLinks.classList.remove('active'));
+      });
+    }
+  </script>
 </body>
 </html>

@@ -424,10 +424,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
+  // ===== SNS Coming Soon =====
+  document.querySelectorAll('.sns-coming-soon').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const toast = document.createElement('div');
+      toast.textContent = 'SNSアカウントは準備中です';
+      toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s';
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => toast.style.opacity = '1');
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+    });
+  });
+
   // ===== Smooth Scroll =====
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', function(e) {
-      const t = document.querySelector(this.getAttribute('href'));
+      const href = this.getAttribute('href');
+      if (href === '#' || href === '') return;
+      const t = document.querySelector(href);
       if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
     });
   });
