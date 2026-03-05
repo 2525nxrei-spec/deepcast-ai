@@ -1,7 +1,25 @@
 // ===== Service Worker Registration (PWA) =====
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js').catch(() => {});
 }
+
+// ===== iOS Safari audio unlock =====
+// iOS requires a user gesture to unlock audio playback.
+// We play a tiny silent buffer on first touch to unlock the audio context.
+(function() {
+  let unlocked = false;
+  function unlock() {
+    if (unlocked) return;
+    unlocked = true;
+    const a = new Audio();
+    a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+    a.play().then(() => a.pause()).catch(() => {});
+    document.removeEventListener('touchstart', unlock, true);
+    document.removeEventListener('click', unlock, true);
+  }
+  document.addEventListener('touchstart', unlock, true);
+  document.addEventListener('click', unlock, true);
+})();
 
 // ===== DeepCast AI =====
 document.addEventListener('DOMContentLoaded', () => {

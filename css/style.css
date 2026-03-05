@@ -713,20 +713,18 @@ body.player-active .footer { padding-bottom: 56px; }
   .service-name { font-size: 17px; }
   .service-desc { font-size: 12px; }
   .episode-list {
-    display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory;
+    display: flex; flex-direction: column;
     gap: 10px; padding-bottom: 8px;
-    -webkit-overflow-scrolling: touch;
   }
-  .episode-list::-webkit-scrollbar { display: none; }
   .episode-card {
     display: flex; flex-direction: column; gap: 14px;
-    min-width: 260px; max-width: 300px; flex-shrink: 0;
-    scroll-snap-align: start;
+    min-width: 0; max-width: none; flex-shrink: 1;
     padding: 20px;
   }
   .episode-title { font-size: 16px; }
   .episode-desc { font-size: 12px; }
   .episode-embed { width: 100%; }
+  .play-btn { width: 48px; height: 48px; font-size: 16px; -webkit-tap-highlight-color: transparent; }
   .request-layout { grid-template-columns: 1fr; }
   .steps-grid { flex-direction: column; align-items: center; }
   .step-connector { width: 1px; height: 20px; margin: 0; }
@@ -788,6 +786,17 @@ body.player-active .footer { padding-bottom: 56px; }
   .cta-card { padding: 48px 22px; }
   .cta-trust { flex-direction: column; gap: 4px; }
   .form-row { grid-template-columns: 1fr; }
+  /* Mini player mobile */
+  .mini-player { padding: 0 12px; }
+  .mini-player-inner { gap: 8px; height: 60px; }
+  .mini-play-btn { width: 40px; height: 40px; font-size: 15px; }
+  .mini-title { font-size: 12px; }
+  .mini-progress-bar { height: 4px; }
+  .mini-close-btn { width: 32px; height: 32px; font-size: 18px; }
+  body.player-active .footer { padding-bottom: 60px; }
+  /* Episode player mobile */
+  .episode-player { gap: 10px; }
+  .progress-bar { height: 4px; }
 }
 @media (max-width: 480px) {
   .hero::before {

@@ -276,6 +276,22 @@
   </div>
 
   <script>
+    // iOS Safari audio unlock
+    (function() {
+      let unlocked = false;
+      function unlock() {
+        if (unlocked) return;
+        unlocked = true;
+        const a = new Audio();
+        a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+        a.play().then(() => a.pause()).catch(() => {});
+        document.removeEventListener('touchstart', unlock, true);
+        document.removeEventListener('click', unlock, true);
+      }
+      document.addEventListener('touchstart', unlock, true);
+      document.addEventListener('click', unlock, true);
+    })();
+
     // Auth check
     const member = JSON.parse(localStorage.getItem('deepcast_member') || 'null');
     const isPaid = member && (member.plan === 'pro' || member.plan === 'business');
