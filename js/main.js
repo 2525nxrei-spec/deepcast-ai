@@ -259,13 +259,38 @@ document.addEventListener('DOMContentLoaded', () => {
     initReveal();
   }
 
+  // Daily rotation: pick 3 free + 2 pro based on today's date
+  function getDailySeed() {
+    const now = new Date();
+    return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  }
+
+  function seededShuffle(arr, seed) {
+    const copy = arr.slice();
+    let s = seed;
+    for (let i = copy.length - 1; i > 0; i--) {
+      s = (s * 9301 + 49297) % 233280;
+      const j = Math.floor((s / 233280) * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function pickDailyEpisodes(episodes) {
+    const seed = getDailySeed();
+    const freeEps = episodes.filter(ep => ep.free);
+    const proEps = episodes.filter(ep => !ep.free);
+    const shuffledFree = seededShuffle(freeEps, seed);
+    const shuffledPro = seededShuffle(proEps, seed + 1);
+    return [...shuffledFree.slice(0, 3), ...shuffledPro.slice(0, 2)];
+  }
+
   fetch('episodes/episodes.json')
     .then(r => r.json())
-    .then(loadEpisodes)
+    .then(episodes => loadEpisodes(pickDailyEpisodes(episodes)))
     .catch(() => {
-      // Fallback for file:// protocol
       const fallback = [
-        { id: 3, title: "GPT-5 vs Gemini 2.5：次世代AIの覇権争い", description: "OpenAIとGoogleの最新モデル比較。ベンチマーク、実用性、そして開発者が本当に選ぶべきモデルとは。", date: "2026.03.02", category: "tech", tags: ["AI", "テクノロジー"], duration: "5:12", free: true, audio: "" },
+        { id: 3, title: "GPT-5 vs Gemini 2.5：次世代AIの覇権争い", description: "OpenAIとGoogleの最新モデル比較。", date: "2026.03.02", category: "tech", tags: ["AI", "テクノロジー"], duration: "5:12", free: true, audio: "" },
         { id: 2, title: "スタートアップ資金調達の新常識 2026", description: "VC市場の変化、AIスタートアップへの投資トレンド。", date: "2026.03.01", category: "business", tags: ["ビジネス"], duration: "4:58", free: true, audio: "" },
         { id: 1, title: "量子コンピュータの実用化が見えてきた", description: "IBMとGoogleの量子超越性競争。実用化のユースケース。", date: "2026.02.28", category: "science", tags: ["サイエンス"], duration: "5:31", free: false, audio: "" }
       ];
