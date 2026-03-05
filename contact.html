@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ - DeepCast AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .legal-page { max-width: 720px; margin: 0 auto; padding: 120px 24px 80px; }
+    .legal-page h1 { font-family: var(--serif); font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .legal-updated { font-size: 13px; color: var(--text-muted); margin-bottom: 48px; }
+    .legal-page h2 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin: 40px 0 12px; }
+    .legal-page p, .legal-page li { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+    .legal-back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+    .legal-back:hover { color: var(--text); }
+    .contact-form { margin-top: 32px; }
+    .form-group { margin-bottom: 24px; }
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-family: var(--sans);
+      color: var(--text);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+    .form-group textarea { resize: vertical; min-height: 160px; }
+    .form-group select { cursor: pointer; }
+    .form-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 40px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .form-submit:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">&#9678;</span>
+        <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html#episodes">エピソード</a></li>
+        <li><a href="index.html#request">リクエスト</a></li>
+        <li><a href="index.html#services">サービス</a></li>
+        <li><a href="index.html#pricing">料金プラン</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="index.html#pricing" class="btn btn-outline btn-sm">無料で始める</a>
+        <a href="index.html#pricing" class="btn btn-primary btn-sm">Pro登録</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="legal-page">
+    <a href="index.html" class="legal-back">&larr; トップに戻る</a>
+    <h1>お問い合わせ</h1>
+    <p class="legal-updated">お気軽にご連絡ください</p>
+
+    <p>DeepCast AI に関するご質問・ご要望・不具合のご報告など、下記フォームよりお問い合わせください。内容を確認のうえ、通常2営業日以内にご返信いたします。</p>
+
+    <form class="contact-form" action="https://formspree.io/f/2525nxrei@gmail.com" method="POST">
+      <div class="form-group">
+        <label for="name">お名前</label>
+        <input type="text" id="name" name="name" required placeholder="山田 太郎">
+      </div>
+      <div class="form-group">
+        <label for="email">メールアドレス</label>
+        <input type="email" id="email" name="email" required placeholder="example@email.com">
+      </div>
+      <div class="form-group">
+        <label for="category">お問い合わせカテゴリ</label>
+        <select id="category" name="category" required>
+          <option value="" disabled selected>選択してください</option>
+          <option value="ご質問">ご質問</option>
+          <option value="ご要望">ご要望</option>
+          <option value="不具合報告">不具合報告</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="message">メッセージ</label>
+        <textarea id="message" name="message" required placeholder="お問い合わせ内容をご記入ください"></textarea>
+      </div>
+      <button type="submit" class="form-submit">送信する</button>
+    </form>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-icon">&#9678;</span>
+            <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+          </a>
+          <p class="footer-desc">AIが生み出す、5分間の深い洞察。<br>あなたの知識を毎日アップデート。</p>
+        </div>
+        <div class="footer-links-group">
+          <h4>サービス</h4>
+          <ul>
+            <li><a href="index.html#episodes">エピソード一覧</a></li>
+            <li><a href="index.html#request">トピックリクエスト</a></li>
+            <li><a href="index.html#services">サービス紹介</a></li>
+            <li><a href="index.html#pricing">料金プラン</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>サポート</h4>
+          <ul>
+            <li><a href="index.html#faq">よくある質問</a></li>
+            <li><a href="contact.html">お問い合わせ</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>法的情報</h4>
+          <ul>
+            <li><a href="terms.html">利用規約</a></li>
+            <li><a href="privacy.html">プライバシーポリシー</a></li>
+            <li><a href="tokushoho.html">特定商取引法に基づく表示</a></li>
+            <li><a href="copyright.html">著作権について</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    if (hamburger && navLinks) {
+      hamburger.addEventListener('click', () => navLinks.classList.toggle('active'));
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => navLinks.classList.remove('active'));
+      });
+    }
+  </script>
+</body>
+</html>
