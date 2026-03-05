@@ -104,11 +104,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const audioEl = new Audio();
   audioEl.preload = 'metadata';
   let currentPlayBtn = null;
+  let currentTitle = '';
+
+  // Mini player elements (may not exist on legal pages)
+  const miniPlayer = document.getElementById('miniPlayer');
+  const miniPlayBtn = document.getElementById('miniPlayBtn');
+  const miniTitle = document.getElementById('miniTitle');
+  const miniProgressFill = document.getElementById('miniProgressFill');
+  const miniProgressBar = document.getElementById('miniProgressBar');
+  const miniTime = document.getElementById('miniTime');
+  const miniCloseBtn = document.getElementById('miniCloseBtn');
 
   function formatTime(sec) {
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  function showMiniPlayer() {
+    if (miniPlayer) {
+      miniPlayer.classList.add('active');
+      document.body.classList.add('player-active');
+    }
+  }
+  function hideMiniPlayer() {
+    if (miniPlayer) {
+      miniPlayer.classList.remove('active');
+      document.body.classList.remove('player-active');
+    }
+  }
+
+  function updatePlayIcons(playing) {
+    const icon = playing ? '&#10074;&#10074;' : '&#9654;';
+    if (currentPlayBtn) currentPlayBtn.innerHTML = '<span class="play-icon">' + icon + '</span>';
+    if (miniPlayBtn) miniPlayBtn.innerHTML = '<span class="play-icon">' + icon + '</span>';
   }
 
   function stopCurrent() {
@@ -122,74 +151,127 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     audioEl.pause();
     audioEl.currentTime = 0;
+    hideMiniPlayer();
   }
 
-  // Media Session API — enables lock-screen controls & background playback
+  // Media Session API — lock-screen & background controls
   function setMediaSession(title) {
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: title,
-        artist: 'DeepCast AI',
-        album: 'AIポッドキャスト',
-      });
-      navigator.mediaSession.setActionHandler('play', () => audioEl.play());
-      navigator.mediaSession.setActionHandler('pause', () => audioEl.pause());
-      navigator.mediaSession.setActionHandler('stop', stopCurrent);
-    }
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: 'DeepCast AI',
+      album: 'AIポッドキャスト',
+    });
+    navigator.mediaSession.setActionHandler('play', () => { audioEl.play(); updatePlayIcons(true); });
+    navigator.mediaSession.setActionHandler('pause', () => { audioEl.pause(); updatePlayIcons(false); });
+    navigator.mediaSession.setActionHandler('stop', stopCurrent);
+    navigator.mediaSession.setActionHandler('seekbackward', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
+    navigator.mediaSession.setActionHandler('seekforward', () => { audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 10); });
+    navigator.mediaSession.setActionHandler('seekto', (d) => { if (d.seekTime != null) audioEl.currentTime = d.seekTime; });
   }
+
+  // Mini player controls
+  if (miniPlayBtn) {
+    miniPlayBtn.addEventListener('click', () => {
+      if (!audioEl.src) return;
+      if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
+      else { audioEl.pause(); updatePlayIcons(false); }
+    });
+  }
+  if (miniCloseBtn) {
+    miniCloseBtn.addEventListener('click', stopCurrent);
+  }
+  if (miniProgressBar) {
+    miniProgressBar.addEventListener('click', (e) => {
+      if (!audioEl.duration) return;
+      const rect = miniProgressBar.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      audioEl.currentTime = ratio * audioEl.duration;
+    });
+  }
+
+  // Global time update — syncs card player + mini player
+  audioEl.addEventListener('timeupdate', () => {
+    if (!audioEl.duration) return;
+    const pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
+    const timeStr = formatTime(audioEl.currentTime) + ' / ' + formatTime(audioEl.duration);
+
+    if (miniProgressFill) miniProgressFill.style.width = pct;
+    if (miniTime) miniTime.textContent = timeStr;
+
+    // Update card progress too
+    if (currentPlayBtn) {
+      const card = currentPlayBtn.closest('.episode-card');
+      const fill = card.querySelector('.progress-fill');
+      const timeEl = card.querySelector('.progress-time');
+      if (fill) fill.style.width = pct;
+      if (timeEl) timeEl.textContent = timeStr;
+    }
+
+    // Update Media Session position
+    if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: audioEl.duration,
+          playbackRate: audioEl.playbackRate,
+          position: audioEl.currentTime
+        });
+      } catch(e) {}
+    }
+  });
+
+  audioEl.addEventListener('ended', () => {
+    if (currentPlayBtn) {
+      const card = currentPlayBtn.closest('.episode-card');
+      currentPlayBtn.innerHTML = '<span class="play-icon">&#9654;</span>';
+      currentPlayBtn.classList.remove('playing');
+      const fill = card.querySelector('.progress-fill');
+      if (fill) fill.style.width = '0%';
+      const timeEl = card.querySelector('.progress-time');
+      const dur = card.querySelector('.episode-duration');
+      if (timeEl && dur) timeEl.textContent = '0:00 / ' + dur.textContent;
+      currentPlayBtn = null;
+    }
+    updatePlayIcons(false);
+    hideMiniPlayer();
+  });
 
   function bindPlayer(btn, audioSrc, title) {
     btn.addEventListener('click', () => {
       const card = btn.closest('.episode-card');
-      const fill = card.querySelector('.progress-fill');
       const timeEl = card.querySelector('.progress-time');
-      const durationText = card.querySelector('.episode-duration').textContent;
 
-      // If this button is already playing → pause
+      // If this button is already playing → toggle pause
       if (currentPlayBtn === btn) {
-        if (audioEl.paused) {
-          audioEl.play();
-          btn.innerHTML = '<span class="play-icon">&#10074;&#10074;</span>';
-        } else {
-          audioEl.pause();
-          btn.innerHTML = '<span class="play-icon">&#9654;</span>';
-        }
+        if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
+        else { audioEl.pause(); updatePlayIcons(false); }
         return;
       }
 
       // Stop any current playback
       stopCurrent();
 
-      // Check if audio file exists (not placeholder)
       if (!audioSrc) {
-        timeEl.textContent = '音声ファイル未設定';
+        if (timeEl) timeEl.textContent = '音声ファイル未設定';
         return;
       }
 
       currentPlayBtn = btn;
+      currentTitle = title;
       audioEl.src = audioSrc;
       audioEl.play().catch(() => {
-        timeEl.textContent = '音声ファイルを episodes/ に配置してください';
+        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
         currentPlayBtn = null;
+        return;
       });
 
-      btn.innerHTML = '<span class="play-icon">&#10074;&#10074;</span>';
       btn.classList.add('playing');
+      updatePlayIcons(true);
       setMediaSession(title);
 
-      audioEl.ontimeupdate = () => {
-        if (audioEl.duration) {
-          fill.style.width = (audioEl.currentTime / audioEl.duration * 100) + '%';
-          timeEl.textContent = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration)}`;
-        }
-      };
-      audioEl.onended = () => {
-        btn.innerHTML = '<span class="play-icon">&#9654;</span>';
-        btn.classList.remove('playing');
-        fill.style.width = '0%';
-        timeEl.textContent = `0:00 / ${durationText}`;
-        currentPlayBtn = null;
-      };
+      // Show mini player
+      if (miniTitle) miniTitle.textContent = title;
+      showMiniPlayer();
     });
   }
 
