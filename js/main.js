@@ -364,8 +364,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <div style="font-size:24px;margin-bottom:8px">&#10003;</div>
           <h3 style="font-size:17px;font-weight:600;margin-bottom:4px">登録完了</h3>
           <p style="color:var(--text-secondary);font-size:13px">${emailVal} で登録しました。</p>
+          <p style="font-size:13px;margin-top:12px">全エピソードページへ移動します...</p>
         </div>`;
-      setTimeout(closeModal, 3000);
+      setTimeout(() => { window.location.href = 'all-episodes.html'; }, 2000);
     })
     .catch(() => {
       btn.textContent = '登録に失敗しました';
