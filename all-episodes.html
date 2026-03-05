@@ -73,6 +73,70 @@
       padding: 48px 0;
       display: none;
     }
+    /* Auth gate */
+    .auth-gate {
+      position: fixed; inset: 0; z-index: 3000;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .auth-gate-card {
+      text-align: center;
+      max-width: 400px;
+      padding: 48px 32px;
+    }
+    .auth-gate-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .auth-gate-card h2 {
+      font-family: var(--serif);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .auth-gate-card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .auth-gate-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    /* Member bar */
+    .member-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+    .member-info { color: var(--text-secondary); }
+    .member-plan {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .member-plan.pro { background: rgba(58,138,68,0.1); color: var(--green); }
+    .member-plan.business { background: rgba(26,26,26,0.08); color: var(--text); }
+    .logout-btn {
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .logout-btn:hover { color: var(--text); }
   </style>
 </head>
 <body>
@@ -100,15 +164,32 @@
     </div>
   </nav>
 
+  <!-- AUTH GATE (shown if not paid member) -->
+  <div class="auth-gate" id="authGate">
+    <div class="auth-gate-card">
+      <div class="auth-gate-icon">&#128274;</div>
+      <h2>有料会員限定コンテンツ</h2>
+      <p>全エピソードの視聴にはPro以上のプランが必要です。<br>7日間無料トライアルで今すぐお試しください。</p>
+      <div class="auth-gate-actions">
+        <a href="index.html#pricing" class="btn btn-primary btn-lg">料金プランを見る</a>
+        <a href="index.html" class="btn btn-ghost">トップに戻る</a>
+      </div>
+    </div>
+  </div>
+
   <!-- PAGE HERO -->
-  <div class="page-hero">
+  <div class="page-hero" id="pageContent" style="display:none">
     <h1>全エピソード</h1>
     <p>DeepCast AIのすべてのエピソードをお楽しみください。</p>
   </div>
 
   <!-- EPISODES -->
-  <section class="episodes-page">
+  <section class="episodes-page" id="episodesSection" style="display:none">
     <div class="container">
+      <div class="member-bar" id="memberBar">
+        <span class="member-info" id="memberInfo"></span>
+        <button class="logout-btn" id="logoutBtn">ログアウト</button>
+      </div>
       <div class="search-bar">
         <span class="search-icon">&#128269;</span>
         <input type="text" id="episodeSearch" placeholder="エピソードを検索...">
@@ -133,7 +214,7 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="footer">
+  <footer class="footer" id="pageFooter" style="display:none">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
@@ -176,6 +257,27 @@
   </footer>
 
   <script>
+    // Auth check
+    const member = JSON.parse(localStorage.getItem('deepcast_member') || 'null');
+    const isPaid = member && (member.plan === 'pro' || member.plan === 'business');
+
+    if (isPaid) {
+      document.getElementById('authGate').style.display = 'none';
+      document.getElementById('pageContent').style.display = '';
+      document.getElementById('episodesSection').style.display = '';
+      document.getElementById('pageFooter').style.display = '';
+
+      // Show member info
+      const planLabel = member.plan === 'pro' ? 'Pro' : 'Business';
+      document.getElementById('memberInfo').innerHTML =
+        '<span class="member-plan ' + member.plan + '">' + planLabel + '</span> ' + member.email;
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('deepcast_member');
+        window.location.href = 'index.html';
+      });
+    }
+
     // Hamburger menu
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');

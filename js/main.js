@@ -331,17 +331,22 @@ document.addEventListener('DOMContentLoaded', () => {
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+  let currentPlan = null;
+
   document.querySelectorAll('[data-action]').forEach(btn => {
     btn.addEventListener('click', e => {
       e.preventDefault();
       const msgs = {
-        'signup-free':     ['無料で始める', 'メールアドレスで簡単登録。'],
-        'signup-pro':      ['Pro プランに登録', '全エピソード聴き放題＋月3回リクエスト。'],
-        'signup-business': ['Business プランに登録', 'リクエスト無制限。'],
-        'contact':         ['お問い合わせ', 'ご質問・ご相談はこちらから。']
+        'signup-free':     ['無料で始める', 'メールアドレスで簡単登録。', 'free'],
+        'signup-pro':      ['Pro プランに登録', '全エピソード聴き放題＋月3回リクエスト。', 'pro'],
+        'signup-business': ['Business プランに登録', 'リクエスト無制限。', 'business'],
+        'contact':         ['お問い合わせ', 'ご質問・ご相談はこちらから。', null]
       };
       const m = msgs[btn.dataset.action];
-      if (m) openModal(m[0], m[1]);
+      if (m) {
+        currentPlan = m[2];
+        openModal(m[0], m[1]);
+      }
     });
   });
 
@@ -352,21 +357,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = e.target.querySelector('button[type="submit"]');
     btn.textContent = '登録中...';
     btn.disabled = true;
+
+    const planName = currentPlan || 'free';
     fetch('https://formsubmit.co/ajax/2525nxrei@gmail.com', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ email: emailVal, _subject: 'DeepCast AI 新規会員登録', _captcha: 'false' })
+      body: JSON.stringify({ email: emailVal, plan: planName, _subject: 'DeepCast AI 新規会員登録 (' + planName + ')', _captcha: 'false' })
     })
     .then(r => r.json())
     .then(() => {
-      e.target.innerHTML = `
-        <div style="text-align:center;padding:24px 0">
-          <div style="font-size:24px;margin-bottom:8px">&#10003;</div>
-          <h3 style="font-size:17px;font-weight:600;margin-bottom:4px">登録完了</h3>
-          <p style="color:var(--text-secondary);font-size:13px">${emailVal} で登録しました。</p>
-          <p style="font-size:13px;margin-top:12px">全エピソードページへ移動します...</p>
-        </div>`;
-      setTimeout(() => { window.location.href = 'all-episodes.html'; }, 2000);
+      // Save member info
+      localStorage.setItem('deepcast_member', JSON.stringify({
+        email: emailVal,
+        plan: planName,
+        registered: new Date().toISOString()
+      }));
+
+      const isPaid = planName === 'pro' || planName === 'business';
+      e.target.innerHTML = '<div style="text-align:center;padding:24px 0">' +
+        '<div style="font-size:24px;margin-bottom:8px">&#10003;</div>' +
+        '<h3 style="font-size:17px;font-weight:600;margin-bottom:4px">登録完了</h3>' +
+        '<p style="color:var(--text-secondary);font-size:13px">' + emailVal + ' で登録しました。</p>' +
+        (isPaid ? '<p style="font-size:13px;margin-top:12px">全エピソードページへ移動します...</p>' : '') +
+        '</div>';
+
+      if (isPaid) {
+        setTimeout(() => { window.location.href = 'all-episodes.html'; }, 2000);
+      } else {
+        setTimeout(closeModal, 3000);
+      }
     })
     .catch(() => {
       btn.textContent = '登録に失敗しました';
