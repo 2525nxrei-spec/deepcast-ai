@@ -416,15 +416,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ===== Pricing Toggle =====
   const pricingToggle = document.getElementById('pricingToggle');
-  const toggleLabels = document.querySelectorAll('.toggle-label');
-  let isYearly = false;
-  pricingToggle.addEventListener('click', () => {
-    isYearly = !isYearly;
-    pricingToggle.classList.toggle('active', isYearly);
-    toggleLabels.forEach(l => l.classList.toggle('active', (l.dataset.period === 'yearly') === isYearly));
-    document.querySelectorAll('.monthly-price,.monthly-period').forEach(e => e.style.display = isYearly ? 'none' : '');
-    document.querySelectorAll('.yearly-price,.yearly-period').forEach(e => e.style.display = isYearly ? '' : 'none');
-  });
+  if (pricingToggle) {
+    const toggleLabels = document.querySelectorAll('.toggle-label');
+    let isYearly = false;
+    pricingToggle.addEventListener('click', () => {
+      isYearly = !isYearly;
+      pricingToggle.classList.toggle('active', isYearly);
+      toggleLabels.forEach(l => l.classList.toggle('active', (l.dataset.period === 'yearly') === isYearly));
+      document.querySelectorAll('.monthly-price,.monthly-period').forEach(e => e.style.display = isYearly ? 'none' : '');
+      document.querySelectorAll('.yearly-price,.yearly-period').forEach(e => e.style.display = isYearly ? '' : 'none');
+    });
+  }
 
 
   // ===== FAQ =====

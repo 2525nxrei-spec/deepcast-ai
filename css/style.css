@@ -481,13 +481,14 @@ input, textarea, select { font: inherit; }
 }
 .toggle-switch.active .toggle-knob { left: 20px; }
 
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-items: start; }
+.pricing-grid { display: flex; justify-content: center; gap: 10px; align-items: start; }
 .pricing-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 28px 22px; position: relative;
   transition: all 0.4s var(--ease);
+  width: 100%; max-width: 480px;
 }
 .pricing-card:hover { background: var(--bg-card-hover); }
 .pricing-card.featured { border-color: var(--border-hover); }
@@ -696,7 +697,7 @@ body.player-active .footer { padding-bottom: 56px; }
   }
   .pricing-grid::-webkit-scrollbar { display: none; }
   .pricing-card {
-    min-width: 200px; flex: 1 0 0; flex-shrink: 0;
+    min-width: 200px; flex-shrink: 0;
     scroll-snap-align: start;
   }
   .services-grid {
