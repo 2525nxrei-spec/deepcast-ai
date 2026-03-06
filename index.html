@@ -21,6 +21,10 @@
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon.svg">
   <link rel="stylesheet" href="css/style.css?v=20260306">
+  <style>
+    .pricing-grid{display:flex!important;justify-content:center!important;grid-template-columns:none!important}
+    .pricing-card{width:100%!important;max-width:480px!important}
+  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -677,5 +681,14 @@
   </div>
 
   <script src="js/main.js?v=20260306"></script>
+  <script>
+    document.querySelectorAll('.faq-item').forEach(function(item){
+      item.querySelector('.faq-question').addEventListener('click',function(){
+        var wasActive=item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('active')});
+        if(!wasActive)item.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
