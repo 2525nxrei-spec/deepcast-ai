@@ -274,14 +274,16 @@
     currentPlayBtn = null;
     updatePlayIcons(false);
 
-    // Navigate to article page of finished episode (PV boost)
-    var articleUrl = audioToArticle[audioFileName(finishedAudio)];
-    if (articleUrl) {
-      // Don't navigate if already on that article page
-      var currentPath = location.pathname.replace(/^\//, '');
-      var targetPath = articleUrl.replace(/^\.?\.?\//, '');
-      if (currentPath !== targetPath) {
-        navigateTo(articleUrl, true);
+    // Navigate to article page only when user is actively viewing the page
+    // Skip if backgrounded — avoids annoying UX + protects AdSense viewability rate
+    if (document.visibilityState === 'visible') {
+      var articleUrl = audioToArticle[audioFileName(finishedAudio)];
+      if (articleUrl) {
+        var currentPath = location.pathname.replace(/^\//, '');
+        var targetPath = articleUrl.replace(/^\.?\.?\//, '');
+        if (currentPath !== targetPath) {
+          navigateTo(articleUrl, true);
+        }
       }
     }
 
