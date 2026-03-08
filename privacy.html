@@ -182,15 +182,25 @@
     </div>
   </footer>
 
-  <script>
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.getElementById('navLinks');
-    if (hamburger && navLinks) {
-      hamburger.addEventListener('click', () => navLinks.classList.toggle('active'));
-      navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => navLinks.classList.remove('active'));
-      });
-    }
-  </script>
+  <!-- MINI PLAYER -->
+  <div class="mini-player" id="miniPlayer">
+    <div class="mini-player-inner">
+      <button class="mini-play-btn" id="miniPlayBtn" aria-label="再生/一時停止">
+        <span class="play-icon">&#9654;</span>
+      </button>
+      <div class="mini-info">
+        <span class="mini-title" id="miniTitle">-</span>
+        <div class="mini-progress-wrap">
+          <div class="mini-progress-bar" id="miniProgressBar">
+            <div class="mini-progress-fill" id="miniProgressFill" style="width:0%"></div>
+          </div>
+          <span class="mini-time" id="miniTime">0:00 / 0:00</span>
+        </div>
+      </div>
+      <button class="mini-close-btn" id="miniCloseBtn" aria-label="閉じる">&times;</button>
+    </div>
+  </div>
+
+  <script src="js/spa-router.js?v=20260308"></script>
 </body>
 </html>

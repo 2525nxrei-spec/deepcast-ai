@@ -296,8 +296,6 @@ input, textarea, select { font: inherit; }
   transition: all 0.4s var(--ease);
 }
 .episode-card:hover { background: var(--bg-card-hover); }
-.episode-card.locked { opacity: 0.6; }
-.episode-card.locked:hover { opacity: 0.75; }
 .episode-header { min-width: 0; }
 .episode-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
 .episode-badge {
@@ -305,7 +303,6 @@ input, textarea, select { font: inherit; }
   font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
 }
 .episode-badge.free { background: rgba(94, 194, 105, 0.1); color: var(--green); }
-.episode-badge.pro { background: rgba(232, 230, 227, 0.08); color: var(--text-secondary); }
 .episode-number, .episode-date, .episode-duration { font-size: 11px; color: var(--text-muted); }
 .episode-title {
   font-family: var(--serif);
@@ -331,13 +328,10 @@ input, textarea, select { font: inherit; }
 }
 .play-btn:hover { opacity: 0.8; }
 .play-btn.playing { background: var(--text-muted); }
-.play-btn.locked-btn { background: var(--surface); color: var(--text-muted); }
 .episode-progress { flex: 1; min-width: 0; }
 .progress-bar { height: 3px; border-radius: 2px; background: var(--surface); overflow: hidden; margin-bottom: 4px; }
 .progress-fill { height: 100%; border-radius: 2px; background: var(--text); transition: width 0.2s; }
 .progress-time { font-size: 11px; color: var(--text-muted); }
-.locked-player .progress-time { cursor: pointer; }
-.locked-player .progress-time:hover { color: var(--text-secondary); }
 .episodes-cta { text-align: center; margin-top: 32px; }
 
 /* ===== REQUEST ===== */
