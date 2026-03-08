@@ -574,21 +574,33 @@
 
   // After SPA navigation, try to find the play button matching current audio
   function reassociatePlayingButton() {
-    if (!currentAudioSrc || audioEl.paused && audioEl.currentTime === 0) return;
-    // Find button with matching data-audio
-    const btns = document.querySelectorAll('.play-btn[data-audio]');
-    let found = false;
-    btns.forEach(btn => {
+    // Reset ALL play buttons to default state first
+    document.querySelectorAll('.play-btn').forEach(function(btn) {
+      btn.classList.remove('playing');
+      btn.innerHTML = '<span class="play-icon">&#9654;</span>';
+      var card = btn.closest('.episode-card');
+      if (card) {
+        var fill = card.querySelector('.progress-fill');
+        var timeEl = card.querySelector('.progress-time');
+        if (fill) fill.style.width = '0%';
+      }
+    });
+
+    if (!currentAudioSrc || (audioEl.paused && audioEl.currentTime === 0)) return;
+    // Find button with matching data-audio and restore its playing state
+    var btns = document.querySelectorAll('.play-btn[data-audio]');
+    var found = false;
+    btns.forEach(function(btn) {
       if (btn.dataset.audio === currentAudioSrc) {
         currentPlayBtn = btn;
         btn.classList.add('playing');
         updatePlayIcons(!audioEl.paused);
         // Update progress UI
-        const card = btn.closest('.episode-card');
+        var card = btn.closest('.episode-card');
         if (card && audioEl.duration) {
-          const fill = card.querySelector('.progress-fill');
-          const timeEl = card.querySelector('.progress-time');
-          const pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
+          var fill = card.querySelector('.progress-fill');
+          var timeEl = card.querySelector('.progress-time');
+          var pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
           if (fill) fill.style.width = pct;
           if (timeEl) timeEl.textContent = formatTime(audioEl.currentTime) + ' / ' + formatTime(audioEl.duration);
         }
