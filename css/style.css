@@ -303,6 +303,10 @@ input, textarea, select { font: inherit; }
   font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
 }
 .episode-badge.free { background: rgba(94, 194, 105, 0.1); color: var(--green); }
+.episode-badge.category-tech { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.episode-badge.category-business { background: rgba(234, 179, 8, 0.12); color: #ca8a04; }
+.episode-badge.category-science { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+.episode-badge.category-society { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
 .episode-number, .episode-date, .episode-duration { font-size: 11px; color: var(--text-muted); }
 .episode-title {
   font-family: var(--serif);

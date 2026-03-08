@@ -790,13 +790,119 @@
     });
   }
 
+  // =========================================================
+  //  AUTO CATEGORY DETECTION
+  //  Analyzes title, description, and tags to assign category
+  // =========================================================
+  const CATEGORY_KEYWORDS = {
+    tech: [
+      'AI', 'GPT', 'Gemini', 'LLM', '機械学習', 'ディープラーニング', '深層学習',
+      'プログラミング', 'アルゴリズム', 'ブロックチェーン', 'Web3', '半導体', 'チップ',
+      '量子コンピュータ', 'サイバー', 'ハッキング', 'プラットフォーム', 'クラウド',
+      'ロボット', '自動運転', 'VR', 'AR', 'メタバース', '5G', '6G', 'IoT',
+      'スマートフォン', 'アプリ', 'ソフトウェア', 'ハードウェア', 'API',
+      'オープンソース', 'テクノロジー', '技術', 'デジタル', 'ネットワーク',
+      '暗号化', 'セキュリティ', 'データ', 'サーバー', '通信', 'インターネット',
+      'Google', 'OpenAI', 'Apple', 'Microsoft', 'Meta', 'NVIDIA',
+      '地政学', '監視', 'GAFAM', '海底ケーブル', 'TSMC', 'AGI'
+    ],
+    business: [
+      '経済', 'ビジネス', '投資', '株', '資産', '金融', '起業', 'スタートアップ',
+      'マーケティング', '経営', '利益', '市場', 'GDP', 'インフレ', 'デフレ',
+      '円安', '円高', '為替', '貿易', 'サブスク', '年収', '所得', '給料',
+      '不動産', 'ローン', '保険', '年金', '税金', '節税', '副業', '転職',
+      'リモートワーク', 'フリーランス', '成功', 'キャリア', '貯金', '貯蓄',
+      '消費', '購買', 'マネー', 'ファイナンス', '資本主義', '格差',
+      'ベーシックインカム', '失業', '労働', 'ビットコイン', '暗号資産',
+      '宝くじ', 'MMT', '通貨', '貨幣', '推し活', 'DAO', 'Web3',
+      '老後', '2000万', '貧困', '中間層', '富裕層'
+    ],
+    science: [
+      '科学', 'サイエンス', '物理', '化学', '生物', '数学', '医学', '医療',
+      '遺伝子', 'DNA', 'ゲノム', '進化', '宇宙', '天文', '量子', '素粒子',
+      '相対性理論', '脳', '神経', 'ニューロン', '認知', '心理学', '実験',
+      '研究', '論文', '仮説', '臨床', '細胞', 'ウイルス', '免疫',
+      'バイオ', 'テクノロジー', 'エネルギー', '核融合', '気候変動', '環境',
+      '生態系', '絶滅', '火星', 'ブラックホール', '暗黒物質', 'フェルミ',
+      '脳科学', '神経美学', 'ドーパミン', 'セロトニン', '依存', '中毒',
+      '睡眠', '記憶', '知能', 'IQ', '老化', 'テロメア', 'CRISPR',
+      '意識', '哲学ゾンビ', '多世界解釈', '生命'
+    ],
+    society: [
+      '社会', '文化', '政治', '法律', '倫理', '道徳', '哲学', '宗教',
+      '歴史', '戦争', '平和', '民主主義', '独裁', '権力', '差別',
+      '人権', '自由', 'ジェンダー', '教育', '学校', '子ども', '少子化',
+      '高齢化', '人口', '移民', 'メディア', 'SNS', 'フェイクニュース',
+      '陰謀論', '選挙', '世論', 'プロパガンダ', '心理操作',
+      '犯罪', '刑法', '裁判', '司法', '冤罪', '監視社会', '死刑',
+      '恋愛', '結婚', '家族', 'コミュニティ', '孤独', '幸福',
+      'ディストピア', 'ユートピア', 'シンギュラリティ', '存在',
+      'アイデンティティ', '意味', '死', '不死', '正義', '功利主義'
+    ]
+  };
+
+  function autoDetectCategory(ep) {
+    var text = (ep.title || '') + ' ' + (ep.description || '') + ' ' + (ep.tags || []).join(' ');
+    text = text.toLowerCase();
+    var scores = { tech: 0, business: 0, science: 0, society: 0 };
+    for (var cat in CATEGORY_KEYWORDS) {
+      CATEGORY_KEYWORDS[cat].forEach(function(kw) {
+        if (text.indexOf(kw.toLowerCase()) !== -1) {
+          scores[cat]++;
+        }
+      });
+    }
+    var best = 'society';
+    var bestScore = 0;
+    for (var c in scores) {
+      if (scores[c] > bestScore) {
+        bestScore = scores[c];
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  function autoAssignCategories(episodes) {
+    episodes.forEach(function(ep) {
+      ep.category = autoDetectCategory(ep);
+    });
+    return episodes;
+  }
+
+  // Category label map
+  var CATEGORY_LABELS = {
+    tech: 'テクノロジー',
+    business: 'ビジネス',
+    science: 'サイエンス',
+    society: '社会・文化'
+  };
+
+  // Dynamically create filter buttons from existing categories
+  function buildFilterButtons(container, episodes) {
+    var cats = {};
+    episodes.forEach(function(ep) {
+      if (ep.category) cats[ep.category] = true;
+    });
+    // Always show "all" first
+    var html = '<button class="filter-btn active" data-filter="all">すべて</button>';
+    // Ordered categories
+    ['tech', 'business', 'science', 'society'].forEach(function(cat) {
+      if (cats[cat]) {
+        html += '<button class="filter-btn" data-filter="' + cat + '">' + (CATEGORY_LABELS[cat] || cat) + '</button>';
+      }
+    });
+    container.innerHTML = html;
+  }
+
   // Episode rendering shared between index and all-episodes
   function renderEpisode(ep) {
+    var categoryLabel = CATEGORY_LABELS[ep.category] || ep.category || '';
     const tags = ep.tags.map(t => '<span class="tag">' + t + '</span>').join('');
     return '<article class="episode-card" data-category="' + ep.category + '">' +
       '<div class="episode-header">' +
         '<div class="episode-info">' +
-          '<span class="episode-badge free">FREE</span>' +
+          '<span class="episode-badge category-' + ep.category + '">' + (CATEGORY_LABELS[ep.category] || '') + '</span>' +
           '<span class="episode-number">#' + ep.id + '</span>' +
           '<span class="episode-date">' + ep.date + '</span>' +
           '<span class="episode-duration">' + ep.duration + '</span>' +
@@ -833,6 +939,12 @@
           episodeList.innerHTML = '<p class="loading-text">\u30a8\u30d4\u30bd\u30fc\u30c9\u306f\u307e\u3060\u3042\u308a\u307e\u305b\u3093\u3002</p>';
           return;
         }
+        // Auto-detect categories from content
+        autoAssignCategories(episodes);
+        // Build filter buttons dynamically based on existing categories
+        var filterContainer = document.querySelector('.episode-filters');
+        if (filterContainer) buildFilterButtons(filterContainer, episodes);
+
         episodeList.innerHTML = episodes.map(renderEpisode).join('');
         // Update episode count stat dynamically
         document.querySelectorAll('.stat-number[data-count]').forEach(el => {
@@ -917,23 +1029,29 @@
     fetch('episodes/episodes.json')
       .then(r => r.json())
       .then(episodes => {
+        // Auto-detect categories from content
+        autoAssignCategories(episodes);
+        // Build filter buttons dynamically
+        var filterContainer = document.querySelector('.episode-filters');
+        if (filterContainer) {
+          buildFilterButtons(filterContainer, episodes);
+          // Re-bind filter button events after dynamic generation
+          var filterBtns2 = filterContainer.querySelectorAll('.filter-btn');
+          filterBtns2.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              filterBtns2.forEach(function(b) { b.classList.remove('active'); });
+              btn.classList.add('active');
+              activeFilter = btn.dataset.filter;
+              applyFilters();
+            });
+          });
+        }
         allEpisodes = episodes;
         displayEpisodes(episodes);
       })
       .catch(() => {
         episodeList.innerHTML = '<p class="loading-text">\u30a8\u30d4\u30bd\u30fc\u30c9\u306e\u8aad\u307f\u8fbc\u307f\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002</p>';
       });
-
-    // Filters
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeFilter = btn.dataset.filter;
-        applyFilters();
-      });
-    });
 
     episodeSearch.addEventListener('input', applyFilters);
   }
