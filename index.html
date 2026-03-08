@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DeepCast AI｜無料AIポッドキャスト - 5分で深い洞察を毎日配信</title>
   <meta name="description" content="【完全無料・登録不要】AIが生成する高品質ポッドキャスト。Gemini Deep Thinkが毎日5分で最新トピックを深掘り分析。テクノロジー・ビジネス・サイエンスの洞察をお届け。リクエストも無料。">
-  <meta name="keywords" content="AIポッドキャスト,Gemini,Deep Think,AI音声,ポッドキャスト,深い洞察,5分,無料,AI生成">
+  <meta name="keywords" content="AIポッドキャスト,Gemini,Deep Think,AI音声,ポッドキャスト,深い洞察,5分,無料,AI生成,ながら聴き,通勤,スキマ時間,深掘り解説,AI解説,無料ポッドキャスト">
   <meta property="og:title" content="DeepCast AI｜無料AIポッドキャスト - 5分で深い洞察を毎日配信">
   <meta property="og:description" content="【完全無料・登録不要】AIが生成する高品質ポッドキャスト。Gemini Deep Thinkが毎日5分で最新トピックを深掘り分析。リクエストも無料。">
   <meta property="og:type" content="website">
@@ -68,6 +68,64 @@
       }
     }
   ]
+  </script>
+  <!-- PodcastEpisode structured data: dynamically injected by spa-router.js from episodes.json -->
+  <!-- Template for reference:
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "PodcastEpisode",
+    "name": "EPISODE_TITLE",
+    "description": "EPISODE_DESCRIPTION",
+    "url": "https://deepcast-ai.com/all-episodes.html#epXXX",
+    "datePublished": "YYYY-MM-DD",
+    "timeRequired": "PT5M",
+    "associatedMedia": {
+      "@type": "MediaObject",
+      "contentUrl": "https://deepcast-ai.com/episodes/epXXX.mp3"
+    },
+    "partOfSeries": {
+      "@type": "PodcastSeries",
+      "name": "DeepCast AI",
+      "url": "https://deepcast-ai.com/"
+    }
+  }
+  </script>
+  -->
+  <script>
+  // Generate PodcastEpisode structured data from episodes.json
+  (function() {
+    fetch('episodes/episodes.json')
+      .then(function(r) { return r.json(); })
+      .then(function(episodes) {
+        var items = (Array.isArray(episodes) ? episodes : episodes.episodes || []).slice(0, 10);
+        items.forEach(function(ep) {
+          var sd = {
+            "@context": "https://schema.org",
+            "@type": "PodcastEpisode",
+            "name": ep.title,
+            "description": ep.description || ep.summary || "",
+            "url": "https://deepcast-ai.com/all-episodes.html#" + (ep.id || ""),
+            "datePublished": ep.date || ep.pubDate || "",
+            "timeRequired": "PT" + (ep.duration || "5M").replace(":", "M") + (ep.duration && ep.duration.indexOf(":") !== -1 ? "S" : ""),
+            "associatedMedia": {
+              "@type": "MediaObject",
+              "contentUrl": ep.audioUrl || ep.audio || ""
+            },
+            "partOfSeries": {
+              "@type": "PodcastSeries",
+              "name": "DeepCast AI",
+              "url": "https://deepcast-ai.com/"
+            }
+          };
+          var script = document.createElement("script");
+          script.type = "application/ld+json";
+          script.textContent = JSON.stringify(sd);
+          document.head.appendChild(script);
+        });
+      })
+      .catch(function() {});
+  })();
   </script>
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964975138803092" crossorigin="anonymous"></script>
