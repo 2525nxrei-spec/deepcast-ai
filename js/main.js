@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playlist = [];
     const episodeList = document.getElementById('episodeList');
     if (!episodeList) return;
-    episodeList.querySelectorAll('.play-btn:not(.locked-btn)').forEach(btn => {
+    episodeList.querySelectorAll('.play-btn').forEach(btn => {
       if (btn.closest('.episode-card').style.display !== 'none') {
         playlist.push({
           btn: btn,
@@ -377,11 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== Render Episodes from JSON =====
 
   function renderEpisode(ep) {
-    const isFree = ep.free;
     const tags = ep.tags.map(t => `<span class="tag">${t}</span>`).join('');
 
-    const playerHtml = isFree
-      ? `<div class="episode-player">
+    const playerHtml = `<div class="episode-player">
           <button class="play-btn" data-audio="${ep.audio || ''}" data-title="${ep.title}" aria-label="再生">
             <span class="play-icon">&#9654;</span>
           </button>
@@ -389,21 +387,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
             <span class="progress-time">0:00 / ${ep.duration}</span>
           </div>
-        </div>`
-      : `<div class="episode-player locked-player">
-          <button class="play-btn locked-btn" aria-label="Pro会員限定">
-            <span class="lock-icon">&#128274;</span>
-          </button>
-          <div class="episode-progress">
-            <span class="progress-time">Pro会員で再生 &#8594;</span>
-          </div>
         </div>`;
 
     return `
-      <article class="episode-card ${isFree ? '' : 'locked'}" data-category="${ep.category}">
+      <article class="episode-card" data-category="${ep.category}">
         <div class="episode-header">
           <div class="episode-info">
-            <span class="episode-badge ${isFree ? 'free' : 'pro'}">${isFree ? 'FREE' : 'PRO'}</span>
+            <span class="episode-badge free">FREE</span>
             <span class="episode-number">#${ep.id}</span>
             <span class="episode-date">${ep.date}</span>
             <span class="episode-duration">${ep.duration}</span>
@@ -425,13 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     episodeList.innerHTML = episodes.map(renderEpisode).join('');
 
-    episodeList.querySelectorAll('.play-btn:not(.locked-btn)').forEach(btn => {
+    episodeList.querySelectorAll('.play-btn').forEach(btn => {
       bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
-    });
-    episodeList.querySelectorAll('.locked-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        openModal('Pro プランに登録', '全エピソード聴き放題＋月3回リクエスト。');
-      });
     });
 
     initFilters();
@@ -439,35 +424,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initReveal();
   }
 
-  // Daily rotation: pick 3 free + 2 pro based on today's date
-  function getDailySeed() {
-    const now = new Date();
-    return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-  }
-
-  function seededShuffle(arr, seed) {
-    const copy = arr.slice();
-    let s = seed;
-    for (let i = copy.length - 1; i > 0; i--) {
-      s = (s * 9301 + 49297) % 233280;
-      const j = Math.floor((s / 233280) * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-  }
-
-  function pickDailyEpisodes(episodes) {
-    const seed = getDailySeed();
-    const freeEps = episodes.filter(ep => ep.free);
-    const proEps = episodes.filter(ep => !ep.free);
-    const shuffledFree = seededShuffle(freeEps, seed);
-    const shuffledPro = seededShuffle(proEps, seed + 1);
-    return [...shuffledFree.slice(0, 3), ...shuffledPro.slice(0, 2)];
-  }
-
   fetch('episodes/episodes.json')
     .then(r => r.json())
-    .then(episodes => loadEpisodes(pickDailyEpisodes(episodes)))
+    .then(episodes => loadEpisodes(episodes))
     .catch(() => {
       const fallback = [
         { id: 3, title: "GPT-5 vs Gemini 2.5：次世代AIの覇権争い", description: "OpenAIとGoogleの最新モデル比較。", date: "2026.03.02", category: "tech", tags: ["AI", "テクノロジー"], duration: "5:12", free: true, audio: "" },
