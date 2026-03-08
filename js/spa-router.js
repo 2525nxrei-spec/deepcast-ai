@@ -542,6 +542,9 @@
     // Contact form
     initContactForm();
 
+    // Article page player (episodes/ep00X.html)
+    initArticlePlayer();
+
     // Re-init SPA link interception on new content
     interceptLinks();
 
@@ -800,7 +803,7 @@
             '<span class="progress-time">0:00 / ' + ep.duration + '</span>' +
           '</div>' +
         '</div>' +
-        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn">\u30c6\u30ad\u30b9\u30c8\u3067\u8aad\u3080 &rarr;</a>' : '') +
+        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn">\u8981\u7d04\u3092\u8aad\u3080 &rarr;</a>' : '') +
       '</div>' +
     '</article>';
   }
@@ -921,6 +924,15 @@
     });
 
     episodeSearch.addEventListener('input', applyFilters);
+  }
+
+  function initArticlePlayer() {
+    var btn = document.getElementById('articlePlayBtn');
+    if (!btn) return;
+    var audioSrc = btn.dataset.audio;
+    var title = btn.dataset.title;
+    if (!audioSrc) return;
+    bindPlayer(btn, audioSrc, title);
   }
 
   function initContactForm() {
