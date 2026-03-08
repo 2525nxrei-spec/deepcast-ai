@@ -488,23 +488,7 @@
       });
     });
 
-    // Stat counter (index page)
-    document.querySelectorAll('.stat-number[data-count]').forEach(el => {
-      const obs = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          const target = parseInt(el.dataset.count);
-          const start = performance.now();
-          const tick = (now) => {
-            const p = Math.min((now - start) / 1800, 1);
-            el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString();
-            if (p < 1) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-          obs.unobserve(el);
-        }
-      }, { threshold: 0.5 });
-      obs.observe(el);
-    });
+    // Stat counter — skip here, animation triggered after fetch updates count
 
     // Floating formulas (index page)
     initFloatingFormulas();
@@ -895,6 +879,19 @@
     container.innerHTML = html;
   }
 
+  // Stat counter animation (called after episode count is known)
+  function animateCounter(el) {
+    var target = parseInt(el.dataset.count);
+    if (!target || target <= 0) return;
+    var start = performance.now();
+    var tick = function(now) {
+      var p = Math.min((now - start) / 1800, 1);
+      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
   // Episode rendering shared between index and all-episodes
   function renderEpisode(ep) {
     var categoryLabel = CATEGORY_LABELS[ep.category] || ep.category || '';
@@ -946,9 +943,10 @@
         if (filterContainer) buildFilterButtons(filterContainer, episodes);
 
         episodeList.innerHTML = episodes.map(renderEpisode).join('');
-        // Update episode count stat dynamically
+        // Update episode count stat dynamically and trigger animation
         document.querySelectorAll('.stat-number[data-count]').forEach(el => {
           el.dataset.count = episodes.length;
+          animateCounter(el);
         });
         episodeList.querySelectorAll('.play-btn').forEach(btn => {
           bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
