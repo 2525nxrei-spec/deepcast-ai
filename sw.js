@@ -1,11 +1,13 @@
-const CACHE_NAME = 'deepcast-v2';
+const CACHE_NAME = 'deepcast-v3';
 const ASSETS = [
   '/',
   '/index.html',
   '/css/style.css',
   '/js/main.js',
   '/episodes/episodes.json',
-  '/manifest.json'
+  '/manifest.json',
+  '/all-episodes.html',
+  '/feed.xml'
 ];
 
 // Install: cache shell assets
@@ -30,10 +32,13 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
+  // Skip non-GET and cross-origin ad requests
+  if (e.request.method !== 'GET') return;
+  if (url.hostname.includes('googlesyndication') || url.hostname.includes('doubleclick')) return;
+
   e.respondWith(
     fetch(e.request)
       .then(res => {
-        // Cache the fresh response for offline fallback
         if (url.origin === location.origin) {
           const clone = res.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));

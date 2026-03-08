@@ -20,28 +20,33 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon.svg">
-  <link rel="stylesheet" href="css/style.css?v=20260306">
-  <style>
-    .pricing-grid{display:flex!important;justify-content:center!important;grid-template-columns:none!important}
-    .pricing-card{width:100%!important;max-width:480px!important}
-  </style>
+  <link rel="stylesheet" href="css/style.css?v=20260308">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
+    "@type": "PodcastSeries",
     "name": "DeepCast AI",
     "url": "https://deepcast-ai.com/",
     "description": "【完全無料】AIが生み出す5分間の深い洞察。Gemini Deep Thinkで制作した高品質AIポッドキャスト。毎日更新・登録不要。",
-    "applicationCategory": "EntertainmentApplication",
-    "operatingSystem": "Web",
+    "webFeed": "https://deepcast-ai.com/feed.xml",
+    "author": {
+      "@type": "Organization",
+      "name": "DeepCast AI",
+      "url": "https://deepcast-ai.com/"
+    },
+    "inLanguage": "ja",
+    "genre": ["Technology", "Science", "Business"],
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "JPY"
-    },
-    "inLanguage": "ja"
+    }
   }
   </script>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964975138803092" crossorigin="anonymous"></script>
+  <!-- RSS Feed -->
+  <link rel="alternate" type="application/rss+xml" title="DeepCast AI Podcast" href="https://deepcast-ai.com/feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
@@ -205,6 +210,12 @@
       </div>
     </div>
   </section>
+
+  <!-- Ad: after episodes -->
+  <div style="margin:12px auto;max-width:920px;padding:0 24px;min-height:90px">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1964975138803092" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
 
   <!-- ===== SERVICES SECTION ===== -->
   <section class="section services" id="services">
@@ -454,7 +465,7 @@
             <li class="included">文字起こし＆要約テキスト無料</li>
             <li class="included">トピックリクエスト無料</li>
             <li class="included">会員登録・ログイン不要</li>
-            <li class="included">広告なしで快適視聴</li>
+            <li class="included">連続再生で快適視聴</li>
             <li class="included">クレジットカード登録不要</li>
           </ul>
           <a href="all-episodes.html" class="btn btn-primary btn-block">エピソードを聴く</a>
@@ -507,6 +518,12 @@
       </div>
     </div>
   </section>
+
+  <!-- Ad: before FAQ -->
+  <div style="margin:20px auto;max-width:920px;padding:0 24px;min-height:100px">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1964975138803092" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
 
   <!-- ===== FAQ SECTION ===== -->
   <section class="section faq" id="faq">
@@ -633,6 +650,7 @@
             <li><a href="privacy.html">プライバシーポリシー</a></li>
             <li><a href="tokushoho.html">特定商取引法に基づく表示</a></li>
             <li><a href="copyright.html">著作権について</a></li>
+            <li><a href="about.html">運営者情報</a></li>
           </ul>
         </div>
       </div>
@@ -680,15 +698,6 @@
     </div>
   </div>
 
-  <script src="js/main.js?v=20260306"></script>
-  <script>
-    document.querySelectorAll('.faq-item').forEach(function(item){
-      item.querySelector('.faq-question').addEventListener('click',function(){
-        var wasActive=item.classList.contains('active');
-        document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('active')});
-        if(!wasActive)item.classList.add('active');
-      });
-    });
-  </script>
+  <script src="js/main.js?v=20260308"></script>
 </body>
 </html>

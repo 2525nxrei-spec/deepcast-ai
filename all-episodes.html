@@ -12,6 +12,8 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://deepcast-ai.com/all-episodes.html">
   <meta name="twitter:card" content="summary_large_image">
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964975138803092" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,70 +82,7 @@
       padding: 48px 0;
       display: none;
     }
-    /* Auth gate */
-    .auth-gate {
-      position: fixed; inset: 0; z-index: 3000;
-      background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .auth-gate-card {
-      text-align: center;
-      max-width: 400px;
-      padding: 48px 32px;
-    }
-    .auth-gate-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-    .auth-gate-card h2 {
-      font-family: var(--serif);
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .auth-gate-card p {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      margin-bottom: 24px;
-    }
-    .auth-gate-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-    }
-    /* Member bar */
-    .member-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 24px;
-      font-size: 13px;
-    }
-    .member-info { color: var(--text-secondary); }
-    .member-plan {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: var(--radius-full);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-    .member-plan.pro { background: rgba(58,138,68,0.1); color: var(--green); }
-    .member-plan.business { background: rgba(26,26,26,0.08); color: var(--text); }
-    .logout-btn {
-      font-size: 12px;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: color 0.3s;
-    }
-    .logout-btn:hover { color: var(--text); }
+    .ad-slot { margin: 20px auto; max-width: 920px; padding: 0 24px; min-height: 90px; }
   </style>
 </head>
 <body>
@@ -175,6 +114,12 @@
     <p>DeepCast AIのすべてのエピソードをお楽しみください。</p>
   </div>
 
+  <!-- Ad: header -->
+  <div class="ad-slot">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1964975138803092" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
   <!-- EPISODES -->
   <section class="episodes-page" id="episodesSection">
     <div class="container">
@@ -201,6 +146,12 @@
     </div>
   </section>
 
+  <!-- Ad: after episodes -->
+  <div class="ad-slot" style="min-height:100px">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1964975138803092" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
   <!-- FOOTER -->
   <footer class="footer" id="pageFooter">
     <div class="container">
@@ -224,7 +175,7 @@
           <h4>サポート</h4>
           <ul>
             <li><a href="index.html#faq">よくある質問</a></li>
-            <li><a href="index.html#request">お問い合わせ</a></li>
+            <li><a href="contact.html">お問い合わせ</a></li>
           </ul>
         </div>
         <div class="footer-links-group">
@@ -234,6 +185,7 @@
             <li><a href="privacy.html">プライバシーポリシー</a></li>
             <li><a href="tokushoho.html">特定商取引法に基づく表示</a></li>
             <li><a href="copyright.html">著作権について</a></li>
+            <li><a href="about.html">運営者情報</a></li>
           </ul>
         </div>
       </div>
@@ -287,10 +239,12 @@
       link.addEventListener('click', () => navLinks.classList.remove('active'));
     });
 
-    // Audio player with mini player
+    // Audio player with continuous playback
     const audioEl = new Audio();
     audioEl.preload = 'metadata';
     let currentPlayBtn = null;
+    let playlist = [];
+    let playlistIndex = -1;
 
     const miniPlayer = document.getElementById('miniPlayer');
     const miniPlayBtn = document.getElementById('miniPlayBtn');
@@ -319,15 +273,19 @@
       if (miniPlayBtn) miniPlayBtn.innerHTML = '<span class="play-icon">' + icon + '</span>';
     }
 
+    function resetCardUI(btn) {
+      if (!btn) return;
+      const card = btn.closest('.episode-card');
+      btn.innerHTML = '<span class="play-icon">&#9654;</span>';
+      btn.classList.remove('playing');
+      const fill = card.querySelector('.progress-fill');
+      if (fill) fill.style.width = '0%';
+    }
+
     function stopCurrent() {
-      if (currentPlayBtn) {
-        const card = currentPlayBtn.closest('.episode-card');
-        currentPlayBtn.innerHTML = '<span class="play-icon">&#9654;</span>';
-        currentPlayBtn.classList.remove('playing');
-        const fill = card.querySelector('.progress-fill');
-        if (fill) fill.style.width = '0%';
-        currentPlayBtn = null;
-      }
+      resetCardUI(currentPlayBtn);
+      currentPlayBtn = null;
+      playlistIndex = -1;
       audioEl.pause();
       audioEl.currentTime = 0;
       hideMiniPlayer();
@@ -336,7 +294,12 @@
     function setMediaSession(title) {
       if (!('mediaSession' in navigator)) return;
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: title, artist: 'DeepCast AI', album: 'AIポッドキャスト'
+        title: title, artist: 'DeepCast AI', album: 'AIポッドキャスト',
+        artwork: [
+          { src: 'assets/icon.svg', sizes: '96x96', type: 'image/svg+xml' },
+          { src: 'assets/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'assets/icon-512.png', sizes: '512x512', type: 'image/png' }
+        ]
       });
       navigator.mediaSession.setActionHandler('play', () => { audioEl.play(); updatePlayIcons(true); });
       navigator.mediaSession.setActionHandler('pause', () => { audioEl.pause(); updatePlayIcons(false); });
@@ -344,6 +307,43 @@
       navigator.mediaSession.setActionHandler('seekbackward', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
       navigator.mediaSession.setActionHandler('seekforward', () => { audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 10); });
       navigator.mediaSession.setActionHandler('seekto', (d) => { if (d.seekTime != null) audioEl.currentTime = d.seekTime; });
+      navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+      navigator.mediaSession.setActionHandler('nexttrack', playNext);
+    }
+
+    function playNext() {
+      if (playlist.length === 0) return;
+      const nextIdx = playlistIndex + 1;
+      if (nextIdx < playlist.length) playFromPlaylist(nextIdx);
+      else stopCurrent();
+    }
+
+    function playPrev() {
+      if (playlist.length === 0) return;
+      if (audioEl.currentTime > 3 && playlistIndex >= 0) { audioEl.currentTime = 0; return; }
+      const prevIdx = playlistIndex - 1;
+      if (prevIdx >= 0) playFromPlaylist(prevIdx);
+      else audioEl.currentTime = 0;
+    }
+
+    function playFromPlaylist(idx) {
+      if (idx < 0 || idx >= playlist.length) return;
+      const item = playlist[idx];
+      resetCardUI(currentPlayBtn);
+      currentPlayBtn = item.btn;
+      playlistIndex = idx;
+      audioEl.src = item.audio;
+      audioEl.play().catch(() => {
+        const card = item.btn.closest('.episode-card');
+        const timeEl = card.querySelector('.progress-time');
+        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+        currentPlayBtn = null;
+      });
+      item.btn.classList.add('playing');
+      updatePlayIcons(true);
+      setMediaSession(item.title);
+      if (miniTitle) miniTitle.textContent = item.title;
+      showMiniPlayer();
     }
 
     if (miniPlayBtn) {
@@ -380,45 +380,54 @@
       }
     });
 
+    // On ended: auto-play next (continuous playback)
     audioEl.addEventListener('ended', () => {
-      if (currentPlayBtn) {
-        const card = currentPlayBtn.closest('.episode-card');
-        currentPlayBtn.innerHTML = '<span class="play-icon">&#9654;</span>';
-        currentPlayBtn.classList.remove('playing');
-        const fill = card.querySelector('.progress-fill');
-        if (fill) fill.style.width = '0%';
-        const timeEl = card.querySelector('.progress-time');
-        const dur = card.querySelector('.episode-duration');
-        if (timeEl && dur) timeEl.textContent = '0:00 / ' + dur.textContent;
-        currentPlayBtn = null;
-      }
+      resetCardUI(currentPlayBtn);
+      currentPlayBtn = null;
       updatePlayIcons(false);
-      hideMiniPlayer();
+      const nextIdx = playlistIndex + 1;
+      if (nextIdx < playlist.length) {
+        playFromPlaylist(nextIdx);
+      } else {
+        playlistIndex = -1;
+        hideMiniPlayer();
+      }
     });
 
     function bindPlayer(btn, audioSrc, title) {
       btn.addEventListener('click', () => {
         const card = btn.closest('.episode-card');
         const timeEl = card.querySelector('.progress-time');
-
         if (currentPlayBtn === btn) {
           if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
           else { audioEl.pause(); updatePlayIcons(false); }
           return;
         }
-
-        stopCurrent();
+        resetCardUI(currentPlayBtn);
+        audioEl.pause();
+        audioEl.currentTime = 0;
         if (!audioSrc) { if (timeEl) timeEl.textContent = '音声ファイル未設定'; return; }
-
+        const idx = playlist.findIndex(p => p.btn === btn);
+        playlistIndex = idx >= 0 ? idx : -1;
         currentPlayBtn = btn;
         audioEl.src = audioSrc;
         audioEl.play().catch(() => { if (timeEl) timeEl.textContent = '音声ファイルを読み込めません'; currentPlayBtn = null; });
-
         btn.classList.add('playing');
         updatePlayIcons(true);
         setMediaSession(title);
         if (miniTitle) miniTitle.textContent = title;
         showMiniPlayer();
+      });
+    }
+
+    function buildPlaylist() {
+      playlist = [];
+      const list = document.getElementById('episodeList');
+      if (!list) return;
+      list.querySelectorAll('.play-btn').forEach(btn => {
+        if (btn.closest('.episode-card').style.display !== 'none') {
+          playlist.push({ btn: btn, audio: btn.dataset.audio || '', title: btn.dataset.title || '' });
+        }
       });
     }
 
@@ -470,9 +479,9 @@
       episodeList.querySelectorAll('.play-btn').forEach(btn => {
         bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
       });
+      buildPlaylist();
     }
 
-    // Load episodes
     fetch('episodes/episodes.json')
       .then(r => r.json())
       .then(episodes => {
@@ -509,7 +518,6 @@
       });
     });
 
-    // Search
     document.getElementById('episodeSearch').addEventListener('input', applyFilters);
   </script>
 </body>

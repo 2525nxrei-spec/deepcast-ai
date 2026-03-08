@@ -4,8 +4,6 @@ if ('serviceWorker' in navigator) {
 }
 
 // ===== iOS Safari audio unlock =====
-// iOS requires a user gesture to unlock audio playback.
-// We play a tiny silent buffer on first touch to unlock the audio context.
 (function() {
   let unlocked = false;
   function unlock() {
@@ -30,17 +28,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!container) return;
     const items = container.querySelectorAll('.formula');
     const w = window.innerWidth;
-    const scale = Math.min(Math.max(w / 1200, 0.45), 1); // 0.45–1.0
+    const scale = Math.min(Math.max(w / 1200, 0.45), 1);
     const minSize = Math.round(16 * scale);
     const maxSize = Math.round(26 * scale);
 
     const state = [];
     items.forEach((el) => {
       const size = minSize + Math.random() * (maxSize - minSize);
-      const x = 5 + Math.random() * 90;   // 5%–95%
+      const x = 5 + Math.random() * 90;
       const y = 5 + Math.random() * 90;
       const rot = -15 + Math.random() * 30;
-      // random velocity (% per second)
       const vx = (0.3 + Math.random() * 0.7) * (Math.random() < 0.5 ? 1 : -1);
       const vy = (0.2 + Math.random() * 0.5) * (Math.random() < 0.5 ? 1 : -1);
 
@@ -55,12 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let last = performance.now();
     function tick(now) {
-      const dt = (now - last) / 1000; // seconds
+      const dt = (now - last) / 1000;
       last = now;
       for (const s of state) {
         s.x += s.vx * dt;
         s.y += s.vy * dt;
-        // bounce off edges (5%–95%)
         if (s.x < 2)  { s.x = 2;  s.vx = Math.abs(s.vx); }
         if (s.x > 95) { s.x = 95; s.vx = -Math.abs(s.vx); }
         if (s.y < 2)  { s.y = 2;  s.vy = Math.abs(s.vy); }
@@ -107,24 +103,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // =========================================================
-  //  AUDIO PLAYER — self-hosted, no external platforms
+  //  AUDIO PLAYER — self-hosted with continuous playback
   //  - HTML5 <audio> element
   //  - Media Session API for lock-screen / background control
-  //  - episodes.json で audio フィールドにファイルパスを指定
-  //
-  //  使い方:
-  //    1. episodes/ に mp3 を置く (例: ep003.mp3)
-  //    2. episodes.json の audio に "episodes/ep003.mp3" と書く
-  //    3. サイトを開けば再生できる
+  //  - Continuous playback (auto-next episode)
+  //  - Previous/Next track controls
   // =========================================================
 
-  // Shared audio element
   const audioEl = new Audio();
   audioEl.preload = 'metadata';
   let currentPlayBtn = null;
   let currentTitle = '';
 
-  // Mini player elements (may not exist on legal pages)
+  // Playlist state for continuous playback
+  let playlist = [];       // ordered list of { btn, audio, title }
+  let playlistIndex = -1;
+
+  // Mini player elements
   const miniPlayer = document.getElementById('miniPlayer');
   const miniPlayBtn = document.getElementById('miniPlayBtn');
   const miniTitle = document.getElementById('miniTitle');
@@ -158,27 +153,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if (miniPlayBtn) miniPlayBtn.innerHTML = '<span class="play-icon">' + icon + '</span>';
   }
 
+  function resetCardUI(btn) {
+    if (!btn) return;
+    const card = btn.closest('.episode-card');
+    btn.innerHTML = '<span class="play-icon">&#9654;</span>';
+    btn.classList.remove('playing');
+    const fill = card.querySelector('.progress-fill');
+    if (fill) fill.style.width = '0%';
+  }
+
   function stopCurrent() {
-    if (currentPlayBtn) {
-      const card = currentPlayBtn.closest('.episode-card');
-      currentPlayBtn.innerHTML = '<span class="play-icon">&#9654;</span>';
-      currentPlayBtn.classList.remove('playing');
-      const fill = card.querySelector('.progress-fill');
-      if (fill) fill.style.width = '0%';
-      currentPlayBtn = null;
-    }
+    resetCardUI(currentPlayBtn);
+    currentPlayBtn = null;
+    playlistIndex = -1;
     audioEl.pause();
     audioEl.currentTime = 0;
     hideMiniPlayer();
   }
 
-  // Media Session API — lock-screen & background controls
+  // Media Session API — lock-screen & background controls with artwork
   function setMediaSession(title) {
     if (!('mediaSession' in navigator)) return;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title,
       artist: 'DeepCast AI',
       album: 'AIポッドキャスト',
+      artwork: [
+        { src: 'assets/icon.svg', sizes: '96x96', type: 'image/svg+xml' },
+        { src: 'assets/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { src: 'assets/icon-512.png', sizes: '512x512', type: 'image/png' }
+      ]
     });
     navigator.mediaSession.setActionHandler('play', () => { audioEl.play(); updatePlayIcons(true); });
     navigator.mediaSession.setActionHandler('pause', () => { audioEl.pause(); updatePlayIcons(false); });
@@ -186,6 +190,63 @@ document.addEventListener('DOMContentLoaded', () => {
     navigator.mediaSession.setActionHandler('seekbackward', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
     navigator.mediaSession.setActionHandler('seekforward', () => { audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 10); });
     navigator.mediaSession.setActionHandler('seekto', (d) => { if (d.seekTime != null) audioEl.currentTime = d.seekTime; });
+    navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+    navigator.mediaSession.setActionHandler('nexttrack', playNext);
+  }
+
+  // Continuous playback: play next episode
+  function playNext() {
+    if (playlist.length === 0) return;
+    const nextIdx = playlistIndex + 1;
+    if (nextIdx < playlist.length) {
+      playFromPlaylist(nextIdx);
+    } else {
+      // End of playlist
+      stopCurrent();
+    }
+  }
+
+  function playPrev() {
+    if (playlist.length === 0) return;
+    // If more than 3 seconds in, restart current; otherwise go back
+    if (audioEl.currentTime > 3 && playlistIndex >= 0) {
+      audioEl.currentTime = 0;
+      return;
+    }
+    const prevIdx = playlistIndex - 1;
+    if (prevIdx >= 0) {
+      playFromPlaylist(prevIdx);
+    } else {
+      audioEl.currentTime = 0;
+    }
+  }
+
+  function playFromPlaylist(idx) {
+    if (idx < 0 || idx >= playlist.length) return;
+    const item = playlist[idx];
+
+    // Reset previous card UI
+    resetCardUI(currentPlayBtn);
+
+    currentPlayBtn = item.btn;
+    currentTitle = item.title;
+    playlistIndex = idx;
+
+    audioEl.src = item.audio;
+    audioEl.play().catch(() => {
+      const card = item.btn.closest('.episode-card');
+      const timeEl = card.querySelector('.progress-time');
+      if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+      currentPlayBtn = null;
+      return;
+    });
+
+    item.btn.classList.add('playing');
+    updatePlayIcons(true);
+    setMediaSession(item.title);
+
+    if (miniTitle) miniTitle.textContent = item.title;
+    showMiniPlayer();
   }
 
   // Mini player controls
@@ -208,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Global time update — syncs card player + mini player
+  // Global time update
   audioEl.addEventListener('timeupdate', () => {
     if (!audioEl.duration) return;
     const pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
@@ -217,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (miniProgressFill) miniProgressFill.style.width = pct;
     if (miniTime) miniTime.textContent = timeStr;
 
-    // Update card progress too
     if (currentPlayBtn) {
       const card = currentPlayBtn.closest('.episode-card');
       const fill = card.querySelector('.progress-fill');
@@ -226,7 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (timeEl) timeEl.textContent = timeStr;
     }
 
-    // Update Media Session position
     if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
       try {
         navigator.mediaSession.setPositionState({
@@ -238,20 +297,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // On ended: auto-play next episode (continuous playback)
   audioEl.addEventListener('ended', () => {
-    if (currentPlayBtn) {
-      const card = currentPlayBtn.closest('.episode-card');
-      currentPlayBtn.innerHTML = '<span class="play-icon">&#9654;</span>';
-      currentPlayBtn.classList.remove('playing');
-      const fill = card.querySelector('.progress-fill');
-      if (fill) fill.style.width = '0%';
-      const timeEl = card.querySelector('.progress-time');
-      const dur = card.querySelector('.episode-duration');
-      if (timeEl && dur) timeEl.textContent = '0:00 / ' + dur.textContent;
-      currentPlayBtn = null;
-    }
+    resetCardUI(currentPlayBtn);
+    currentPlayBtn = null;
     updatePlayIcons(false);
-    hideMiniPlayer();
+
+    // Try to play next episode
+    const nextIdx = playlistIndex + 1;
+    if (nextIdx < playlist.length) {
+      playFromPlaylist(nextIdx);
+    } else {
+      playlistIndex = -1;
+      hideMiniPlayer();
+    }
   });
 
   function bindPlayer(btn, audioSrc, title) {
@@ -259,20 +318,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = btn.closest('.episode-card');
       const timeEl = card.querySelector('.progress-time');
 
-      // If this button is already playing → toggle pause
+      // If this button is already playing -> toggle pause
       if (currentPlayBtn === btn) {
         if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
         else { audioEl.pause(); updatePlayIcons(false); }
         return;
       }
 
-      // Stop any current playback
-      stopCurrent();
+      // Reset previous
+      resetCardUI(currentPlayBtn);
+      audioEl.pause();
+      audioEl.currentTime = 0;
 
       if (!audioSrc) {
         if (timeEl) timeEl.textContent = '音声ファイル未設定';
         return;
       }
+
+      // Find this button in playlist to set index
+      const idx = playlist.findIndex(p => p.btn === btn);
+      playlistIndex = idx >= 0 ? idx : -1;
 
       currentPlayBtn = btn;
       currentTitle = title;
@@ -287,9 +352,24 @@ document.addEventListener('DOMContentLoaded', () => {
       updatePlayIcons(true);
       setMediaSession(title);
 
-      // Show mini player
       if (miniTitle) miniTitle.textContent = title;
       showMiniPlayer();
+    });
+  }
+
+  // Build playlist from currently visible play buttons
+  function buildPlaylist() {
+    playlist = [];
+    const episodeList = document.getElementById('episodeList');
+    if (!episodeList) return;
+    episodeList.querySelectorAll('.play-btn:not(.locked-btn)').forEach(btn => {
+      if (btn.closest('.episode-card').style.display !== 'none') {
+        playlist.push({
+          btn: btn,
+          audio: btn.dataset.audio || '',
+          title: btn.dataset.title || ''
+        });
+      }
     });
   }
 
@@ -345,7 +425,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     episodeList.innerHTML = episodes.map(renderEpisode).join('');
 
-    // Bind audio players
     episodeList.querySelectorAll('.play-btn:not(.locked-btn)').forEach(btn => {
       bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
     });
@@ -356,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     initFilters();
+    buildPlaylist();
     initReveal();
   }
 
@@ -409,6 +489,8 @@ document.addEventListener('DOMContentLoaded', () => {
         cards.forEach(c => {
           c.style.display = (btn.dataset.filter === 'all' || c.dataset.category === btn.dataset.filter) ? '' : 'none';
         });
+        // Rebuild playlist after filter change
+        buildPlaylist();
       });
     });
   }
@@ -477,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Signup form — Ajax submit
+  // Signup form
   document.getElementById('signupForm').addEventListener('submit', e => {
     e.preventDefault();
     const emailVal = document.getElementById('email').value;
@@ -493,7 +575,6 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(r => r.json())
     .then(() => {
-      // Save member info
       localStorage.setItem('deepcast_member', JSON.stringify({
         email: emailVal,
         plan: planName,
