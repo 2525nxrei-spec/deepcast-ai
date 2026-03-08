@@ -332,6 +332,16 @@ input, textarea, select { font: inherit; }
 .progress-bar { height: 3px; border-radius: 2px; background: var(--surface); overflow: hidden; margin-bottom: 4px; }
 .progress-fill { height: 100%; border-radius: 2px; background: var(--text); transition: width 0.2s; }
 .progress-time { font-size: 11px; color: var(--text-muted); }
+.read-article-btn {
+  display: inline-block; margin-top: 10px;
+  font-size: 12px; font-weight: 500; color: var(--text-muted);
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.read-article-btn:hover { color: var(--text); border-color: var(--text-secondary); }
 .episodes-cta { text-align: center; margin-top: 32px; }
 
 /* ===== REQUEST ===== */

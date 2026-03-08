@@ -359,10 +359,59 @@
     return Array.from(styles).map(s => s.outerHTML).join('\n');
   }
 
+  // Extract meta/OG/canonical info from a parsed document
+  function extractMeta(doc) {
+    const get = (sel, attr) => {
+      const el = doc.head.querySelector(sel);
+      return el ? el.getAttribute(attr) : null;
+    };
+    return {
+      description:   get('meta[name="description"]', 'content'),
+      ogTitle:       get('meta[property="og:title"]', 'content'),
+      ogDescription: get('meta[property="og:description"]', 'content'),
+      ogUrl:         get('meta[property="og:url"]', 'content'),
+      canonical:     get('link[rel="canonical"]', 'href')
+    };
+  }
+
+  // Update or create a <meta> tag
+  function setMeta(selector, attr, value) {
+    if (value == null) return;
+    let el = document.head.querySelector(selector);
+    if (el) {
+      el.setAttribute(attr, value);
+    } else {
+      el = document.createElement(selector.startsWith('link') ? 'link' : 'meta');
+      // Parse selector to set attributes, e.g. meta[name="description"]
+      const matches = selector.match(/\[(\w[\w-]*)="([^"]+)"\]/g);
+      if (matches) {
+        matches.forEach(m => {
+          const [, k, v] = m.match(/\[(\w[\w-]*)="([^"]+)"\]/);
+          el.setAttribute(k, v);
+        });
+      }
+      el.setAttribute(attr, value);
+      document.head.appendChild(el);
+    }
+  }
+
+  // Apply meta tags from extracted info
+  function applyMeta(meta) {
+    if (!meta) return;
+    setMeta('meta[name="description"]',        'content', meta.description);
+    setMeta('meta[property="og:title"]',       'content', meta.ogTitle);
+    setMeta('meta[property="og:description"]', 'content', meta.ogDescription);
+    setMeta('meta[property="og:url"]',         'content', meta.ogUrl);
+    setMeta('link[rel="canonical"]',           'href',    meta.canonical);
+  }
+
   // Apply swap
-  function applySwap(contentNodes, pageStyles, title, navHTML) {
+  function applySwap(contentNodes, pageStyles, title, navHTML, meta) {
     // Update title
     document.title = title;
+
+    // Update meta / OG / canonical tags
+    applyMeta(meta);
 
     // Remove existing page-specific styles
     document.querySelectorAll('style[data-spa-page]').forEach(s => s.remove());
@@ -755,6 +804,7 @@
             '<span class="progress-time">0:00 / ' + ep.duration + '</span>' +
           '</div>' +
         '</div>' +
+        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn">\u8a18\u4e8b\u3092\u8aad\u3080 &rarr;</a>' : '') +
       '</div>' +
     '</article>';
   }
@@ -933,8 +983,9 @@
         const pageStyles = getPageStyles(doc);
         const title = doc.title;
         const navHTML = getNavContent(doc);
+        const meta = extractMeta(doc);
 
-        applySwap(contentNodes, pageStyles, title, navHTML);
+        applySwap(contentNodes, pageStyles, title, navHTML, meta);
 
         if (pushState !== false) {
           history.pushState({ spa: true }, title, url);

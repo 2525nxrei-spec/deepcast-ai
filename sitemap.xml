@@ -16,7 +16,7 @@
     <loc>https://deepcast-ai.com/feed.xml</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://deepcast-ai.com/about.html</loc>
@@ -28,7 +28,7 @@
     <loc>https://deepcast-ai.com/contact.html</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://deepcast-ai.com/privacy.html</loc>
@@ -53,5 +53,11 @@
     <lastmod>2026-03-08</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://deepcast-ai.com/episodes/ep001.html</loc>
+    <lastmod>2026-03-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
