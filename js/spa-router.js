@@ -291,31 +291,27 @@
   // =========================================================
 
   // Internal pages that participate in SPA routing
-  const SPA_PAGES = [
-    'index.html', 'all-episodes.html', 'about.html', 'contact.html',
-    'terms.html', 'privacy.html', 'tokushoho.html', 'copyright.html',
-    '' // root path
-  ];
-
-  function getPageName(url) {
-    const u = new URL(url, location.origin);
-    const path = u.pathname;
-    const name = path.split('/').pop() || '';
-    return name;
-  }
+  // Non-SPA file extensions (let browser handle these)
+  const NON_SPA_EXT = ['.mp3', '.wav', '.ogg', '.mp4', '.pdf', '.zip', '.xml', '.json', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'];
 
   function isSPALink(anchor) {
     // Must be same origin
-    if (anchor.origin !== location.origin) return false;
+    try {
+      const url = new URL(anchor.href, location.origin);
+      if (url.origin !== location.origin) return false;
+    } catch(e) { return false; }
     // Must not have target
     if (anchor.target && anchor.target !== '_self') return false;
     // Must not be a download
     if (anchor.hasAttribute('download')) return false;
-    // Get page name
-    const pageName = getPageName(anchor.href);
-    // Check if it's an SPA page (or has a hash for index.html sections)
-    const baseName = pageName.split('#')[0];
-    if (SPA_PAGES.indexOf(baseName) === -1) return false;
+    // Skip non-HTML files
+    const pathname = new URL(anchor.href, location.origin).pathname;
+    for (var i = 0; i < NON_SPA_EXT.length; i++) {
+      if (pathname.toLowerCase().endsWith(NON_SPA_EXT[i])) return false;
+    }
+    // Must end in .html or be a directory path (no extension)
+    var lastSegment = pathname.split('/').pop();
+    if (lastSegment && lastSegment.indexOf('.') !== -1 && !lastSegment.endsWith('.html')) return false;
     return true;
   }
 
@@ -1026,33 +1022,28 @@
 
     // Handle hash links to other pages (e.g., "index.html#episodes")
     if (href.includes('#') && !href.startsWith('#')) {
-      const [pagePart, hashPart] = href.split('#');
-      const currentPage = getPageName(location.href).split('#')[0];
-      const targetPage = pagePart || currentPage;
-
-      // If same page, just scroll
-      if (targetPage === currentPage || (targetPage === '' && currentPage === 'index.html') || (targetPage === 'index.html' && currentPage === '')) {
-        e.preventDefault();
-        const target = document.getElementById(hashPart);
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-        return;
-      }
+      const hashPart = href.split('#')[1];
+      try {
+        const linkUrl = new URL(href, location.href);
+        // If same page, just scroll
+        if (linkUrl.pathname === location.pathname) {
+          e.preventDefault();
+          const target = document.getElementById(hashPart);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      } catch(ex) {}
     }
 
     // Skip pure hash links
     if (href.startsWith('#')) return;
 
     // Check if it's an SPA-eligible link
+    if (!isSPALink(anchor)) return;
+
     try {
-      const linkUrl = new URL(href, location.origin);
+      const linkUrl = new URL(href, location.href);
       if (linkUrl.origin !== location.origin) return;
-
-      const pageName = getPageName(linkUrl.href).split('#')[0];
-      if (SPA_PAGES.indexOf(pageName) === -1) return;
-
-      // Skip if target attribute is set
-      if (anchor.target && anchor.target !== '_self') return;
-      if (anchor.hasAttribute('download')) return;
 
       e.preventDefault();
       navigateTo(linkUrl.href, true);
