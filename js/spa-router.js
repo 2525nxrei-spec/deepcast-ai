@@ -804,7 +804,7 @@
             '<span class="progress-time">0:00 / ' + ep.duration + '</span>' +
           '</div>' +
         '</div>' +
-        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn">\u8a18\u4e8b\u3092\u8aad\u3080 &rarr;</a>' : '') +
+        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn">\u30c6\u30ad\u30b9\u30c8\u3067\u8aad\u3080 &rarr;</a>' : '') +
       '</div>' +
     '</article>';
   }
