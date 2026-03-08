@@ -819,6 +819,10 @@
           return;
         }
         episodeList.innerHTML = episodes.map(renderEpisode).join('');
+        // Update episode count stat dynamically
+        document.querySelectorAll('.stat-number[data-count]').forEach(el => {
+          el.dataset.count = episodes.length;
+        });
         episodeList.querySelectorAll('.play-btn').forEach(btn => {
           bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
         });
