@@ -39,6 +39,8 @@
   let currentTitleText = '';
   let playlist = [];
   let playlistIndex = -1;
+  // Map audio filename -> article URL for post-play navigation
+  let audioToArticle = {};
 
   // Expose globally so page scripts can use it
   window.DeepCastAudio = {
@@ -265,14 +267,32 @@
     }
   });
 
-  // Auto-play next
+  // Auto-play next + navigate to article page for PV boost
   audioEl.addEventListener('ended', () => {
+    var finishedAudio = currentAudioSrc;
     resetCardUI(currentPlayBtn);
     currentPlayBtn = null;
     updatePlayIcons(false);
+
+    // Navigate to article page of finished episode (PV boost)
+    var articleUrl = audioToArticle[audioFileName(finishedAudio)];
+    if (articleUrl) {
+      // Don't navigate if already on that article page
+      var currentPath = location.pathname.replace(/^\//, '');
+      var targetPath = articleUrl.replace(/^\.?\.?\//, '');
+      if (currentPath !== targetPath) {
+        navigateTo(articleUrl, true);
+      }
+    }
+
+    // Auto-play next episode after short delay (let page transition settle)
     const nextIdx = playlistIndex + 1;
-    if (nextIdx < playlist.length) playFromPlaylist(nextIdx);
-    else { playlistIndex = -1; hideMiniPlayer(); }
+    if (nextIdx < playlist.length) {
+      setTimeout(function() { playFromPlaylist(nextIdx); }, 800);
+    } else {
+      playlistIndex = -1;
+      hideMiniPlayer();
+    }
   });
 
   // Bind mini player controls (re-bind after each navigation since DOM may change)
@@ -888,6 +908,15 @@
     return episodes;
   }
 
+  // Build audio filename -> article URL mapping
+  function buildArticleMap(episodes) {
+    episodes.forEach(function(ep) {
+      if (ep.audio && ep.article) {
+        audioToArticle[audioFileName(ep.audio)] = ep.article;
+      }
+    });
+  }
+
   // Category label map
   var CATEGORY_LABELS = {
     tech: 'テクノロジー',
@@ -972,6 +1001,7 @@
         }
         // Auto-detect categories from content
         autoAssignCategories(episodes);
+        buildArticleMap(episodes);
         // Build filter buttons dynamically based on existing categories
         var filterContainer = document.querySelector('.episode-filters');
         if (filterContainer) buildFilterButtons(filterContainer, episodes);
@@ -1063,6 +1093,7 @@
       .then(episodes => {
         // Auto-detect categories from content
         autoAssignCategories(episodes);
+        buildArticleMap(episodes);
         // Build filter buttons dynamically
         var filterContainer = document.querySelector('.episode-filters');
         if (filterContainer) {
