@@ -225,6 +225,16 @@
         if (fill) fill.style.width = pct;
         if (timeEl) timeEl.textContent = timeStr;
       }
+      // Also sync article page player if it matches
+      const artFill = document.getElementById('articleProgressFill');
+      const artTime = document.getElementById('articleProgressTime');
+      if (artFill || artTime) {
+        const artBtn = document.getElementById('articlePlayBtn');
+        if (artBtn && artBtn.dataset.audio === currentAudioSrc) {
+          if (artFill) artFill.style.width = pct;
+          if (artTime) artTime.textContent = timeStr;
+        }
+      }
     }
     if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
       try { navigator.mediaSession.setPositionState({ duration: audioEl.duration, playbackRate: audioEl.playbackRate, position: audioEl.currentTime }); } catch(e) {}
