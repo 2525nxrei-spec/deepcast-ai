@@ -110,12 +110,13 @@
 
   function setMediaSession(title) {
     if (!('mediaSession' in navigator)) return;
+    // Use absolute URL for lock screen artwork (relative paths fail on some devices)
+    var base = location.origin + '/';
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title, artist: 'DeepCast AI', album: 'AI\u30dd\u30c3\u30c9\u30ad\u30e3\u30b9\u30c8',
       artwork: [
-        { src: 'assets/icon.svg', sizes: '96x96', type: 'image/svg+xml' },
-        { src: 'assets/icon-192.png', sizes: '192x192', type: 'image/png' },
-        { src: 'assets/icon-512.png', sizes: '512x512', type: 'image/png' }
+        { src: base + 'assets/cover-podcast.svg', sizes: '512x512', type: 'image/svg+xml' },
+        { src: base + 'assets/icon.svg', sizes: '96x96', type: 'image/svg+xml' }
       ]
     });
     navigator.mediaSession.setActionHandler('play', () => { audioEl.play(); updatePlayIcons(true); });
@@ -209,14 +210,22 @@
   }
 
   // Audio time update
+  // Normalize audio path to filename only for comparison
+  function audioFileName(src) {
+    if (!src) return '';
+    return src.split('/').pop().split('?')[0];
+  }
+
   audioEl.addEventListener('timeupdate', () => {
     if (!audioEl.duration) return;
     const pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
     const timeStr = formatTime(audioEl.currentTime) + ' / ' + formatTime(audioEl.duration);
+    // Mini player
     const mpf = getMiniEl('miniProgressFill');
     const mtime = getMiniEl('miniTime');
     if (mpf) mpf.style.width = pct;
     if (mtime) mtime.textContent = timeStr;
+    // Episode card on home/all-episodes page
     if (currentPlayBtn) {
       const card = currentPlayBtn.closest('.episode-card');
       if (card) {
@@ -225,16 +234,31 @@
         if (fill) fill.style.width = pct;
         if (timeEl) timeEl.textContent = timeStr;
       }
-      // Also sync article page player if it matches
-      const artFill = document.getElementById('articleProgressFill');
-      const artTime = document.getElementById('articleProgressTime');
-      if (artFill || artTime) {
-        const artBtn = document.getElementById('articlePlayBtn');
-        if (artBtn && artBtn.dataset.audio === currentAudioSrc) {
-          if (artFill) artFill.style.width = pct;
-          if (artTime) artTime.textContent = timeStr;
-        }
+    }
+    // Article page player (always check, regardless of currentPlayBtn)
+    const artFill = document.getElementById('articleProgressFill');
+    const artTime = document.getElementById('articleProgressTime');
+    if (artFill || artTime) {
+      const artBtn = document.getElementById('articlePlayBtn');
+      if (artBtn && audioFileName(artBtn.dataset.audio) === audioFileName(currentAudioSrc)) {
+        if (artFill) artFill.style.width = pct;
+        if (artTime) artTime.textContent = timeStr;
       }
+    }
+    // All play buttons with matching audio (covers home cards after SPA navigation)
+    if (currentAudioSrc) {
+      document.querySelectorAll('.play-btn[data-audio]').forEach(function(btn) {
+        if (btn === currentPlayBtn) return;
+        if (audioFileName(btn.dataset.audio) === audioFileName(currentAudioSrc)) {
+          var card = btn.closest('.episode-card');
+          if (card) {
+            var fill = card.querySelector('.progress-fill');
+            var tEl = card.querySelector('.progress-time');
+            if (fill) fill.style.width = pct;
+            if (tEl) tEl.textContent = timeStr;
+          }
+        }
+      });
     }
     if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
       try { navigator.mediaSession.setPositionState({ duration: audioEl.duration, playbackRate: audioEl.playbackRate, position: audioEl.currentTime }); } catch(e) {}
@@ -585,7 +609,7 @@
     var btns = document.querySelectorAll('.play-btn[data-audio]');
     var found = false;
     btns.forEach(function(btn) {
-      if (btn.dataset.audio === currentAudioSrc) {
+      if (audioFileName(btn.dataset.audio) === audioFileName(currentAudioSrc)) {
         currentPlayBtn = btn;
         btn.classList.add('playing');
         updatePlayIcons(!audioEl.paused);
@@ -895,7 +919,7 @@
     if (!target || target <= 0) return;
     var start = performance.now();
     var tick = function(now) {
-      var p = Math.min((now - start) / 1800, 1);
+      var p = Math.min((now - start) / 500, 1);
       el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString();
       if (p < 1) requestAnimationFrame(tick);
     };
