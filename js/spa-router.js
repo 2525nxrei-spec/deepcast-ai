@@ -279,8 +279,9 @@
     if (document.visibilityState === 'visible') {
       var articleUrl = audioToArticle[audioFileName(finishedAudio)];
       if (articleUrl) {
-        var currentPath = location.pathname.replace(/^\//, '');
-        var targetPath = articleUrl.replace(/^\.?\.?\//, '');
+        var normPath = function(p) { return p.replace(/\/index\.html$/, '/').replace(/^\//, '').replace(/\/$/, '') || ''; };
+        var currentPath = normPath(location.pathname);
+        var targetPath = normPath(articleUrl);
         if (currentPath !== targetPath) {
           navigateTo(articleUrl, true);
         }
@@ -553,7 +554,7 @@
     const navbar = document.getElementById('navbar');
     if (navbar) {
       // On non-index pages, keep scrolled class
-      const isIndex = location.pathname.endsWith('index.html') || location.pathname.endsWith('/') || location.pathname === '';
+      const isIndex = (function() { var p = location.pathname.replace(/\/index\.html$/, '/'); return p.endsWith('/') || p === ''; })();
       if (!isIndex) {
         navbar.classList.add('scrolled');
       } else {
@@ -1286,7 +1287,7 @@
   window.addEventListener('scroll', function() {
     const navbar = document.getElementById('navbar');
     if (!navbar) return;
-    const isIndex = location.pathname.endsWith('index.html') || location.pathname.endsWith('/') || location.pathname === '';
+    const isIndex = (function() { var p = location.pathname.replace(/\/index\.html$/, '/'); return p.endsWith('/') || p === ''; })();
     if (isIndex) {
       navbar.classList.toggle('scrolled', window.scrollY > 20);
     }

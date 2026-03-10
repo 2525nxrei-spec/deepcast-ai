@@ -2,7 +2,7 @@
   "name": "DeepCast AI",
   "short_name": "DeepCast",
   "description": "AIが生み出す、5分間の深い洞察",
-  "start_url": "/index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",

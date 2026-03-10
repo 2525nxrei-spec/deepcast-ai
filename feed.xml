@@ -24,6 +24,17 @@
     <itunes:keywords>AIポッドキャスト,Gemini,Deep Think,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,5分</itunes:keywords>
 
     <item>
+      <title>#3 AIが裁判官になったら冤罪は増えるのか減るのか — 司法アルゴリズムのバイアス問題</title>
+      <description>司法の自動化と正義の再定義。AI裁判官の冤罪リスクを、人間のバイアスとアルゴリズムの偏見の両面から構造分析する。</description>
+      <enclosure url="https://deepcast-ai.com/episodes/ep023.mp3" type="audio/mpeg" length="0"/>
+      <pubDate>Sun, 08 Mar 2026 00:00:00 +0900</pubDate>
+      <itunes:duration>5:00</itunes:duration>
+      <itunes:episode>3</itunes:episode>
+      <itunes:keywords>AI倫理,司法,AI裁判官,冤罪,アルゴリズムバイアス</itunes:keywords>
+      <guid isPermaLink="false">deepcast-ep003</guid>
+    </item>
+
+    <item>
       <title>#2 ChatGPTに育てられた子どもは、人間関係を築けるのか — 発達心理学×AI倫理×教育学のトリレンマ</title>
       <description>AIネイティブ世代の対人関係能力はどうなるのか。従順すぎるAIが奪う「葛藤から学ぶ力」と、擬似親密性の危険性を解明する。</description>
       <enclosure url="https://deepcast-ai.com/episodes/ep022.mp3" type="audio/mpeg" length="2672870"/>
@@ -40,7 +51,7 @@
       <enclosure url="https://deepcast-ai.com/episodes/ep021.mp3" type="audio/mpeg" length="0"/>
       <pubDate>Sun, 08 Mar 2026 00:00:00 +0900</pubDate>
       <itunes:duration>5:00</itunes:duration>
-      <itunes:episode>21</itunes:episode>
+      <itunes:episode>1</itunes:episode>
       <itunes:keywords>AGI,哲学,労働,アイデンティティ,生存戦略</itunes:keywords>
       <guid isPermaLink="false">deepcast-ep021</guid>
     </item>
