@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepcast-v11';
+const CACHE_NAME = 'deepcast-v12';
 const ASSETS = [
   '/',
   '/index.html',
@@ -28,18 +28,24 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for everything (always get latest, fallback to cache)
+// Fetch: network-first, but skip audio and ad requests entirely
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
-  // Skip non-GET and cross-origin ad requests
+  // Skip non-GET requests
   if (e.request.method !== 'GET') return;
+
+  // Skip cross-origin ad requests
   if (url.hostname.includes('googlesyndication') || url.hostname.includes('doubleclick')) return;
+
+  // Skip audio files — let browser handle Range Requests natively
+  if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav')) return;
 
   e.respondWith(
     fetch(e.request)
       .then(res => {
-        if (url.origin === location.origin) {
+        // Only cache 200 OK responses from same origin (not 206 Partial Content)
+        if (url.origin === location.origin && res.status === 200) {
           const clone = res.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
         }
