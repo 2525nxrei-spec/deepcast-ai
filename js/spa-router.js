@@ -184,7 +184,9 @@
     currentAudioSrc = item.audio;
     currentTitleText = item.title;
     playlistIndex = idx;
-    audioEl.src = item.audio;
+    var src = item.audio;
+    if (src && !src.startsWith('http') && !src.startsWith('/')) src = '/' + src;
+    audioEl.src = src;
     audioEl.play().catch(() => {
       const card = item.btn.closest('.episode-card');
       if (card) {
@@ -219,7 +221,12 @@
       currentPlayBtn = btn;
       currentAudioSrc = audioSrc;
       currentTitleText = title;
-      audioEl.src = audioSrc;
+      // 相対パスをルートからの絶対パスに変換（SPA遷移でbaseがズレるのを防止）
+      var resolvedSrc = audioSrc;
+      if (audioSrc && !audioSrc.startsWith('http') && !audioSrc.startsWith('/')) {
+        resolvedSrc = '/' + audioSrc;
+      }
+      audioEl.src = resolvedSrc;
       audioEl.play().catch(() => { if (timeEl) timeEl.textContent = '\u97f3\u58f0\u30d5\u30a1\u30a4\u30eb\u3092\u8aad\u307f\u8fbc\u3081\u307e\u305b\u3093'; currentPlayBtn = null; });
       btn.classList.add('playing');
       updatePlayIcons(true);
