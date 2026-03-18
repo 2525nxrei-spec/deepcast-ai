@@ -655,6 +655,16 @@ class VoiceEngine:
             logger.warning("voice_engine.gemini_dialogue.no_lines")
             segments = [("host", script)]
 
+        # --- 同一話者の連続セリフをバッチ化（リクエスト数削減） ---
+        batched: list[tuple[str, str]] = []
+        for role, text in segments:
+            if batched and batched[-1][0] == role:
+                # 同じ話者が続く → テキストを結合（文の切れ目を保持）
+                batched[-1] = (role, batched[-1][1] + "\n" + text)
+            else:
+                batched.append((role, text))
+        segments = batched
+
         logger.info(
             "voice_engine.gemini_dialogue.start",
             lines=len(segments),
