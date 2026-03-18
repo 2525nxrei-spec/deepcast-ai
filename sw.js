@@ -1,9 +1,9 @@
-const CACHE_NAME = 'deepcast-v8';
+const CACHE_NAME = 'deepcast-v11';
 const ASSETS = [
   '/',
   '/index.html',
   '/css/style.css',
-  '/js/main.js',
+  '/js/spa-router.js',
   '/episodes/episodes.json',
   '/manifest.json',
   '/all-episodes.html',

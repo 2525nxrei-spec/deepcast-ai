@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deepcast Embed Widget — Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      line-height: 1.6;
+    }
+    .demo-header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .demo-header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .demo-header h1 span { color: #3a8a44; }
+    .demo-header p {
+      color: #a0a0b0;
+      font-size: 15px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .demo-section {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .demo-section h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+    .demo-section h2::before {
+      content: "# ";
+      color: #3a8a44;
+    }
+    .demo-section p {
+      margin-bottom: 16px;
+      color: #555;
+      font-size: 14px;
+    }
+    .demo-box {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .demo-box--dark {
+      background: #1a1a2e;
+      border-color: #33334a;
+    }
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    pre .tag { color: #89b4fa; }
+    pre .attr { color: #a6e3a1; }
+    pre .val { color: #f9e2af; }
+    pre .comment { color: #6c7086; }
+    .demo-footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-header">
+    <h1><span>Deepcast</span> Embed Widget</h1>
+    <p>外部サイトにDeepcastのコンテンツを埋め込むための軽量ウィジェット。依存関係なし、コピペで導入可能。</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Example 1 — Light theme (default)                             -->
+  <!-- ============================================================ -->
+  <div class="demo-section">
+    <h2>Light Theme（デフォルト）</h2>
+    <p>最小構成。scriptタグを1行追加するだけでウィジェットが表示されます。</p>
+
+    <pre><span class="comment">&lt;!-- コピペ用コード --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="val">"deepcast-widget"</span><span class="tag">&gt;&lt;/div&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"http://localhost:8000/api/embed/latest.js"</span>
+        <span class="attr">data-api-url</span>=<span class="val">"http://localhost:8000"</span>
+        <span class="attr">data-language</span>=<span class="val">"ja"</span>
+        <span class="attr">data-count</span>=<span class="val">"3"</span>
+        <span class="attr">data-theme</span>=<span class="val">"light"</span><span class="tag">&gt;&lt;/script&gt;</span></pre>
+
+    <div class="demo-box">
+      <div id="deepcast-widget-light"></div>
+      <script src="embed.js"
+              data-api-url="http://localhost:8000"
+              data-language="ja"
+              data-count="3"
+              data-theme="light"
+              data-container="deepcast-widget-light"></script>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Example 2 — Dark theme                                        -->
+  <!-- ============================================================ -->
+  <div class="demo-section">
+    <h2>Dark Theme</h2>
+    <p><code>data-theme="dark"</code> を指定するとダークモードになります。</p>
+
+    <pre><span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="val">"deepcast-dark"</span><span class="tag">&gt;&lt;/div&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"http://localhost:8000/api/embed/latest.js"</span>
+        <span class="attr">data-api-url</span>=<span class="val">"http://localhost:8000"</span>
+        <span class="attr">data-language</span>=<span class="val">"ja"</span>
+        <span class="attr">data-count</span>=<span class="val">"3"</span>
+        <span class="attr">data-theme</span>=<span class="val">"dark"</span>
+        <span class="attr">data-container</span>=<span class="val">"deepcast-dark"</span><span class="tag">&gt;&lt;/script&gt;</span></pre>
+
+    <div class="demo-box demo-box--dark">
+      <div id="deepcast-widget-dark"></div>
+      <script src="embed.js"
+              data-api-url="http://localhost:8000"
+              data-language="ja"
+              data-count="3"
+              data-theme="dark"
+              data-container="deepcast-widget-dark"></script>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Example 3 — English, 5 items                                  -->
+  <!-- ============================================================ -->
+  <div class="demo-section">
+    <h2>English / 5 items</h2>
+    <p><code>data-language="en"</code> と <code>data-count="5"</code> で英語コンテンツを5件表示。</p>
+
+    <pre><span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="val">"http://localhost:8000/api/embed/latest.js"</span>
+        <span class="attr">data-api-url</span>=<span class="val">"http://localhost:8000"</span>
+        <span class="attr">data-language</span>=<span class="val">"en"</span>
+        <span class="attr">data-count</span>=<span class="val">"5"</span>
+        <span class="attr">data-theme</span>=<span class="val">"light"</span>
+        <span class="attr">data-container</span>=<span class="val">"deepcast-en"</span><span class="tag">&gt;&lt;/script&gt;</span></pre>
+
+    <div class="demo-box">
+      <div id="deepcast-widget-en"></div>
+      <script src="embed.js"
+              data-api-url="http://localhost:8000"
+              data-language="en"
+              data-count="5"
+              data-theme="light"
+              data-container="deepcast-widget-en"></script>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Data attributes reference                                     -->
+  <!-- ============================================================ -->
+  <div class="demo-section">
+    <h2>設定オプション一覧</h2>
+    <div class="demo-box">
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <thead>
+          <tr style="text-align:left;border-bottom:2px solid #ddd;">
+            <th style="padding:8px;">属性</th>
+            <th style="padding:8px;">デフォルト</th>
+            <th style="padding:8px;">説明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;"><code>data-api-url</code></td>
+            <td style="padding:8px;"><code>""</code> (same origin)</td>
+            <td style="padding:8px;">APIサーバーのベースURL</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;"><code>data-language</code></td>
+            <td style="padding:8px;"><code>"ja"</code></td>
+            <td style="padding:8px;">表示言語（<code>ja</code> / <code>en</code>）</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;"><code>data-count</code></td>
+            <td style="padding:8px;"><code>3</code></td>
+            <td style="padding:8px;">表示件数</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:8px;"><code>data-theme</code></td>
+            <td style="padding:8px;"><code>"light"</code></td>
+            <td style="padding:8px;">テーマ（<code>light</code> / <code>dark</code>）</td>
+          </tr>
+          <tr>
+            <td style="padding:8px;"><code>data-container</code></td>
+            <td style="padding:8px;"><code>"deepcast-widget"</code></td>
+            <td style="padding:8px;">ウィジェットを挿入するコンテナのID</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="demo-footer">
+    Deepcast Engine &mdash; Embed Widget Demo
+  </div>
+
+</body>
+</html>

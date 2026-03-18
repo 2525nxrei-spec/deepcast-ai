@@ -5,8 +5,14 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 import json, struct, os, time
 from google import genai
+from dotenv import load_dotenv
 
-API_KEY = "AIzaSyAIiFAZZFzZFshD3AWicsowCmbt_JO8Wl0"
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "engine", ".env"))
+API_KEY = os.environ.get("GEMINI_API_KEY", "")
+if not API_KEY:
+    print("ERROR: GEMINI_API_KEY not set. Check engine/.env")
+    sys.exit(1)
+
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "episodes")
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
 os.makedirs(SCRIPTS_DIR, exist_ok=True)

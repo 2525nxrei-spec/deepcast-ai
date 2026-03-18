@@ -3,10 +3,12 @@ import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
-import struct
+import struct, os
 from google import genai
+from dotenv import load_dotenv
 
-client = genai.Client(api_key="AIzaSyAIiFAZZFzZFshD3AWicsowCmbt_JO8Wl0")
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "engine", ".env"))
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
 
 print("Sending request to Gemini TTS...")
 

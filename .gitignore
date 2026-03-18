@@ -11,3 +11,20 @@ desktop.ini
 *.gdoc
 *.gsheet
 *.gslides
+
+# Secrets
+.env
+engine/.env
+
+# Next.js backup (managed separately)
+app/
+
+# Database
+engine/data/
+
+# Python
+__pycache__/
+*.pyc
+
+# Audio test files
+engine/data/audio/test_*

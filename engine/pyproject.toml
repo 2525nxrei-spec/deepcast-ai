@@ -1,0 +1,34 @@
+[project]
+name = "deepcast-engine"
+version = "0.1.0"
+description = "Deepcast Engine — Autonomous AI content generation system"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "httpx",
+    "apscheduler>=3.10",
+    "aiosqlite",
+    "python-dotenv",
+    "structlog",
+    "edge-tts",
+]
+
+[project.optional-dependencies]
+voice = [
+    "TTS",
+    "piper-tts",
+]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[tool.setuptools.packages.find]
+include = ["config*", "core*", "engine*", "api*", "scheduler*", "manager*"]

@@ -23,5 +23,27 @@
     <itunes:type>episodic</itunes:type>
     <itunes:keywords>AIポッドキャスト,Gemini,Deep Think,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,5分</itunes:keywords>
 
+  
+<item>
+  <title>#2 実はヤバい！サステナブルファイナンスとESG投資の真実</title>
+  <description>## えっ、マジで？会社のお金の使い方が変わるって知ってましたか？  最近、ニュースでもよく耳にする「サステナブルファイナンス」と「ESG投資」。ぶっちゃけ、これって普通の人にとってどんな意味があるんでしょうか？  ### 1. まずはサス</description>
+  <enclosure url="https://deepcast-ai.com/episodes/ep002.mp3" type="audio/mpeg" length="0"/>
+  <pubDate>Wed, 18 Mar 2026 22:27:54 +0900</pubDate>
+  <itunes:duration>5:00</itunes:duration>
+  <itunes:episode>2</itunes:episode>
+  <itunes:keywords>sustainable finance,ESG investing,corporate social responsibility</itunes:keywords>
+  <guid isPermaLink="false">deepcast-ep002</guid>
+</item>
+
+<item>
+  <title>#1 AIと倫理 — 人工知能の進化とともに考える未来社会</title>
+  <description># AIと倫理 — 人工知能の進化とともに考える未来社会  ## えっ、マジで？AIが私たちの生活にこんなに影響を与えてるのか！  ぶっちゃけ、最近AIってめっちゃ話題になってるよね。でも、その実態ってよく分かんないじゃないですか。だから、</description>
+  <enclosure url="https://deepcast-ai.com/episodes/ep001.mp3" type="audio/mpeg" length="0"/>
+  <pubDate>Wed, 18 Mar 2026 22:27:32 +0900</pubDate>
+  <itunes:duration>5:00</itunes:duration>
+  <itunes:episode>1</itunes:episode>
+  <itunes:keywords>AI,倫理,未来社会,道德</itunes:keywords>
+  <guid isPermaLink="false">deepcast-ep001</guid>
+</item>
   </channel>
 </rss>

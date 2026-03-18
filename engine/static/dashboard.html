@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deepcast Engine — ダッシュボード</title>
+<style>
+/* ================================================================
+   ROOT & RESET
+   ================================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#3a8a44;
+  --accent-light:#e8f5e9;
+  --accent-dark:#2e6e36;
+  --bg-sidebar:#1a1a2e;
+  --bg-main:#f4f6f9;
+  --bg-card:#fff;
+  --text-primary:#1e1e2f;
+  --text-secondary:#6b7280;
+  --text-sidebar:#c8c8d4;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.1);
+  --radius:10px;
+  --transition:all .25s ease;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+}
+html{font-size:14px}
+body{font-family:var(--font);background:var(--bg-main);color:var(--text-primary);display:flex;min-height:100vh;overflow-x:hidden}
+
+/* ================================================================
+   SIDEBAR
+   ================================================================ */
+.sidebar{
+  width:260px;min-height:100vh;background:var(--bg-sidebar);
+  color:var(--text-sidebar);display:flex;flex-direction:column;
+  position:fixed;left:0;top:0;bottom:0;z-index:100;
+  transition:transform .3s ease;
+}
+.sidebar-header{padding:1.5rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:.75rem}
+.sidebar-logo{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#fff}
+.sidebar-title{font-size:1.1rem;font-weight:700;color:#fff;line-height:1.2}
+.sidebar-subtitle{font-size:.7rem;color:var(--text-sidebar);opacity:.6}
+/* Sidebar mobile overlay backdrop */
+.sidebar-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;
+}
+.sidebar-backdrop.open{display:block}
+.sidebar-nav{flex:1;padding:1rem 0}
+.nav-section{padding:.5rem 1.5rem;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-top:.5rem}
+.nav-item{
+  display:flex;align-items:center;gap:.75rem;padding:.7rem 1.5rem;
+  cursor:pointer;transition:var(--transition);font-size:.9rem;
+  border-left:3px solid transparent;
+}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-item.active{background:rgba(58,138,68,.15);color:var(--accent);border-left-color:var(--accent)}
+.sidebar-footer{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,.08);font-size:.7rem;opacity:.5}
+
+/* ================================================================
+   MAIN CONTENT
+   ================================================================ */
+.main{margin-left:260px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* Top bar */
+.topbar{
+  background:var(--bg-card);border-bottom:1px solid var(--border);
+  padding:.8rem 2rem;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-left{display:flex;align-items:center;gap:1rem}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:.5rem}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text-primary);margin:4px 0;transition:var(--transition)}
+.status-badge{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--text-secondary)}
+.status-dot{width:8px;height:8px;border-radius:50%;animation:pulse 2s infinite}
+.status-dot.healthy{background:#22c55e}
+.status-dot.error{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.topbar-right{display:flex;align-items:center;gap:1.5rem}
+.clock{font-size:.85rem;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+.refresh-indicator{font-size:.7rem;color:var(--text-secondary);opacity:.6}
+
+.content{padding:2rem;flex:1}
+
+/* ================================================================
+   STATS CARDS
+   ================================================================ */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{
+  background:var(--bg-card);border-radius:var(--radius);padding:1.25rem;
+  box-shadow:var(--shadow);transition:var(--transition);position:relative;overflow:hidden;
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);border-radius:var(--radius) var(--radius) 0 0}
+.stat-label{font-size:.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem}
+.stat-value{font-size:1.8rem;font-weight:700;color:var(--text-primary);line-height:1}
+.stat-sub{font-size:.7rem;color:var(--text-secondary);margin-top:.4rem}
+.stat-icon{position:absolute;top:1rem;right:1rem;font-size:1.5rem;opacity:.15}
+.stat-card.loading .stat-value{background:#e2e8f0;color:transparent;border-radius:4px;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+
+/* ================================================================
+   SECTIONS
+   ================================================================ */
+.section{background:var(--bg-card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:1.5rem;overflow:hidden}
+.section-header{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-title{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+.section-desc{font-size:.75rem;color:var(--text-secondary);margin-top:.25rem;font-weight:400}
+.section-body{padding:1.25rem 1.5rem}
+
+/* Confirm dialog */
+.confirm-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;
+  display:flex;align-items:center;justify-content:center;
+}
+.confirm-box{
+  background:var(--bg-card);border-radius:12px;padding:2rem;max-width:400px;width:90%;
+  box-shadow:var(--shadow-lg);text-align:center;
+}
+.confirm-title{font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
+.confirm-msg{font-size:.9rem;color:var(--text-secondary);margin-bottom:1.5rem;line-height:1.5}
+.confirm-actions{display:flex;gap:.75rem;justify-content:center}
+.confirm-actions .btn{min-width:100px;padding:.6rem 1.25rem}
+
+/* ================================================================
+   TABLE
+   ================================================================ */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead th{text-align:left;padding:.7rem .5rem;color:var(--text-secondary);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:var(--transition);cursor:pointer}
+tbody tr:hover{background:var(--accent-light)}
+tbody td{padding:.65rem .5rem;vertical-align:middle}
+.badge{display:inline-block;padding:.15rem .6rem;border-radius:999px;font-size:.7rem;font-weight:600}
+.badge-published{background:#dcfce7;color:#166534}
+.badge-draft{background:#fef3c7;color:#92400e}
+.badge-review{background:#dbeafe;color:#1e40af}
+.badge-rejected{background:#fee2e2;color:#991b1b}
+.score-pill{display:inline-block;padding:.1rem .5rem;border-radius:999px;font-size:.75rem;font-weight:700;min-width:2.5rem;text-align:center}
+.score-high{background:#dcfce7;color:#166534}
+.score-mid{background:#fef3c7;color:#92400e}
+.score-low{background:#fee2e2;color:#991b1b}
+.expand-row{display:none}
+.expand-row.open{display:table-row}
+.expand-content{padding:1rem;background:#f8fafc;font-size:.85rem;line-height:1.6;color:var(--text-secondary);max-height:200px;overflow-y:auto}
+.action-btn{
+  padding:6px 12px;border:1px solid var(--border);border-radius:6px;
+  background:var(--bg-card);cursor:pointer;font-size:0.8rem;font-weight:600;
+  transition:all 0.2s;white-space:nowrap;margin-right:.3rem;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.action-btn:hover{background:var(--accent-light)}
+.action-btn.approve{color:#22c55e;border-color:#22c55e;background:#f0fdf4}
+.action-btn.approve:hover{background:#dcfce7}
+.action-btn.reject{color:#ef4444;border-color:#ef4444;background:#fef2f2}
+.action-btn.reject:hover{background:#fee2e2}
+.action-btn.audio{color:#3b82f6;border-color:#3b82f6;background:#eff6ff}
+.action-btn.audio:hover{background:#dbeafe}
+.action-btn.view{color:#8b5cf6;border-color:#8b5cf6;background:#f5f3ff}
+.action-btn.view:hover{background:#ede9fe}
+
+/* ================================================================
+   CHART
+   ================================================================ */
+.chart-container{position:relative;width:100%;height:260px}
+.chart-container canvas{width:100%!important;height:100%!important}
+.chart-legend{display:flex;gap:1.5rem;margin-top:.75rem;font-size:.75rem;color:var(--text-secondary)}
+.chart-legend span{display:flex;align-items:center;gap:.4rem}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+
+/* ================================================================
+   HEALTH PANEL
+   ================================================================ */
+.health-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.health-item{display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:8px;background:#f8fafc}
+.health-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.health-dot.ok{background:#22c55e}
+.health-dot.ng{background:#ef4444}
+.health-dot.warn{background:#f59e0b}
+.health-label{font-size:.8rem;font-weight:600}
+.health-detail{font-size:.7rem;color:var(--text-secondary)}
+
+/* ================================================================
+   REVIEW PANEL
+   ================================================================ */
+.review-list{display:flex;flex-direction:column;gap:.75rem}
+.review-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1rem;border-radius:8px;background:#f8fafc;transition:var(--transition);
+}
+.review-item:hover{background:var(--accent-light)}
+.review-info{flex:1}
+.review-title{font-weight:600;font-size:.85rem}
+.review-meta{font-size:.7rem;color:var(--text-secondary);margin-top:.2rem}
+.btn{
+  border:none;padding:.5rem 1rem;border-radius:8px;font-size:.8rem;
+  font-weight:600;cursor:pointer;transition:var(--transition);
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dark)}
+.btn-outline{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn-outline:hover{background:var(--accent-light)}
+.btn-danger{background:#ef4444;color:#fff}
+.btn-danger:hover{background:#dc2626}
+.btn-warn{background:#f59e0b;color:#fff}
+.btn-warn:hover{background:#d97706}
+
+/* ================================================================
+   QUICK ACTIONS
+   ================================================================ */
+.actions-row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
+.lang-toggle{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
+.lang-toggle button{padding:.45rem .9rem;border:none;background:transparent;cursor:pointer;font-size:.8rem;font-weight:600;transition:var(--transition)}
+.lang-toggle button.active{background:var(--accent);color:#fff}
+
+/* ================================================================
+   MODAL
+   ================================================================ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{
+  background:var(--bg-card);border-radius:var(--radius);width:90%;max-width:640px;
+  max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg);
+  transform:translateY(20px);transition:transform .3s ease;
+}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:1.05rem;font-weight:700}
+.modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-secondary);padding:.25rem}
+.modal-body{padding:1.5rem}
+.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.75rem}
+.content-preview{background:#f8fafc;border-radius:8px;padding:1rem;font-size:.85rem;line-height:1.7;max-height:300px;overflow-y:auto;margin-bottom:1rem;white-space:pre-wrap}
+.feedback-input{width:100%;padding:.7rem;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:var(--font);resize:vertical;min-height:80px}
+.feedback-input:focus{outline:none;border-color:var(--accent)}
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+.toast-container{position:fixed;top:1rem;right:1rem;z-index:2000;display:flex;flex-direction:column;gap:.5rem}
+.toast{
+  padding:.75rem 1.25rem;border-radius:8px;font-size:.85rem;font-weight:500;
+  color:#fff;box-shadow:var(--shadow-lg);transform:translateX(120%);
+  transition:transform .3s ease;max-width:360px;
+}
+.toast.show{transform:translateX(0)}
+.toast.success{background:#22c55e}
+.toast.error{background:#ef4444}
+.toast.info{background:#3b82f6}
+.toast.warning{background:#f59e0b}
+
+/* ================================================================
+   EMPTY & LOADING
+   ================================================================ */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary)}
+.empty-state .empty-icon{font-size:2.5rem;margin-bottom:.75rem;opacity:.3}
+.empty-state .empty-hint{font-size:.8rem;color:var(--text-secondary);margin-top:.5rem;opacity:.7}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ================================================================
+   TWO-COL LAYOUT
+   ================================================================ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+
+/* ================================================================
+   REVIEW & EVALUATION PANEL
+   ================================================================ */
+.eval-section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.eval-counter{font-size:.8rem;color:var(--text-secondary);background:#f1f5f9;padding:.3rem .8rem;border-radius:999px}
+.eval-cards-container{display:flex;flex-direction:column;gap:1.5rem}
+.eval-card{
+  background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;
+  overflow:hidden;transition:var(--transition);
+}
+.eval-card:hover{box-shadow:var(--shadow-lg)}
+.eval-card-preview{padding:1.5rem;border-bottom:1.5px solid var(--border)}
+.eval-card-title-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+.eval-card-title{font-size:1.25rem;font-weight:700;flex:1;min-width:0;line-height:1.4}
+.eval-lang-badge{
+  display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .7rem;
+  border-radius:999px;font-size:.75rem;font-weight:600;background:#f1f5f9;flex-shrink:0;
+}
+.eval-ai-score{
+  display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .7rem;
+  border-radius:999px;font-size:.75rem;font-weight:700;flex-shrink:0;
+}
+.eval-ai-score.high{background:#dcfce7;color:#166534}
+.eval-ai-score.mid{background:#fef3c7;color:#92400e}
+.eval-ai-score.low{background:#fee2e2;color:#991b1b}
+.eval-body-preview{
+  max-height:300px;overflow-y:auto;background:#f8fafc;border-radius:8px;
+  padding:1.25rem;font-size:.9rem;line-height:1.8;color:var(--text-primary);
+  white-space:pre-wrap;word-break:break-word;border:1px solid var(--border);
+}
+.eval-body-preview::-webkit-scrollbar{width:6px}
+.eval-body-preview::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+.eval-body-preview::-webkit-scrollbar-track{background:transparent}
+.eval-audio-play-btn{
+  display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;
+  border:1.5px solid var(--accent);background:transparent;color:var(--accent);
+  border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;
+  transition:var(--transition);margin-top:1rem;
+}
+.eval-audio-play-btn:hover{background:var(--accent-light)}
+/* Star Rating */
+.eval-form{padding:1.5rem}
+.eval-form-title{font-size:1rem;font-weight:700;margin-bottom:1.25rem;color:var(--text-primary)}
+.eval-overall-stars{margin-bottom:1.5rem}
+.eval-overall-label{font-size:.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:.5rem}
+.star-rating{display:inline-flex;flex-direction:row-reverse;gap:.15rem}
+.star-rating input{display:none}
+.star-rating label{
+  font-size:1.8rem;color:#d1d5db;cursor:pointer;transition:color .15s ease,transform .15s ease;
+  line-height:1;user-select:none;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label{color:#f59e0b}
+.star-rating label:hover{transform:scale(1.15)}
+.star-rating.sm label{font-size:1.3rem}
+.eval-criteria{
+  background:#f8fafc;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;
+  border:1px solid var(--border);
+}
+.eval-criteria-title{font-size:.8rem;font-weight:700;color:var(--text-secondary);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em}
+.eval-criterion{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;gap:.75rem;flex-wrap:wrap}
+.eval-criterion-label{font-size:.85rem;font-weight:500;color:var(--text-primary);min-width:100px}
+.eval-comment-label{font-size:.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:.5rem}
+.eval-comment{
+  width:100%;padding:.8rem 1rem;border:1.5px solid var(--border);border-radius:10px;
+  font-size:.9rem;font-family:var(--font);resize:vertical;min-height:100px;
+  line-height:1.6;transition:border-color .2s ease;
+}
+.eval-comment:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(58,138,68,.1)}
+.eval-comment::placeholder{color:#9ca3af}
+.eval-actions{
+  display:flex;gap:.75rem;padding:1.25rem 1.5rem;border-top:1.5px solid var(--border);
+  background:#fafbfc;flex-wrap:wrap;
+}
+.eval-btn{
+  flex:1;min-width:140px;padding:.8rem 1.25rem;border:none;border-radius:10px;
+  font-size:.9rem;font-weight:700;cursor:pointer;transition:var(--transition);
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+}
+.eval-btn:active{transform:scale(.97)}
+.eval-btn.approve{background:#22c55e;color:#fff}
+.eval-btn.approve:hover{background:#16a34a;box-shadow:0 4px 12px rgba(34,197,94,.3)}
+.eval-btn.revision{background:#f59e0b;color:#fff}
+.eval-btn.revision:hover{background:#d97706;box-shadow:0 4px 12px rgba(245,158,11,.3)}
+.eval-btn.reject{background:#ef4444;color:#fff}
+.eval-btn.reject:hover{background:#dc2626;box-shadow:0 4px 12px rgba(239,68,68,.3)}
+.eval-empty{text-align:center;padding:4rem 2rem;color:var(--text-secondary)}
+.eval-empty-icon{font-size:3rem;opacity:.2;margin-bottom:1rem}
+.eval-empty-text{font-size:1rem}
+.eval-nav-btns{display:flex;gap:.5rem;align-items:center}
+.eval-nav-btn{
+  padding:.4rem .8rem;border:1.5px solid var(--border);background:var(--bg-card);
+  border-radius:6px;font-size:.8rem;cursor:pointer;transition:var(--transition);
+}
+.eval-nav-btn:hover{background:var(--accent-light);border-color:var(--accent)}
+.eval-nav-btn:disabled{opacity:.4;cursor:not-allowed}
+.eval-progress{font-size:.75rem;color:var(--text-secondary)}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media(max-width:1024px){
+  .two-col{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+  .content{padding:1rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:.75rem}
+  .player-bar{left:0}
+  .eval-section-header{flex-direction:column;align-items:flex-start}
+  .eval-actions{flex-direction:column}
+  .eval-btn{min-width:auto;padding:1rem}
+  .eval-card-title{font-size:1.05rem}
+  .eval-criterion{flex-direction:column;align-items:flex-start;gap:.25rem}
+  .eval-nav-btns{width:100%;justify-content:space-between}
+  .action-btn{padding:8px 10px;font-size:.75rem}
+  .topbar{padding:.6rem 1rem}
+  .section-header{flex-direction:column;align-items:flex-start;gap:.5rem}
+  .modal{width:95%;max-width:none;margin:1rem}
+}
+
+/* ================================================================
+   AUDIO PLAYER BAR
+   ================================================================ */
+.player-bar{
+  position:fixed;bottom:0;left:260px;right:0;
+  height:72px;background:#1a1a2e;color:#fff;
+  display:flex;align-items:center;padding:0 1.5rem;gap:1rem;
+  transform:translateY(100%);transition:transform .3s ease;
+  z-index:1000;box-shadow:0 -2px 10px rgba(0,0,0,.3);
+}
+.player-bar.active{transform:translateY(0)}
+.player-play-btn{
+  width:40px;height:40px;border-radius:50%;border:none;
+  background:var(--accent);color:#fff;font-size:1.1rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);flex-shrink:0;
+}
+.player-play-btn:hover{background:var(--accent-dark);transform:scale(1.05)}
+.player-info{flex-shrink:0;max-width:200px;overflow:hidden}
+.player-title{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-source{font-size:.65rem;color:rgba(255,255,255,.5)}
+.player-progress-wrap{flex:1;display:flex;align-items:center;gap:.75rem;min-width:0}
+.player-time{font-size:.7rem;color:rgba(255,255,255,.6);font-variant-numeric:tabular-nums;flex-shrink:0;min-width:36px}
+.player-progress{flex:1;height:4px;background:rgba(255,255,255,.15);border-radius:2px;cursor:pointer;position:relative}
+.player-progress:hover{height:6px}
+.player-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .1s linear;pointer-events:none}
+.player-volume-wrap{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
+.player-volume-icon{font-size:.9rem;cursor:pointer;opacity:.7;transition:opacity .2s}
+.player-volume-icon:hover{opacity:1}
+.player-volume{width:70px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;cursor:pointer;position:relative}
+.player-volume:hover{height:6px}
+.player-volume-fill{height:100%;background:rgba(255,255,255,.6);border-radius:2px;pointer-events:none}
+
+/* ================================================================
+   AUDIO LIBRARY
+   ================================================================ */
+.audio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+.audio-card{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.25rem;transition:var(--transition);position:relative;overflow:hidden;
+}
+.audio-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.audio-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem}
+.audio-card-title{font-size:.9rem;font-weight:700;line-height:1.3;flex:1;margin-right:.5rem}
+.audio-source-badge{
+  display:inline-block;padding:.1rem .5rem;border-radius:999px;font-size:.6rem;font-weight:700;
+  text-transform:uppercase;flex-shrink:0;
+}
+.audio-source-badge.engine{background:#dbeafe;color:#1e40af}
+.audio-source-badge.site{background:#dcfce7;color:#166534}
+.audio-card-meta{font-size:.7rem;color:var(--text-secondary);margin-bottom:1rem;display:flex;gap:1rem}
+.audio-card-play{
+  width:48px;height:48px;border-radius:50%;border:none;
+  background:var(--accent);color:#fff;font-size:1.3rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  margin:0 auto;transition:var(--transition);
+}
+.audio-card-play:hover{background:var(--accent-dark);transform:scale(1.08)}
+.audio-card-play.playing{background:#ef4444}
+.audio-empty{text-align:center;padding:3rem;color:var(--text-secondary)}
+.audio-empty-icon{font-size:3rem;opacity:.2;margin-bottom:.75rem}
+
+/* Adjust main content padding when player is active */
+body.player-active .content{padding-bottom:90px}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR BACKDROP (mobile)
+     ============================================================ -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">D</div>
+    <div>
+      <div class="sidebar-title">Deepcast Engine</div>
+      <div class="sidebar-subtitle">AIコンテンツ管理</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">メイン</div>
+    <div class="nav-item active" data-section="dashboard" onclick="navigate(this)">&#x1f4ca; ダッシュボード</div>
+    <div class="nav-item" data-section="contents" onclick="navigate(this)">&#x1f4dd; コンテンツ</div>
+    <div class="nav-section">レビュー・メディア</div>
+    <div class="nav-item" data-section="reviewTop" onclick="navigate(this)">&#x2705; かんたんレビュー</div>
+    <div class="nav-item" data-section="evaluation" onclick="navigate(this)">&#x1f4cb; 詳細レビュー・評価</div>
+    <div class="nav-item" data-section="audio" onclick="navigate(this)">&#x1f3b5; 音声ライブラリ</div>
+    <div class="nav-section">分析・管理</div>
+    <div class="nav-item" data-section="quality" onclick="navigate(this)">&#x1f4c8; 品質トレンド</div>
+    <div class="nav-item" data-section="actions" onclick="navigate(this)">&#x26a1; クイック操作</div>
+    <div class="nav-item" data-section="health" onclick="navigate(this)">&#x1f6e0;&#xfe0f; システム状態</div>
+  </nav>
+  <div class="sidebar-footer">Deepcast Engine v0.1.0</div>
+</aside>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<div class="main">
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+      <div class="status-badge">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">接続確認中...</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button onclick="triggerGenerate()" style="padding:8px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='var(--accent-dark)'" onmouseout="this.style.background='var(--accent)'">&#x2728; 新規生成</button>
+      <span class="refresh-indicator" id="refreshTimer">30秒後に更新</span>
+      <span class="clock" id="clock"></span>
+    </div>
+  </header>
+
+  <!-- Content area -->
+  <div class="content">
+
+    <!-- STATS CARDS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card loading">
+        <div class="stat-icon">&#x1f4da;</div>
+        <div class="stat-label">コンテンツ総数</div>
+        <div class="stat-value" id="statTotal">--</div>
+        <div class="stat-sub" id="statLangBreak">JA: -- / EN: --</div>
+      </div>
+      <div class="stat-card loading">
+        <div class="stat-icon">&#x2705;</div>
+        <div class="stat-label">公開済み</div>
+        <div class="stat-value" id="statPublished">--</div>
+        <div class="stat-sub" id="statPublishedToday">本日: --</div>
+      </div>
+      <div class="stat-card loading">
+        <div class="stat-icon">&#x274c;</div>
+        <div class="stat-label">却下</div>
+        <div class="stat-value" id="statRejected">--</div>
+        <div class="stat-sub">品質基準を満たさなかったもの</div>
+      </div>
+      <div class="stat-card loading">
+        <div class="stat-icon">&#x2b50;</div>
+        <div class="stat-label">平均品質スコア</div>
+        <div class="stat-value" id="statQuality">--</div>
+        <div class="stat-sub" id="statQualityLabel">7日間平均</div>
+      </div>
+      <div class="stat-card loading">
+        <div class="stat-icon">&#x1f50d;</div>
+        <div class="stat-label">レビュー待ち</div>
+        <div class="stat-value" id="statPending">--</div>
+        <div class="stat-sub">承認待ちコンテンツ</div>
+      </div>
+      <div class="stat-card loading">
+        <div class="stat-icon">&#x1f3a7;</div>
+        <div class="stat-label">音声ファイル</div>
+        <div class="stat-value" id="statAudio">--</div>
+        <div class="stat-sub">生成済み音声</div>
+      </div>
+      <div class="stat-card loading">
+        <div class="stat-icon">&#x1f4cb;</div>
+        <div class="stat-label">トピックキュー</div>
+        <div class="stat-value" id="statTopics">--</div>
+        <div class="stat-sub">待機中トピック</div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         REVIEW PANEL (メインタスク: レビュー待ちコンテンツの承認/却下)
+         最も重要なセクション: stats直後に配置
+         ============================================================ -->
+    <div class="section" id="sectionReviewTop" style="border:2px solid var(--accent);margin-bottom:1.5rem">
+      <div class="section-header" style="background:var(--accent-light)">
+        <div class="section-title" style="font-size:1.1rem">&#x2705; レビュー待ち &mdash; 承認・却下してください</div>
+        <span class="badge badge-review" id="reviewCountTop" style="font-size:.85rem;padding:.3rem .8rem">0件</span>
+      </div>
+      <div class="section-body">
+        <div class="review-list" id="reviewListTop">
+          <div class="empty-state">
+            <div class="empty-icon">&#x1f4ed;</div>
+            <div>レビュー待ちのコンテンツはありません</div>
+            <div class="empty-hint">「クイック操作」からコンテンツを生成すると、ここにレビュー待ちが表示されます</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERATION PROGRESS -->
+    <div class="section" id="sectionProgress" style="margin-bottom:1.5rem">
+      <div class="section-header">
+        <div>
+          <div class="section-title">&#x1f4e1; 生成アクティビティ</div>
+          <div class="section-desc">最近のコンテンツ生成状況をリアルタイムで表示します</div>
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-outline" style="font-size:.75rem;padding:.35rem .75rem" onclick="refreshProgress()">&#x1f504; 更新</button>
+          <button class="btn" style="font-size:.75rem;padding:.35rem .75rem;background:#e2e8f0;color:#555" onclick="clearProgress()">クリア</button>
+        </div>
+      </div>
+      <div class="section-body">
+        <div id="progressLog" style="font-size:.85rem;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:1rem;max-height:260px;overflow-y:auto;line-height:1.8">
+          <div style="color:var(--text-secondary)">読み込み中...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT CONTENTS TABLE -->
+    <div class="section" id="sectionContents">
+      <div class="section-header">
+        <div>
+          <div class="section-title">&#x1f4dd; コンテンツ一覧</div>
+          <div class="section-desc">生成されたコンテンツの確認・操作ができます。行をクリックでプレビュー展開</div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <select id="statusFilter" onchange="loadContents()" style="padding:.3rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font)">
+            <option value="published">公開済み</option>
+            <option value="draft">下書き</option>
+            <option value="review" selected>レビュー中</option>
+            <option value="rejected">却下</option>
+          </select>
+        </div>
+      </div>
+      <div class="section-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>タイトル</th>
+                <th>言語</th>
+                <th>スコア</th>
+                <th>ステータス</th>
+                <th>作成日</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="contentsBody">
+              <tr><td colspan="7" class="empty-state"><div class="spinner"></div> 読み込み中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- QUALITY TREND CHART -->
+      <div class="section" id="sectionQuality">
+        <div class="section-header">
+          <div>
+            <div class="section-title">&#x1f4c8; 品質トレンド</div>
+            <div class="section-desc">AIが採点した品質スコアの推移</div>
+          </div>
+          <select id="trendDays" onchange="loadQualityTrend()" style="padding:.3rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font)">
+            <option value="7">7日間</option>
+            <option value="14">14日間</option>
+            <option value="30">30日間</option>
+          </select>
+        </div>
+        <div class="section-body">
+          <div class="chart-container">
+            <canvas id="qualityChart"></canvas>
+          </div>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:var(--accent)"></span> 日本語 (JA)</span>
+            <span><span class="legend-dot" style="background:#3b82f6"></span> English (EN)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SYSTEM HEALTH -->
+      <div class="section" id="sectionHealth">
+        <div class="section-header">
+          <div>
+            <div class="section-title">&#x1f6e0;&#xfe0f; システム状態</div>
+            <div class="section-desc">各コンポーネントの接続状況。緑=正常、赤=エラー、黄=注意</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="health-grid" id="healthGrid">
+            <div class="health-item">
+              <span class="health-dot" id="healthOllama"></span>
+              <div>
+                <div class="health-label">Ollama LLM</div>
+                <div class="health-detail" id="healthOllamaDetail">確認中...</div>
+              </div>
+            </div>
+            <div class="health-item">
+              <span class="health-dot" id="healthDB"></span>
+              <div>
+                <div class="health-label">データベース</div>
+                <div class="health-detail" id="healthDBDetail">確認中...</div>
+              </div>
+            </div>
+            <div class="health-item">
+              <span class="health-dot warn" id="healthScheduler"></span>
+              <div>
+                <div class="health-label">スケジューラ</div>
+                <div class="health-detail" id="healthSchedulerDetail">確認中...</div>
+              </div>
+            </div>
+            <div class="health-item">
+              <span class="health-dot" id="healthAPI"></span>
+              <div>
+                <div class="health-label">API サーバー</div>
+                <div class="health-detail" id="healthAPIDetail">確認中...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="two-col">
+      <div class="section" id="sectionActions">
+        <div class="section-header">
+          <div>
+            <div class="section-title">&#x26a1; クイック操作</div>
+            <div class="section-desc">新しいコンテンツの生成やデータ更新ができます</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="actions-row" style="margin-bottom:1rem">
+            <label style="font-size:.8rem;font-weight:600;color:var(--text-secondary)">言語:</label>
+            <div class="lang-toggle" id="langToggle">
+              <button class="active" data-lang="ja" onclick="setLang('ja',this)">JA</button>
+              <button data-lang="en" onclick="setLang('en',this)">EN</button>
+              <button data-lang="both" onclick="setLang('both',this)">両方</button>
+            </div>
+          </div>
+          <div class="actions-row" style="flex-direction:column;align-items:stretch;gap:.75rem">
+            <button class="btn btn-primary" onclick="triggerGenerate()" id="btnGenerate" style="width:100%;padding:.75rem">
+              &#x1f680; コンテンツを生成する
+            </button>
+            <button class="btn btn-outline" onclick="triggerTrends()" id="btnTrends" style="width:100%;padding:.75rem">
+              &#x1f4ca; トレンド分析を実行
+            </button>
+            <button class="btn btn-outline" onclick="loadAll()" style="width:100%;padding:.75rem">
+              &#x1f504; データを再読み込み
+            </button>
+          </div>
+          <div style="margin-top:1.25rem;padding:1rem;background:#f8fafc;border-radius:8px">
+            <div style="font-size:.75rem;font-weight:600;color:var(--text-secondary);margin-bottom:.5rem">生成設定</div>
+            <input type="text" id="topicInput" placeholder="トピック（空欄で自動選択）"
+              style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;font-family:var(--font);margin-bottom:.5rem"
+            >
+            <select id="categorySelect" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;font-family:var(--font)">
+              <option value="">カテゴリ（自動）</option>
+              <option value="technology">テクノロジー</option>
+              <option value="business">ビジネス</option>
+              <option value="science">サイエンス</option>
+              <option value="culture">カルチャー</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIO LIBRARY -->
+    <div class="section" id="sectionAudio">
+      <div class="section-header">
+        <div>
+          <div class="section-title">&#x1f3b5; 音声ライブラリ</div>
+          <div class="section-desc">生成された音声ファイルを再生できます。再生ボタンをクリック</div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <span style="font-size:.75rem;color:var(--text-secondary)" id="audioTotalCount">0 件</span>
+          <button class="btn btn-outline" style="font-size:.7rem;padding:.3rem .7rem" onclick="loadAudioFiles()">&#x1f504; 更新</button>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="audio-grid" id="audioGrid">
+          <div class="audio-empty">
+            <div class="audio-empty-icon">&#x1f3a7;</div>
+            <div>音声ファイルを読み込み中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEW & EVALUATION PANEL -->
+    <div class="section" id="sectionEvaluation">
+      <div class="section-header eval-section-header">
+        <div>
+          <div class="section-title">&#x1f4cb; 詳細レビュー・評価</div>
+          <div class="section-desc">コンテンツを一つずつ読んで、星評価とコメントをつけられます</div>
+        </div>
+        <div style="display:flex;gap:.75rem;align-items:center">
+          <span class="eval-counter" id="evalCounter">0件のレビュー待ち</span>
+          <div class="eval-nav-btns">
+            <button class="eval-nav-btn" id="evalPrev" onclick="evalNavigate(-1)" disabled>&larr; 前へ</button>
+            <span class="eval-progress" id="evalProgress">-- / --</span>
+            <button class="eval-nav-btn" id="evalNext" onclick="evalNavigate(1)" disabled>次へ &rarr;</button>
+          </div>
+          <button class="btn btn-outline" style="font-size:.7rem;padding:.3rem .7rem" onclick="loadEvalItems()">&#x1f504; 更新</button>
+        </div>
+      </div>
+      <div class="section-body" style="padding:0">
+        <div id="evalContainer">
+          <div class="eval-empty">
+            <div class="eval-empty-icon">&#x1f4ed;</div>
+            <div class="eval-empty-text">レビュー待ちのコンテンツを読み込み中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ============================================================
+     AUDIO PLAYER BAR
+     ============================================================ -->
+<div class="player-bar" id="playerBar">
+  <button class="player-play-btn" id="playerPlayBtn" onclick="togglePlayPause()">&#x25b6;</button>
+  <div class="player-info">
+    <div class="player-title" id="playerTitle">音声を選択してください</div>
+    <div class="player-source" id="playerSource"></div>
+  </div>
+  <div class="player-progress-wrap">
+    <span class="player-time" id="playerCurrentTime">0:00</span>
+    <div class="player-progress" id="playerProgress" onclick="seekAudio(event)">
+      <div class="player-progress-fill" id="playerProgressFill" style="width:0%"></div>
+    </div>
+    <span class="player-time" id="playerDuration">0:00</span>
+  </div>
+  <div class="player-volume-wrap">
+    <span class="player-volume-icon" id="playerVolumeIcon" onclick="toggleMute()">&#x1f50a;</span>
+    <div class="player-volume" id="playerVolume" onclick="setVolume(event)">
+      <div class="player-volume-fill" id="playerVolumeFill" style="width:80%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     REVIEW MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">コンテンツレビュー</div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:.75rem;margin-bottom:1rem">
+        <span class="badge" id="modalLang"></span>
+        <span class="score-pill" id="modalScore"></span>
+      </div>
+      <div class="content-preview" id="modalContent">読み込み中...</div>
+      <label style="font-size:.8rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:.4rem">フィードバック</label>
+      <textarea class="feedback-input" id="modalFeedback" placeholder="修正指示やコメントを入力..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="reviewAction('reject')">却下</button>
+      <button class="btn btn-warn" onclick="reviewAction('revision')">修正依頼</button>
+      <button class="btn btn-primary" onclick="reviewAction('approve')">承認</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  /* ================================================================
+     CONFIG
+     ================================================================ */
+  const API_BASE = window.location.origin;
+  const API_KEY = 'deepcast-dev-secret-change-me';
+  const REFRESH_INTERVAL = 30; // seconds
+
+  let currentLang = 'ja';
+  let refreshCountdown = REFRESH_INTERVAL;
+  let allContents = [];
+  let reviewContents = [];
+  let currentReviewId = null;
+  let trendDataJA = [];
+  let trendDataEN = [];
+
+  /* ================================================================
+     HELPERS
+     ================================================================ */
+  function apiHeaders() {
+    return { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' };
+  }
+
+  async function apiFetch(path, options = {}) {
+    const url = API_BASE + path;
+    const opts = { headers: apiHeaders(), ...options };
+    try {
+      const resp = await fetch(url, opts);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return await resp.json();
+    } catch (e) {
+      console.error('API Error:', path, e);
+      throw e;
+    }
+  }
+
+  function toast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = message;
+    container.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 400);
+    }, 3500);
+  }
+
+  function confirmAction(title, message, confirmLabel, confirmClass, onConfirm) {
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
+    overlay.innerHTML = `
+      <div class="confirm-box">
+        <div class="confirm-title">${title}</div>
+        <div class="confirm-msg">${message}</div>
+        <div class="confirm-actions">
+          <button class="btn btn-outline" id="confirmCancel">キャンセル</button>
+          <button class="btn ${confirmClass}" id="confirmOk">${confirmLabel}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#confirmCancel').onclick = () => overlay.remove();
+    overlay.querySelector('#confirmOk').onclick = () => { overlay.remove(); onConfirm(); };
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '--';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    return d.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function shortId(id) {
+    if (!id) return '--';
+    return id.length > 8 ? id.substring(0, 8) + '...' : id;
+  }
+
+  function langFlag(lang) {
+    return lang === 'ja' ? '\ud83c\uddef\ud83c\uddf5' : lang === 'en' ? '\ud83c\uddfa\ud83c\uddf8' : '\ud83c\udf10';
+  }
+
+  function scoreClass(score) {
+    if (score >= 80) return 'score-high';
+    if (score >= 50) return 'score-mid';
+    return 'score-low';
+  }
+
+  function statusBadge(status) {
+    const map = {
+      published: 'badge-published',
+      draft: 'badge-draft',
+      review: 'badge-review',
+      rejected: 'badge-rejected',
+    };
+    const labels = {
+      published: '公開済み',
+      draft: '下書き',
+      review: 'レビュー中',
+      rejected: '却下',
+    };
+    return `<span class="badge ${map[status] || 'badge-draft'}">${labels[status] || status}</span>`;
+  }
+
+  /* ================================================================
+     CLOCK
+     ================================================================ */
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleString('ja-JP', {
+      month: 'short', day: 'numeric', weekday: 'short',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  /* ================================================================
+     REFRESH TIMER
+     ================================================================ */
+  setInterval(() => {
+    refreshCountdown--;
+    if (refreshCountdown <= 0) {
+      refreshCountdown = REFRESH_INTERVAL;
+      loadAll();
+    }
+    document.getElementById('refreshTimer').textContent = `${refreshCountdown}秒後に更新`;
+  }, 1000);
+
+  /* ================================================================
+     NAVIGATION
+     ================================================================ */
+  window.navigate = function(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    // Scroll to section
+    const sectionKey = el.dataset.section;
+    if (sectionKey === 'dashboard') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const sectionId = 'section' + sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1);
+      const target = document.getElementById(sectionId);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    // Close sidebar on mobile
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarBackdrop').classList.remove('open');
+    }
+  };
+
+  window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    sidebar.classList.toggle('open');
+    backdrop.classList.toggle('open');
+  };
+
+  /* ================================================================
+     LANGUAGE TOGGLE
+     ================================================================ */
+  window.setLang = function(lang, btn) {
+    currentLang = lang;
+    document.querySelectorAll('#langToggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+
+  /* ================================================================
+     LOAD HEALTH
+     ================================================================ */
+  async function loadHealth() {
+    try {
+      const data = await apiFetch('/api/health');
+      const isHealthy = data.status === 'ok' && data.db_connected;
+
+      // Top bar status
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      dot.className = 'status-dot ' + (isHealthy ? 'healthy' : 'error');
+      text.textContent = isHealthy ? 'システム正常' : 'エラーあり';
+
+      // Health panel
+      setHealthItem('healthOllama', data.ollama_connected, data.ollama_connected ? '接続済み' : '未接続');
+      setHealthItem('healthDB', data.db_connected, data.db_connected ? '正常' : '接続エラー');
+      setHealthItem('healthAPI', true, 'レスポンス正常');
+
+      // Try status endpoint for scheduler
+      try {
+        const status = await apiFetch('/api/status');
+        setHealthItem('healthScheduler', status.scheduler_running, status.scheduler_running ? '実行中' : '停止中');
+        document.getElementById('healthSchedulerDetail').textContent =
+          status.scheduler_running ? '実行中' : '停止中 (--no-scheduler)';
+      } catch {
+        setHealthItem('healthScheduler', false, '確認不可');
+      }
+
+    } catch (e) {
+      document.getElementById('statusDot').className = 'status-dot error';
+      document.getElementById('statusText').textContent = 'API接続エラー';
+      setHealthItem('healthAPI', false, '接続失敗 — サーバーが起動していない可能性');
+    }
+  }
+
+  function setHealthItem(id, ok, detail) {
+    const dot = document.getElementById(id);
+    const detailEl = document.getElementById(id + 'Detail');
+    dot.className = 'health-dot ' + (ok ? 'ok' : 'ng');
+    if (detailEl) detailEl.textContent = detail;
+  }
+
+  /* ================================================================
+     LOAD STATS
+     ================================================================ */
+  async function loadStats() {
+    try {
+      // Use aggregated dashboard endpoint for efficiency (single DB round-trip)
+      const data = await apiFetch('/api/dashboard');
+      const s = data.stats || {};
+
+      setStatCard('statTotal', s.total_contents || 0, false);
+      const byLang = s.by_language || {};
+      document.getElementById('statLangBreak').textContent = `JA: ${byLang.ja||0} / EN: ${byLang.en||0}`;
+
+      setStatCard('statPublished', s.published || 0, false);
+      document.getElementById('statPublishedToday').textContent = `本日: ${s.published_today||0}`;
+      setStatCard('statRejected', s.rejected || 0, false);
+      setStatCard('statQuality', s.avg_quality_score || '--', false);
+      setStatCard('statPending', s.pending_reviews || 0, false);
+      document.getElementById('reviewCountTop').textContent = `${s.pending_reviews||0}件`;
+      setStatCard('statAudio', s.audio_files || 0, false);
+      setStatCard('statTopics', s.topics_pending || 0, false);
+
+    } catch (e) {
+      console.error('loadStats error:', e);
+      // Fallback: try individual endpoints
+      try {
+        const [pub, draft, review, rejected] = await Promise.all([
+          apiFetch('/api/contents?status=published&limit=1'),
+          apiFetch('/api/contents?status=draft&limit=1'),
+          apiFetch('/api/contents?status=review&limit=1'),
+          apiFetch('/api/contents?status=rejected&limit=1'),
+        ]);
+        const total = (pub.total||0) + (draft.total||0) + (review.total||0) + (rejected.total||0);
+        setStatCard('statTotal', total, false);
+        setStatCard('statPublished', pub.total || 0, false);
+        setStatCard('statRejected', rejected.total || 0, false);
+        setStatCard('statPending', review.total || 0, false);
+        document.getElementById('reviewCountTop').textContent = `${review.total||0}件`;
+        setStatCard('statTopics', draft.total || 0, false);
+      } catch (e2) {
+        console.error('loadStats fallback error:', e2);
+      }
+    }
+  }
+
+  function setStatCard(id, value, loading) {
+    const el = document.getElementById(id);
+    if (!el) { console.warn('setStatCard: element not found:', id); return; }
+    el.textContent = value;
+    const card = el.closest('.stat-card');
+    if (card) card.classList.toggle('loading', loading);
+  }
+
+  /* ================================================================
+     LOAD CONTENTS TABLE
+     ================================================================ */
+  window.loadContents = async function() {
+    const status = document.getElementById('statusFilter').value;
+    const tbody = document.getElementById('contentsBody');
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="spinner"></div> 読み込み中...</td></tr>';
+
+    try {
+      const data = await apiFetch(`/api/contents?status=${status}&limit=20`);
+      allContents = data.contents || [];
+
+      if (allContents.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="empty-icon">\ud83d\udced</div>\u3053\u306e\u30b9\u30c6\u30fc\u30bf\u30b9\u306e\u30b3\u30f3\u30c6\u30f3\u30c4\u306f\u307e\u3060\u3042\u308a\u307e\u305b\u3093<div class="empty-hint">\u4e0a\u306e\u30d5\u30a3\u30eb\u30bf\u30fc\u3067\u4ed6\u306e\u30b9\u30c6\u30fc\u30bf\u30b9\u3082\u78ba\u8a8d\u3067\u304d\u307e\u3059</div></td></tr>';
+        return;
+      }
+
+      let html = '';
+      allContents.forEach((c, i) => {
+        const score = c.quality_score != null ? Math.round(c.quality_score) : '--';
+        const scoreCls = typeof score === 'number' ? scoreClass(score) : '';
+        html += `<tr onclick="toggleExpand(${i})">
+          <td style="font-family:monospace;font-size:.75rem;color:var(--text-secondary)">${shortId(c.id)}</td>
+          <td style="font-weight:600;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.title || '無題'}</td>
+          <td>${langFlag(c.language)} ${(c.language||'').toUpperCase()}</td>
+          <td><span class="score-pill ${scoreCls}">${score}</span></td>
+          <td>${statusBadge(c.status)}</td>
+          <td style="font-size:.8rem;color:var(--text-secondary)">${formatDate(c.created_at)}</td>
+          <td>
+            <button class="action-btn approve" onclick="event.stopPropagation();actionApprove('${c.id}')" title="承認">&#x2713; 承認</button>
+            <button class="action-btn reject" onclick="event.stopPropagation();actionReject('${c.id}')" title="却下">&#x2717; 却下</button>
+            <button class="action-btn audio" onclick="event.stopPropagation();actionAudio('${c.id}')" title="音声生成">&#x266b; 音声</button>
+            <button class="action-btn view" onclick="event.stopPropagation();actionViewBody('${c.id}')" title="台本を見る">&#x1f4c4; 台本</button>
+          </td>
+        </tr>
+        <tr class="expand-row" id="expand-${i}">
+          <td colspan="7">
+            <div class="expand-content">${(c.body || c.summary || 'プレビューなし').substring(0, 500)}${(c.body||'').length > 500 ? '...' : ''}</div>
+          </td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state" style="color:#ef4444">\u30c7\u30fc\u30bf\u306e\u8aad\u307f\u8fbc\u307f\u306b\u5931\u6557\u3057\u307e\u3057\u305f<div class="empty-hint">\u30b5\u30fc\u30d0\u30fc\u304c\u8d77\u52d5\u3057\u3066\u3044\u308b\u304b\u78ba\u8a8d\u3057\u3001\u300c\u30c7\u30fc\u30bf\u3092\u518d\u8aad\u307f\u8fbc\u307f\u300d\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044</div></td></tr>';
+    }
+  };
+
+  window.toggleExpand = function(index) {
+    const row = document.getElementById('expand-' + index);
+    if (row) row.classList.toggle('open');
+  };
+
+  /* ================================================================
+     CONTENT ACTIONS
+     ================================================================ */
+  window.actionApprove = async function(id) {
+    try {
+      await apiFetch(`/api/review/${id}`, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'approve', feedback: '' }),
+      });
+      toast('コンテンツを承認・公開しました', 'success');
+      loadContents();
+      loadReviews();
+      loadStats();
+    } catch (e) {
+      toast('承認処理に失敗しました', 'error');
+    }
+  };
+  window.actionReject = function(id) {
+    confirmAction(
+      'コンテンツを却下しますか？',
+      'この操作を行うと、コンテンツのステータスが「却下」に変わります。',
+      '却下する',
+      'btn-danger',
+      async function() {
+        try {
+          await apiFetch(`/api/review/${id}`, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'reject', feedback: '' }),
+          });
+          toast('コンテンツを却下しました', 'warning');
+          loadContents();
+          loadReviews();
+          loadStats();
+        } catch (e) {
+          toast('却下処理に失敗しました', 'error');
+        }
+      }
+    );
+  };
+  window.actionAudio = async function(id) {
+    toast('音声生成を開始しています...', 'info');
+    try {
+      await apiFetch(`/api/generate/voice/${id}`, { method: 'POST' });
+      toast('音声ファイルを生成しました', 'success');
+      loadStats();
+      loadAudioFiles();
+    } catch (e) {
+      toast('音声生成に失敗しました', 'error');
+    }
+  };
+  window.actionViewBody = async function(id) {
+    try {
+      const content = await apiFetch(`/api/contents/${id}`);
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:2rem';
+      modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+      const box = document.createElement('div');
+      box.style.cssText = 'background:#fff;border-radius:12px;padding:2rem;max-width:800px;width:100%;max-height:80vh;overflow-y:auto;position:relative';
+      const title = content.title || '\u7121\u984c';
+      const body = (content.body || '\u672c\u6587\u304c\u3042\u308a\u307e\u305b\u3093').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+      box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h3 style="margin:0;font-size:1.2rem">${title}</h3><button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer">&times;</button></div><div style="font-size:.9rem;line-height:1.8;color:#333">${body}</div>`;
+      modal.appendChild(box);
+      document.body.appendChild(modal);
+    } catch (e) {
+      toast('コンテンツの読み込みに失敗しました', 'error');
+    }
+  };
+
+  /* ================================================================
+     QUALITY TREND CHART (Canvas)
+     ================================================================ */
+  async function loadQualityTrend() {
+    const days = document.getElementById('trendDays').value;
+    try {
+      const [ja, en] = await Promise.all([
+        apiFetch(`/api/quality/trend?language=ja&days=${days}`),
+        apiFetch(`/api/quality/trend?language=en&days=${days}`),
+      ]);
+      trendDataJA = ja.trend || [];
+      trendDataEN = en.trend || [];
+      drawChart();
+    } catch (e) {
+      console.error('Trend load error:', e);
+    }
+  }
+
+  function drawChart() {
+    const canvas = document.getElementById('qualityChart');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const W = rect.width;
+    const H = rect.height;
+    const PAD = { top: 20, right: 20, bottom: 40, left: 45 };
+    const chartW = W - PAD.left - PAD.right;
+    const chartH = H - PAD.top - PAD.bottom;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Combine all dates
+    const allDates = [...new Set([...trendDataJA.map(d => d.day), ...trendDataEN.map(d => d.day)])].sort();
+
+    if (allDates.length === 0) {
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '14px ' + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = 'center';
+      ctx.fillText('データがありません', W / 2, H / 2);
+      return;
+    }
+
+    const minScore = 0;
+    const maxScore = 100;
+
+    // Grid lines
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = PAD.top + (chartH / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(PAD.left, y);
+      ctx.lineTo(W - PAD.right, y);
+      ctx.stroke();
+      // Y labels
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(Math.round(maxScore - (maxScore / 4) * i), PAD.left - 8, y + 4);
+    }
+
+    // X labels
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '10px sans-serif';
+    const step = Math.max(1, Math.floor(allDates.length / 7));
+    allDates.forEach((d, i) => {
+      if (i % step === 0 || i === allDates.length - 1) {
+        const x = PAD.left + (i / Math.max(allDates.length - 1, 1)) * chartW;
+        ctx.fillText(d.substring(5), x, H - PAD.bottom + 18);
+      }
+    });
+
+    // Draw line helper
+    function drawLine(data, color) {
+      if (data.length === 0) return;
+      const map = {};
+      data.forEach(d => { map[d.day] = d.avg_score; });
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+
+      let started = false;
+      allDates.forEach((d, i) => {
+        if (map[d] == null) return;
+        const x = PAD.left + (i / Math.max(allDates.length - 1, 1)) * chartW;
+        const y = PAD.top + chartH - ((map[d] - minScore) / (maxScore - minScore)) * chartH;
+        if (!started) { ctx.moveTo(x, y); started = true; }
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Dots
+      allDates.forEach((d, i) => {
+        if (map[d] == null) return;
+        const x = PAD.left + (i / Math.max(allDates.length - 1, 1)) * chartW;
+        const y = PAD.top + chartH - ((map[d] - minScore) / (maxScore - minScore)) * chartH;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    drawLine(trendDataJA, '#3a8a44');
+    drawLine(trendDataEN, '#3b82f6');
+  }
+
+  // Redraw on resize
+  window.addEventListener('resize', drawChart);
+
+  /* ================================================================
+     REVIEW PANEL
+     ================================================================ */
+
+  async function loadReviews() {
+    try {
+      const data = await apiFetch('/api/contents?status=review&limit=20');
+      reviewContents = data.contents || [];
+      const list = document.getElementById('reviewListTop');
+      const countEl = document.getElementById('reviewCountTop');
+      if (countEl) countEl.textContent = reviewContents.length + '件';
+
+      if (reviewContents.length === 0) {
+        if (list) list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#x1F4ED;</div><div>レビュー待ちのコンテンツはありません</div></div>';
+        return;
+      }
+
+      if (list) list.innerHTML = reviewContents.map(c => {
+        const score = c.quality_score != null ? Math.round(c.quality_score) : '--';
+        return `<div class="review-item" style="flex-wrap:wrap;gap:.75rem">
+          <div class="review-info">
+            <div class="review-title">${langFlag(c.language)} ${c.title || '無題'}</div>
+            <div class="review-meta">スコア: <span class="score-pill ${typeof score === 'number' ? scoreClass(score) : ''}" style="font-size:.65rem">${score}</span> &middot; ${formatDate(c.created_at)}</div>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-shrink:0;flex-wrap:wrap">
+            <button class="action-btn approve" onclick="actionApprove('${c.id}')" style="font-size:.8rem;padding:8px 14px">&#x2713; 承認</button>
+            <button class="action-btn reject" onclick="actionReject('${c.id}')" style="font-size:.8rem;padding:8px 14px">&#x2717; 却下</button>
+            <button class="btn btn-outline" style="font-size:.8rem;padding:8px 14px" onclick="openReviewModal('${c.id}')">&#x1f4dd; 詳細レビュー</button>
+          </div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      console.error('loadReviews error:', e);
+    }
+  }
+
+  /* ================================================================
+     REVIEW MODAL
+     ================================================================ */
+  window.openReviewModal = function(id) {
+    currentReviewId = id;
+    const content = [...allContents, ...reviewContents].find(c => c.id === id);
+    const modal = document.getElementById('reviewModal');
+
+    document.getElementById('modalTitle').textContent = content ? (content.title || '無題') : 'コンテンツレビュー';
+
+    if (content) {
+      const lang = content.language || '??';
+      document.getElementById('modalLang').textContent = `${langFlag(lang)} ${lang.toUpperCase()}`;
+      document.getElementById('modalLang').className = 'badge badge-review';
+
+      const score = content.quality_score != null ? Math.round(content.quality_score) : '--';
+      const scoreEl = document.getElementById('modalScore');
+      scoreEl.textContent = score;
+      scoreEl.className = 'score-pill ' + (typeof score === 'number' ? scoreClass(score) : '');
+
+      document.getElementById('modalContent').textContent = content.body || content.summary || 'コンテンツの本文がありません';
+    }
+
+    document.getElementById('modalFeedback').value = '';
+    modal.classList.add('open');
+  };
+
+  window.closeModal = function() {
+    document.getElementById('reviewModal').classList.remove('open');
+    currentReviewId = null;
+  };
+
+  window.reviewAction = async function(action) {
+    const feedback = document.getElementById('modalFeedback').value;
+    const labels = { approve: '承認', reject: '却下', revision: '修正依頼' };
+    try {
+      await apiFetch(`/api/review/${currentReviewId}`, {
+        method: 'POST',
+        body: JSON.stringify({ action, feedback: feedback || null }),
+      });
+      toast(`${labels[action]}を送信しました（ID: ${shortId(currentReviewId)})`, action === 'approve' ? 'success' : action === 'reject' ? 'error' : 'info');
+      closeModal();
+      loadContents();
+      loadReviews();
+      loadStats();
+    } catch (e) {
+      toast(`${labels[action]}の送信に失敗しました`, 'error');
+    }
+  };
+
+  document.getElementById('reviewModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  /* ================================================================
+     QUICK ACTIONS
+     ================================================================ */
+  window.triggerGenerate = async function() {
+    const btn = document.getElementById('btnGenerate');
+    const origText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> 生成中...';
+    btn.disabled = true;
+
+    try {
+      const lang = currentLang === 'both' ? 'ja' : currentLang;
+      const topic = document.getElementById('topicInput').value || undefined;
+      const category = document.getElementById('categorySelect').value || undefined;
+      const body = { language: lang };
+      if (topic) body.topic = topic;
+      if (category) body.category = category;
+
+      const result = await apiFetch('/api/generate', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
+
+      toast(`生成タスクを開始しました (ID: ${shortId(result.task_id)})`, 'success');
+
+      if (currentLang === 'both') {
+        const body2 = { language: 'en' };
+        if (topic) body2.topic = topic;
+        if (category) body2.category = category;
+        const r2 = await apiFetch('/api/generate', {
+          method: 'POST',
+          body: JSON.stringify(body2),
+        });
+        toast(`EN生成タスクも開始 (ID: ${shortId(r2.task_id)})`, 'success');
+      }
+    } catch (e) {
+      toast('生成リクエストに失敗しました', 'error');
+    } finally {
+      btn.innerHTML = origText;
+      btn.disabled = false;
+    }
+  };
+
+  window.triggerTrends = async function() {
+    const btn = document.getElementById('btnTrends');
+    const origText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> 分析中...';
+    btn.disabled = true;
+
+    try {
+      const lang = currentLang === 'both' ? 'ja' : currentLang;
+      const result = await apiFetch(`/api/trends/analyze?language=${lang}`, { method: 'POST' });
+
+      toast('トレンド分析が完了しました', 'success');
+
+      // Show results in a modal
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:2rem';
+      modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+      const box = document.createElement('div');
+      box.style.cssText = 'background:#fff;border-radius:12px;padding:2rem;max-width:800px;width:100%;max-height:80vh;overflow-y:auto;position:relative';
+
+      let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem"><h3 style="margin:0;font-size:1.2rem">\ud83d\udcca \u30c8\u30ec\u30f3\u30c9\u5206\u6790\u7d50\u679c</h3><button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer">&times;</button></div>';
+
+      // Seasonal themes
+      const seasonal = result.seasonal_themes || [];
+      if (seasonal.length > 0) {
+        html += '<div style="margin-bottom:1.5rem"><h4 style="font-size:.95rem;margin-bottom:.5rem">\ud83c\udf38 \u5b63\u7bc0\u30c6\u30fc\u30de</h4>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:.4rem">';
+        seasonal.forEach(t => { html += '<span style="background:#e8f5e9;color:#2e6e36;padding:.25rem .7rem;border-radius:999px;font-size:.8rem">' + t + '</span>'; });
+        html += '</div></div>';
+      }
+
+      // Topic predictions
+      const predictions = result.predictions || [];
+      if (predictions.length > 0) {
+        html += '<div style="margin-bottom:1.5rem"><h4 style="font-size:.95rem;margin-bottom:.5rem">\ud83d\udca1 \u304a\u3059\u3059\u3081\u30c8\u30d4\u30c3\u30af</h4>';
+        predictions.forEach(p => {
+          const urgencyColor = p.urgency === 'high' ? '#ef4444' : p.urgency === 'medium' ? '#f59e0b' : '#6b7280';
+          html += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem 1rem;margin-bottom:.5rem">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem">';
+          html += '<strong style="font-size:.9rem">' + (p.topic || '--') + '</strong>';
+          html += '<span style="color:' + urgencyColor + ';font-size:.7rem;font-weight:700;text-transform:uppercase">' + (p.urgency || '') + '</span>';
+          html += '</div>';
+          html += '<div style="font-size:.8rem;color:#6b7280">' + (p.reasoning || '') + '</div>';
+          if (p.keywords && p.keywords.length > 0) {
+            html += '<div style="margin-top:.3rem;display:flex;gap:.3rem;flex-wrap:wrap">';
+            p.keywords.forEach(k => { html += '<span style="background:#dbeafe;color:#1e40af;padding:.1rem .5rem;border-radius:999px;font-size:.7rem">' + k + '</span>'; });
+            html += '</div>';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      // Content gaps
+      const gaps = result.content_gaps || [];
+      if (gaps.length > 0) {
+        html += '<div style="margin-bottom:1.5rem"><h4 style="font-size:.95rem;margin-bottom:.5rem">\ud83d\udd0d \u30b3\u30f3\u30c6\u30f3\u30c4\u30ae\u30e3\u30c3\u30d7</h4>';
+        html += '<table style="width:100%;font-size:.8rem;border-collapse:collapse">';
+        html += '<tr style="border-bottom:2px solid #e2e8f0"><th style="text-align:left;padding:.4rem">\u30ab\u30c6\u30b4\u30ea</th><th style="text-align:center;padding:.4rem">\u4ef6\u6570</th><th style="text-align:center;padding:.4rem">\u5e73\u5747\u30b9\u30b3\u30a2</th><th style="text-align:left;padding:.4rem">\u30b9\u30c6\u30fc\u30bf\u30b9</th></tr>';
+        gaps.forEach(g => {
+          const status = g.needs_more ? '<span style="color:#ef4444;font-weight:600">\u8ffd\u52a0\u304c\u5fc5\u8981</span>' : '<span style="color:#22c55e">\u5145\u8db3</span>';
+          html += '<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:.4rem">' + (g.category || '--') + '</td><td style="text-align:center;padding:.4rem">' + g.content_count + '</td><td style="text-align:center;padding:.4rem">' + (g.avg_score || '--') + '</td><td style="padding:.4rem">' + status + '</td></tr>';
+        });
+        html += '</table></div>';
+      }
+
+      // Content calendar
+      const calendar = result.calendar || [];
+      if (calendar.length > 0) {
+        html += '<div><h4 style="font-size:.95rem;margin-bottom:.5rem">\ud83d\udcc5 \u30b3\u30f3\u30c6\u30f3\u30c4\u30ab\u30ec\u30f3\u30c0\u30fc (7\u65e5\u5206)</h4>';
+        calendar.forEach(c => {
+          const prioColor = c.priority === 'high' ? '#ef4444' : c.priority === 'medium' ? '#f59e0b' : '#6b7280';
+          html += '<div style="display:flex;align-items:center;gap:.75rem;padding:.4rem 0;border-bottom:1px solid #f1f5f9">';
+          html += '<span style="font-size:.8rem;color:#6b7280;min-width:80px">' + (c.date || '') + '</span>';
+          html += '<span style="font-size:.85rem;flex:1">' + (c.topic || '--') + '</span>';
+          html += '<span style="font-size:.7rem;background:#f1f5f9;padding:.15rem .5rem;border-radius:4px">' + (c.category || '') + '</span>';
+          html += '<span style="width:8px;height:8px;border-radius:50%;background:' + prioColor + ';flex-shrink:0" title="' + (c.priority || '') + '"></span>';
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      if (!predictions.length && !gaps.length && !seasonal.length && !calendar.length) {
+        html += '<div style="text-align:center;padding:2rem;color:#6b7280">\u5206\u6790\u30c7\u30fc\u30bf\u304c\u3042\u308a\u307e\u305b\u3093\u3002\u30b3\u30f3\u30c6\u30f3\u30c4\u3092\u751f\u6210\u30fb\u516c\u958b\u3057\u3066\u304b\u3089\u518d\u5b9f\u884c\u3057\u3066\u304f\u3060\u3055\u3044\u3002</div>';
+      }
+
+      box.innerHTML = html;
+      modal.appendChild(box);
+      document.body.appendChild(modal);
+
+      // Refresh data since predictions may have saved new topics
+      loadStats();
+
+    } catch (e) {
+      toast('\u30c8\u30ec\u30f3\u30c9\u5206\u6790\u306b\u5931\u6557\u3057\u307e\u3057\u305f', 'error');
+    } finally {
+      btn.innerHTML = origText;
+      btn.disabled = false;
+    }
+  };
+
+  /* ================================================================
+     AUDIO PLAYER
+     ================================================================ */
+  const audioPlayer = new Audio();
+  let currentTrack = null;
+  let audioFiles = [];
+  audioPlayer.volume = 0.8;
+
+  function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function formatFileSize(bytes) {
+    if (!bytes) return '--';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function formatAudioTitle(filename) {
+    let name = filename.replace(/\.mp3$/i, '');
+    if (name.startsWith('content_')) {
+      return '\u30b3\u30f3\u30c6\u30f3\u30c4 ' + name.substring(8, 16) + '...';
+    }
+    name = name.replace(/[_]/g, ' ').replace(/[-]/g, ' - ');
+    return name;
+  }
+
+  window.playTrack = function(url, title, source) {
+    currentTrack = { url, title, source };
+    audioPlayer.src = url.startsWith('http') ? url : API_BASE + url;
+    audioPlayer.play();
+    document.getElementById('playerTitle').textContent = title;
+    document.getElementById('playerSource').textContent = source === 'site' ? '\u30b5\u30a4\u30c8\u30a8\u30d4\u30bd\u30fc\u30c9' : '\u30a8\u30f3\u30b8\u30f3\u751f\u6210\u97f3\u58f0';
+    document.getElementById('playerBar').classList.add('active');
+    document.getElementById('playerPlayBtn').innerHTML = '&#x23f8;';
+    document.body.classList.add('player-active');
+    document.querySelectorAll('.audio-card-play').forEach(btn => {
+      btn.classList.remove('playing');
+      btn.innerHTML = '&#x25b6;';
+    });
+    const activeBtn = document.querySelector(`.audio-card-play[data-url="${url}"]`);
+    if (activeBtn) {
+      activeBtn.classList.add('playing');
+      activeBtn.innerHTML = '&#x23f8;';
+    }
+  };
+
+  window.togglePlayPause = function() {
+    if (!currentTrack) return;
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+      document.getElementById('playerPlayBtn').innerHTML = '&#x23f8;';
+    } else {
+      audioPlayer.pause();
+      document.getElementById('playerPlayBtn').innerHTML = '&#x25b6;';
+    }
+  };
+
+  window.seekAudio = function(e) {
+    if (!audioPlayer.duration) return;
+    const bar = document.getElementById('playerProgress');
+    const rect = bar.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    audioPlayer.currentTime = pct * audioPlayer.duration;
+  };
+
+  window.setVolume = function(e) {
+    const bar = document.getElementById('playerVolume');
+    const rect = bar.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    audioPlayer.volume = pct;
+    document.getElementById('playerVolumeFill').style.width = (pct * 100) + '%';
+    document.getElementById('playerVolumeIcon').innerHTML = pct === 0 ? '&#x1f507;' : pct < 0.5 ? '&#x1f509;' : '&#x1f50a;';
+  };
+
+  window.toggleMute = function() {
+    audioPlayer.muted = !audioPlayer.muted;
+    if (audioPlayer.muted) {
+      document.getElementById('playerVolumeIcon').innerHTML = '&#x1f507;';
+      document.getElementById('playerVolumeFill').style.width = '0%';
+    } else {
+      document.getElementById('playerVolumeIcon').innerHTML = audioPlayer.volume < 0.5 ? '&#x1f509;' : '&#x1f50a;';
+      document.getElementById('playerVolumeFill').style.width = (audioPlayer.volume * 100) + '%';
+    }
+  };
+
+  audioPlayer.addEventListener('timeupdate', () => {
+    if (!audioPlayer.duration) return;
+    const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    document.getElementById('playerProgressFill').style.width = pct + '%';
+    document.getElementById('playerCurrentTime').textContent = formatTime(audioPlayer.currentTime);
+    document.getElementById('playerDuration').textContent = formatTime(audioPlayer.duration);
+  });
+
+  audioPlayer.addEventListener('ended', () => {
+    document.getElementById('playerPlayBtn').innerHTML = '&#x25b6;';
+    document.getElementById('playerProgressFill').style.width = '0%';
+    document.querySelectorAll('.audio-card-play').forEach(btn => {
+      btn.classList.remove('playing');
+      btn.innerHTML = '&#x25b6;';
+    });
+    currentTrack = null;
+  });
+
+  audioPlayer.addEventListener('error', () => {
+    toast('音声ファイルの再生に失敗しました', 'error');
+    document.getElementById('playerPlayBtn').innerHTML = '&#x25b6;';
+  });
+
+  /* ================================================================
+     AUDIO LIBRARY LOADER
+     ================================================================ */
+  window.loadAudioFiles = async function() {
+    const grid = document.getElementById('audioGrid');
+    grid.innerHTML = '<div class="audio-empty"><div class="spinner"></div><div style="margin-top:.75rem">読み込み中...</div></div>';
+    try {
+      const data = await apiFetch('/api/audio');
+      audioFiles = data.files || [];
+      document.getElementById('audioTotalCount').textContent = data.total + ' 件';
+
+      if (audioFiles.length === 0) {
+        grid.innerHTML = '<div class="audio-empty"><div class="audio-empty-icon">&#x1f3a7;</div><div>音声ファイルがありません</div><div style="font-size:.75rem;margin-top:.5rem;color:var(--text-secondary)">コンテンツの音声生成ボタンから作成できます</div></div>';
+        return;
+      }
+
+      grid.innerHTML = audioFiles.map((f, i) => {
+        const title = formatAudioTitle(f.name);
+        const isPlaying = currentTrack && currentTrack.url === f.path;
+        return `<div class="audio-card">
+          <div class="audio-card-header">
+            <div class="audio-card-title">${title}</div>
+            <span class="audio-source-badge ${f.source}">${f.source === 'site' ? 'Site' : 'Engine'}</span>
+          </div>
+          <div class="audio-card-meta">
+            <span>&#x1f4c1; ${formatFileSize(f.size)}</span>
+            <span>&#x1f4c5; ${formatDate(f.created)}</span>
+          </div>
+          <button class="audio-card-play ${isPlaying ? 'playing' : ''}"
+            data-url="${f.path}"
+            onclick="event.stopPropagation();playTrack('${f.path}','${title.replace(/'/g,"\\'")}','${f.source}')">
+            ${isPlaying ? '&#x23f8;' : '&#x25b6;'}
+          </button>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      grid.innerHTML = '<div class="audio-empty"><div class="audio-empty-icon" style="color:#ef4444">&#x26a0;</div><div>音声ファイルの読み込みに失敗しました</div></div>';
+      console.error('loadAudioFiles error:', e);
+    }
+  };
+
+  /* ================================================================
+     OVERRIDE AUDIO ACTION
+     ================================================================ */
+  const _origActionAudio = window.actionAudio;
+  window.actionAudio = async function(id) {
+    const filename = 'content_' + id + '.mp3';
+    const existing = audioFiles.find(f => f.name === filename);
+    if (existing) {
+      playTrack(existing.path, formatAudioTitle(existing.name), existing.source);
+      toast('既存の音声ファイルを再生しています', 'info');
+      return;
+    }
+    toast('音声生成を開始しています...', 'info');
+    try {
+      await apiFetch(`/api/generate/voice/${id}`, { method: 'POST' });
+      toast('音声ファイルを生成しました', 'success');
+      await loadAudioFiles();
+      const newFile = audioFiles.find(f => f.name === filename);
+      if (newFile) {
+        playTrack(newFile.path, formatAudioTitle(newFile.name), newFile.source);
+      }
+    } catch (e) {
+      toast('音声生成に失敗しました', 'error');
+    }
+  };
+
+  /* ================================================================
+     REVIEW & EVALUATION PANEL
+     ================================================================ */
+  let evalItems = [];
+  let evalCurrentIndex = 0;
+
+  async function loadEvalItems() {
+    const container = document.getElementById('evalContainer');
+    container.innerHTML = '<div class="eval-empty"><div class="spinner"></div><div style="margin-top:.75rem">読み込み中...</div></div>';
+    try {
+      const data = await apiFetch('/api/contents?limit=50&status=review');
+      evalItems = data.contents || [];
+      try {
+        const draftData = await apiFetch('/api/contents?limit=50&status=draft');
+        evalItems = evalItems.concat(draftData.contents || []);
+      } catch(e) { /* ignore */ }
+
+      document.getElementById('evalCounter').textContent = evalItems.length + '件のレビュー待ち';
+      evalCurrentIndex = 0;
+      renderEvalCard();
+    } catch (e) {
+      container.innerHTML = '<div class="eval-empty"><div class="eval-empty-icon" style="color:#ef4444">&#x26a0;</div><div class="eval-empty-text">データの読み込みに失敗しました</div></div>';
+      console.error('loadEvalItems error:', e);
+    }
+  }
+  window.loadEvalItems = loadEvalItems;
+
+  function renderEvalCard() {
+    const container = document.getElementById('evalContainer');
+    const prevBtn = document.getElementById('evalPrev');
+    const nextBtn = document.getElementById('evalNext');
+    const progress = document.getElementById('evalProgress');
+
+    if (evalItems.length === 0) {
+      container.innerHTML = '<div class="eval-empty"><div class="eval-empty-icon">&#x2705;</div><div class="eval-empty-text">すべてのコンテンツを評価済みです</div></div>';
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      progress.textContent = '-- / --';
+      return;
+    }
+
+    if (evalCurrentIndex >= evalItems.length) evalCurrentIndex = evalItems.length - 1;
+    if (evalCurrentIndex < 0) evalCurrentIndex = 0;
+
+    prevBtn.disabled = evalCurrentIndex === 0;
+    nextBtn.disabled = evalCurrentIndex >= evalItems.length - 1;
+    progress.textContent = (evalCurrentIndex + 1) + ' / ' + evalItems.length;
+
+    const c = evalItems[evalCurrentIndex];
+    const cid = c.id;
+    const score = c.quality_score != null ? Math.round(c.quality_score) : null;
+    const scoreLabel = score != null ? score : '--';
+    const scoreCls = score != null ? (score >= 80 ? 'high' : score >= 50 ? 'mid' : 'low') : 'mid';
+    const lang = c.language || '??';
+    const flag = langFlag(lang);
+    const bodyText = c.body || c.summary || 'コンテンツの本文がありません';
+    const hasAudio = audioFiles.some(f => f.name === 'content_' + cid + '.mp3');
+
+    container.innerHTML = `
+      <div class="eval-card" id="eval-card-${cid}">
+        <div class="eval-card-preview">
+          <div class="eval-card-title-row">
+            <div class="eval-card-title">${c.title || '無題'}</div>
+            <span class="eval-lang-badge">${flag} ${lang.toUpperCase()}</span>
+            <span class="eval-ai-score ${scoreCls}">AI スコア: ${scoreLabel}</span>
+          </div>
+          <div class="eval-body-preview">${escapeHtml(bodyText)}</div>
+          ${hasAudio ? `<button class="eval-audio-play-btn" onclick="playEvalAudio('${cid}')">&#x25b6; 音声を再生</button>` : ''}
+        </div>
+        <div class="eval-form">
+          <div class="eval-form-title">あなたの評価</div>
+          <div class="eval-overall-stars">
+            <div class="eval-overall-label">総合評価</div>
+            ${createStarRatingHTML('overall-' + cid, 'lg')}
+          </div>
+          <div class="eval-criteria">
+            <div class="eval-criteria-title">評価項目</div>
+            <div class="eval-criterion">
+              <span class="eval-criterion-label">わかりやすさ</span>
+              ${createStarRatingHTML('clarity-' + cid, 'sm')}
+            </div>
+            <div class="eval-criterion">
+              <span class="eval-criterion-label">おもしろさ</span>
+              ${createStarRatingHTML('interest-' + cid, 'sm')}
+            </div>
+            <div class="eval-criterion">
+              <span class="eval-criterion-label">聴きたい度</span>
+              ${createStarRatingHTML('listen-' + cid, 'sm')}
+            </div>
+            <div class="eval-criterion">
+              <span class="eval-criterion-label">音声の質</span>
+              ${createStarRatingHTML('audio-' + cid, 'sm')}
+            </div>
+          </div>
+          <div class="eval-comment-label">コメント</div>
+          <textarea class="eval-comment" id="review-comment-${cid}"
+            placeholder="例: もっとカジュアルに、音声が早すぎる、この話題いいね、等"></textarea>
+        </div>
+        <div class="eval-actions">
+          <button class="eval-btn approve" onclick="submitEvalReview('${cid}','approve')">&#x2713; 承認して公開</button>
+          <button class="eval-btn revision" onclick="submitEvalReview('${cid}','revision')">&#x270e; 修正して再生成</button>
+          <button class="eval-btn reject" onclick="submitEvalReview('${cid}','reject')">&#x2717; 却下</button>
+        </div>
+      </div>`;
+  }
+
+  function createStarRatingHTML(name, size) {
+    const cls = size === 'sm' ? ' sm' : '';
+    let html = `<div class="star-rating${cls}" data-rating-name="${name}">`;
+    for (let i = 5; i >= 1; i--) {
+      html += `<input type="radio" id="star-${name}-${i}" name="star-${name}" value="${i}">`;
+      html += `<label for="star-${name}-${i}" title="${i}点">&#9733;</label>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function getStarValue(name) {
+    const checked = document.querySelector(`input[name="star-${name}"]:checked`);
+    return checked ? parseInt(checked.value) : 0;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  window.playEvalAudio = function(cid) {
+    const filename = 'content_' + cid + '.mp3';
+    const file = audioFiles.find(f => f.name === filename);
+    if (file) {
+      playTrack(file.path, formatAudioTitle(file.name), file.source);
+    } else {
+      toast('音声ファイルが見つかりません', 'error');
+    }
+  };
+
+  window.evalNavigate = function(direction) {
+    evalCurrentIndex += direction;
+    renderEvalCard();
+    const section = document.getElementById('sectionEvaluation');
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  window.submitEvalReview = async function(contentId, action) {
+    const comment = document.getElementById('review-comment-' + contentId);
+    const feedback = comment ? comment.value : '';
+    const ratings = {
+      overall: getStarValue('overall-' + contentId),
+      clarity: getStarValue('clarity-' + contentId),
+      interest: getStarValue('interest-' + contentId),
+      listenability: getStarValue('listen-' + contentId),
+      audio_quality: getStarValue('audio-' + contentId)
+    };
+
+    const labels = { approve: '承認', reject: '却下', revision: '修正依頼' };
+    const actionLabel = labels[action] || action;
+
+    let feedbackStr = feedback || '';
+    if (Object.values(ratings).some(v => v > 0)) {
+      feedbackStr += '\n\n--- 評価 ---\n';
+      if (ratings.overall) feedbackStr += '総合: ' + '\u2605'.repeat(ratings.overall) + '\u2606'.repeat(5 - ratings.overall) + '\n';
+      if (ratings.clarity) feedbackStr += 'わかりやすさ: ' + '\u2605'.repeat(ratings.clarity) + '\u2606'.repeat(5 - ratings.clarity) + '\n';
+      if (ratings.interest) feedbackStr += 'おもしろさ: ' + '\u2605'.repeat(ratings.interest) + '\u2606'.repeat(5 - ratings.interest) + '\n';
+      if (ratings.listenability) feedbackStr += '聴きたい度: ' + '\u2605'.repeat(ratings.listenability) + '\u2606'.repeat(5 - ratings.listenability) + '\n';
+      if (ratings.audio_quality) feedbackStr += '音声の質: ' + '\u2605'.repeat(ratings.audio_quality) + '\u2606'.repeat(5 - ratings.audio_quality) + '\n';
+      feedbackStr += '\nRatings: ' + JSON.stringify(ratings);
+    }
+
+    const card = document.getElementById('eval-card-' + contentId);
+    if (card) {
+      card.querySelectorAll('.eval-btn').forEach(btn => { btn.disabled = true; btn.style.opacity = '.6'; });
+    }
+
+    try {
+      await apiFetch('/api/review/' + contentId, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: action,
+          feedback: feedbackStr || null
+        }),
+      });
+
+      if (action === 'approve') {
+        toast('承認しました！ コンテンツを公開します', 'success');
+      } else if (action === 'revision') {
+        toast('修正依頼を送信しました', 'info');
+      } else {
+        toast('却下しました', 'info');
+      }
+
+      evalItems.splice(evalCurrentIndex, 1);
+      document.getElementById('evalCounter').textContent = evalItems.length + '件のレビュー待ち';
+
+      if (evalCurrentIndex >= evalItems.length && evalCurrentIndex > 0) {
+        evalCurrentIndex--;
+      }
+      renderEvalCard();
+
+      loadContents();
+      loadReviews();
+      loadStats();
+    } catch (e) {
+      toast(actionLabel + 'の送信に失敗しました', 'error');
+      if (card) {
+        card.querySelectorAll('.eval-btn').forEach(btn => { btn.disabled = false; btn.style.opacity = '1'; });
+      }
+    }
+  };
+
+  /* ================================================================
+     GENERATION PROGRESS (user-friendly style)
+     ================================================================ */
+  window.refreshProgress = async function() {
+    const log = document.getElementById('progressLog');
+    try {
+      const dashboard = await apiFetch('/api/dashboard');
+      const contents = dashboard.recent_contents || [];
+
+      let html = '';
+
+      // System status - friendly card style
+      const ollamaOk = dashboard.health?.ollama;
+      const dbOk = dashboard.health?.db;
+      html += `<div style="display:flex;gap:1rem;padding-bottom:.75rem;margin-bottom:.75rem;border-bottom:1px solid var(--border);font-size:.8rem;color:var(--text-secondary)">`;
+      html += `<span>${ollamaOk ? '\u2705' : '\u274c'} AI\u30e2\u30c7\u30eb: ${ollamaOk ? '\u63a5\u7d9a\u4e2d' : '\u672a\u63a5\u7d9a'}</span>`;
+      html += `<span>${dbOk ? '\u2705' : '\u274c'} \u30c7\u30fc\u30bf\u30d9\u30fc\u30b9: ${dbOk ? '\u6b63\u5e38' : '\u30a8\u30e9\u30fc'}</span>`;
+      if (dashboard.system?.uptime) html += `<span>\u7a3c\u50cd\u6642\u9593: ${dashboard.system.uptime}</span>`;
+      html += `</div>`;
+
+      if (contents.length > 0) {
+        contents.slice(0, 10).forEach(c => {
+          const time = c.created_at ? new Date(c.created_at).toLocaleTimeString('ja-JP') : '--:--';
+          const statusIcon = c.status === 'published' ? '\u2705' : c.status === 'rejected' ? '\u274c' : c.status === 'draft' ? '\ud83d\udcdd' : '\u23f3';
+          const statusLabel = c.status === 'published' ? '\u516c\u958b\u6e08\u307f' : c.status === 'rejected' ? '\u5374\u4e0b' : c.status === 'draft' ? '\u4e0b\u66f8\u304d' : '\u30ec\u30d3\u30e5\u30fc\u5f85\u3061';
+          const score = c.quality_score ? ` [\u30b9\u30b3\u30a2: ${c.quality_score}\u70b9]` : '';
+          const title = (c.title || '\u7121\u984c').substring(0, 50);
+          html += `<div style="padding:.4rem 0;display:flex;align-items:center;gap:.5rem;font-size:.85rem">
+            <span>${statusIcon}</span>
+            <span style="color:var(--text-secondary);min-width:50px">${time}</span>
+            <span style="flex:1">${title}</span>
+            <span style="font-size:.75rem;color:var(--text-secondary)">${statusLabel}${score}</span>
+          </div>`;
+        });
+      } else {
+        html += '<div style="text-align:center;padding:2rem;color:var(--text-secondary)">\u307e\u3060\u751f\u6210\u3055\u308c\u305f\u30b3\u30f3\u30c6\u30f3\u30c4\u306f\u3042\u308a\u307e\u305b\u3093\u3002<br>\u300c\u30af\u30a4\u30c3\u30af\u64cd\u4f5c\u300d\u304b\u3089\u751f\u6210\u3092\u59cb\u3081\u307e\u3057\u3087\u3046\uff01</div>';
+      }
+
+      const topics = dashboard.topics || [];
+      if (topics.length > 0) {
+        html += `<div style="padding-top:.75rem;margin-top:.75rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-secondary)">\u5f85\u6a5f\u4e2d\u30c8\u30d4\u30c3\u30af: ${topics.length}\u4ef6</div>`;
+      }
+
+      log.innerHTML = html;
+    } catch (e) {
+      log.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#ef4444">\u30c7\u30fc\u30bf\u306e\u53d6\u5f97\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u30b5\u30fc\u30d0\u30fc\u304c\u8d77\u52d5\u3057\u3066\u3044\u308b\u304b\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002</div>';
+    }
+  };
+
+  window.clearProgress = function() {
+    document.getElementById('progressLog').innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text-secondary)">\u30ed\u30b0\u3092\u30af\u30ea\u30a2\u3057\u307e\u3057\u305f\u3002\u300c\u66f4\u65b0\u300d\u30dc\u30bf\u30f3\u3067\u6700\u65b0\u60c5\u5831\u3092\u53d6\u5f97\u3067\u304d\u307e\u3059\u3002</div>';
+  };
+
+  /* ================================================================
+     LOAD ALL
+     ================================================================ */
+  async function loadAll() {
+    await Promise.allSettled([
+      loadHealth(),
+      loadStats(),
+      loadContents(),
+      loadQualityTrend(),
+      loadReviews(),
+      loadAudioFiles(),
+      loadEvalItems(),
+      refreshProgress(),
+    ]);
+  }
+  window.loadAll = loadAll;
+
+  /* ================================================================
+     INIT
+     ================================================================ */
+  loadAll();
+
+})();
+</script>
+</body>
+</html>

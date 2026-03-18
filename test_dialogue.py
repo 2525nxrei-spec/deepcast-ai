@@ -3,10 +3,12 @@ import sys, io, struct, os
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
+import os
 from google import genai
+from dotenv import load_dotenv
 
-API_KEY = "AIzaSyAIiFAZZFzZFshD3AWicsowCmbt_JO8Wl0"
-client = genai.Client(api_key=API_KEY)
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "engine", ".env"))
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
 
 # Step 1: Generate dialogue script
 print("Step 1: Generating dialogue script...")

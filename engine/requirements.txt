@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pydantic>=2.0
+pydantic-settings>=2.0
+httpx
+apscheduler>=3.10
+aiosqlite
+python-dotenv
+structlog
+edge-tts
+pytest
+pytest-asyncio
