@@ -1072,7 +1072,7 @@
         // Filter by selected language
         var episodes = filterByLang(allEps);
         if (!episodes.length) {
-          episodeList.innerHTML = '<p class="loading-text">\u30a8\u30d4\u30bd\u30fc\u30c9\u306f\u307e\u3060\u3042\u308a\u307e\u305b\u3093\u3002</p>';
+          episodeList.innerHTML = '<p class="loading-text">新しいエピソードを準備中です。もうしばらくお待ちください。</p>';
           return;
         }
         // Build filter buttons dynamically based on existing categories
