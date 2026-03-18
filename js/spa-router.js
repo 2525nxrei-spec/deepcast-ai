@@ -326,7 +326,7 @@
     updatePlayIcons(false);
 
     // Navigate to article page only when user is actively viewing the page
-    // Skip if backgrounded — avoids annoying UX + protects AdSense viewability rate
+    // Skip if backgrounded — avoids annoying UX
     if (document.visibilityState === 'visible') {
       var articleUrl = audioToArticle[audioFileName(finishedAudio)];
       if (articleUrl) {
@@ -656,15 +656,6 @@
       }
     }
 
-    // Try to push AdSense ads (they may not work perfectly with SPA)
-    try {
-      const adSlots = document.querySelectorAll('.adsbygoogle');
-      adSlots.forEach(ad => {
-        if (!ad.getAttribute('data-ad-status')) {
-          try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
-        }
-      });
-    } catch(e) {}
   }
 
   // After SPA navigation, try to find the play button matching current audio
