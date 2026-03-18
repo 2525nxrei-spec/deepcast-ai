@@ -550,6 +550,7 @@ class Publisher:
             "duration": duration,
             "audio": audio_path or f"episodes/ep{episode_number:03d}.mp3",
             "article": f"episodes/ep{episode_number:03d}.html",
+            "language": content.get("language", "ja"),
         }
 
         episodes.insert(0, new_entry)

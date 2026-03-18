@@ -7,10 +7,10 @@
     <title>DeepCast AI - AIが生み出す5分間の深い洞察</title>
     <link>https://deepcast-ai.com/</link>
     <language>ja</language>
-    <description>Gemini Deep Thinkが生成する高品質AIポッドキャスト。毎日更新、5分で最新トピックの深い洞察を。登録不要。</description>
+    <description>AIが生成する高品質ポッドキャスト。毎日更新、5分で最新トピックの深い洞察を。登録不要。</description>
     <atom:link href="https://deepcast-ai.com/feed.xml" rel="self" type="application/rss+xml"/>
     <itunes:author>DeepCast AI</itunes:author>
-    <itunes:summary>Gemini Deep Thinkが生成する高品質AIポッドキャスト。毎日更新、5分で最新トピックの深い洞察を。</itunes:summary>
+    <itunes:summary>AIが生成する高品質ポッドキャスト。毎日更新、5分で最新トピックの深い洞察を。</itunes:summary>
     <itunes:owner>
       <itunes:name>DeepCast AI</itunes:name>
       <itunes:email>2525nxrei@gmail.com</itunes:email>
@@ -21,7 +21,7 @@
     <itunes:category text="Business"/>
     <itunes:explicit>false</itunes:explicit>
     <itunes:type>episodic</itunes:type>
-    <itunes:keywords>AIポッドキャスト,Gemini,Deep Think,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,5分</itunes:keywords>
+    <itunes:keywords>AIポッドキャスト,AI生成,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,5分</itunes:keywords>
 
   
 <item>

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
+import subprocess
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -535,7 +537,12 @@ async def dashboard_data():
 
 @app.post("/api/review/{content_id}", dependencies=[Depends(verify_api_key)])
 async def review_content(content_id: str, body: ReviewRequest):
-    """Submit a review for a content item."""
+    """Submit a review for a content item.
+
+    When action is 'approve', this also:
+    1. Runs Publisher.publish_episode() to generate HTML/JSON/RSS/sitemap
+    2. Runs git add -A, commit, push to deploy to Cloudflare Pages
+    """
     if body.action not in ("approve", "reject", "revision"):
         raise HTTPException(
             status_code=400,
@@ -587,12 +594,130 @@ async def review_content(content_id: str, body: ReviewRequest):
             action=body.action,
             feedback=body.feedback,
         )
-        return {"status": "ok", "message": message}
+
+        # --- Publish & Deploy on approve ---
+        deploy_status: dict | None = None
+        if body.action == "approve":
+            deploy_status = await _publish_and_deploy(content_id)
+
+        result = {"status": "ok", "message": message}
+        if deploy_status is not None:
+            result["deploy"] = deploy_status
+        return result
     except HTTPException:
         raise
     except Exception as exc:
         logger.error("review.failed", content_id=content_id, error=str(exc))
         raise HTTPException(status_code=500, detail="Review submission failed") from exc
+
+
+async def _publish_and_deploy(content_id: str) -> dict:
+    """Run Publisher then git add/commit/push to deploy to Cloudflare Pages.
+
+    Returns a dict with publish/deploy results. Never raises — errors are
+    captured in the returned dict so the review itself always succeeds.
+    """
+    result: dict = {"publish": None, "git_add": None, "git_commit": None, "git_push": None}
+    site_root = settings.SITE_ROOT
+
+    # --- 1. Publish (generate HTML/JSON/RSS/sitemap) ---
+    try:
+        from core.database import DatabaseManager
+        from manager.publisher import Publisher
+
+        db = DatabaseManager()
+        publisher = Publisher(db=db)
+        publish_results = await publisher.publish_episode(content_id)
+        all_ok = all(r.success for r in publish_results)
+        result["publish"] = {
+            "success": all_ok,
+            "files": [r.file_path for r in publish_results if r.success],
+            "errors": [r.error for r in publish_results if not r.success],
+        }
+        logger.info(
+            "deploy.publish_done",
+            content_id=content_id,
+            success=all_ok,
+        )
+        if not all_ok:
+            logger.warning("deploy.publish_partial_failure", content_id=content_id)
+    except Exception as exc:
+        logger.error("deploy.publish_failed", content_id=content_id, error=str(exc))
+        result["publish"] = {"success": False, "error": str(exc)}
+        # Even if publish fails, we don't abort — return what we have
+        return result
+
+    # --- 2. Git add -A ---
+    try:
+        proc = await asyncio.to_thread(
+            subprocess.run,
+            ["git", "add", "-A"],
+            cwd=site_root,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        result["git_add"] = {
+            "success": proc.returncode == 0,
+            "stderr": proc.stderr.strip() if proc.stderr else None,
+        }
+        if proc.returncode != 0:
+            logger.warning("deploy.git_add_failed", stderr=proc.stderr)
+            return result
+    except Exception as exc:
+        logger.error("deploy.git_add_error", error=str(exc))
+        result["git_add"] = {"success": False, "error": str(exc)}
+        return result
+
+    # --- 3. Git commit ---
+    try:
+        title = (await _get_content_by_id(content_id)).get("title", "untitled")
+        commit_msg = f"publish: {title} (content_id={content_id[:8]})"
+        proc = await asyncio.to_thread(
+            subprocess.run,
+            ["git", "commit", "-m", commit_msg],
+            cwd=site_root,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        result["git_commit"] = {
+            "success": proc.returncode == 0,
+            "message": commit_msg if proc.returncode == 0 else None,
+            "stderr": proc.stderr.strip() if proc.stderr else None,
+        }
+        if proc.returncode != 0:
+            logger.warning("deploy.git_commit_failed", stderr=proc.stderr)
+            return result
+    except Exception as exc:
+        logger.error("deploy.git_commit_error", error=str(exc))
+        result["git_commit"] = {"success": False, "error": str(exc)}
+        return result
+
+    # --- 4. Git push origin master ---
+    try:
+        proc = await asyncio.to_thread(
+            subprocess.run,
+            ["git", "push", "origin", "master"],
+            cwd=site_root,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        result["git_push"] = {
+            "success": proc.returncode == 0,
+            "stdout": proc.stdout.strip() if proc.stdout else None,
+            "stderr": proc.stderr.strip() if proc.stderr else None,
+        }
+        if proc.returncode == 0:
+            logger.info("deploy.git_push_success", content_id=content_id)
+        else:
+            logger.warning("deploy.git_push_failed", stderr=proc.stderr)
+    except Exception as exc:
+        logger.error("deploy.git_push_error", error=str(exc))
+        result["git_push"] = {"success": False, "error": str(exc)}
+
+    return result
 
 
 @app.post("/api/generate/voice/{content_id}", dependencies=[Depends(verify_api_key)])
@@ -678,10 +803,58 @@ async def analyze_trends(
 
 @app.get("/api/audio")
 async def list_audio_files(api_key: str = Depends(verify_api_key)):
-    """List all audio files with metadata."""
+    """List all audio files with metadata, resolving episode titles from DB."""
+    import json as _json
+    import re
+    import urllib.parse
+
     audio_dir = Path(__file__).parent.parent / "data" / "audio"
     # Also check the site episodes directory
     site_episodes = Path(settings.SITE_ROOT) / "episodes"
+
+    # Build a lookup: audio filename -> content title from the database
+    audio_title_map: dict[str, str] = {}
+    try:
+        import aiosqlite
+
+        async with aiosqlite.connect(settings.DB_PATH) as db:
+            db.row_factory = aiosqlite.Row
+            async with db.execute(
+                "SELECT title, metadata FROM contents WHERE metadata IS NOT NULL"
+            ) as cur:
+                rows = await cur.fetchall()
+                for row in rows:
+                    try:
+                        meta = _json.loads(row["metadata"]) if row["metadata"] else {}
+                        ap = meta.get("audio_path", "")
+                        if ap:
+                            # audio_path may be a full path; extract just the filename
+                            audio_filename = Path(ap).name
+                            audio_title_map[audio_filename] = row["title"]
+                    except (_json.JSONDecodeError, TypeError):
+                        pass
+    except Exception as exc:
+        logger.warning("audio.title_lookup_failed", error=str(exc))
+
+    def _clean_filename(filename: str) -> str:
+        """Fallback: clean up raw filename into a readable display name."""
+        name = filename.rsplit(".", 1)[0]  # strip extension
+        # Remove leading language prefix like "ja_" or "en_"
+        name = re.sub(r"^(ja|en)_", "", name)
+        # Remove numeric timestamps (10+ digit sequences)
+        name = re.sub(r"\d{10,}", "", name)
+        # Replace underscores / hyphens with spaces, collapse whitespace
+        name = name.replace("_", " ").replace("-", " ")
+        name = re.sub(r"\s+", " ", name).strip()
+        # URL-decode any percent-encoded Japanese characters
+        name = urllib.parse.unquote(name)
+        return name if name else filename
+
+    def _resolve_title(filename: str) -> str:
+        """Return DB title if matched, otherwise a cleaned-up filename."""
+        if filename in audio_title_map:
+            return audio_title_map[filename]
+        return _clean_filename(filename)
 
     files = []
     # Engine audio
@@ -689,6 +862,7 @@ async def list_audio_files(api_key: str = Depends(verify_api_key)):
         for f in sorted(audio_dir.glob("*.mp3")):
             files.append({
                 "name": f.name,
+                "display_name": _resolve_title(f.name),
                 "path": f"/api/audio/play/{f.name}",
                 "size": f.stat().st_size,
                 "source": "engine",
@@ -699,6 +873,7 @@ async def list_audio_files(api_key: str = Depends(verify_api_key)):
         for f in sorted(site_episodes.glob("*.mp3")):
             files.append({
                 "name": f.name,
+                "display_name": _resolve_title(f.name),
                 "path": f"/api/audio/play/{f.name}",
                 "size": f.stat().st_size,
                 "source": "site",

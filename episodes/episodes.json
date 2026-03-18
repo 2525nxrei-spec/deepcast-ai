@@ -12,7 +12,8 @@
     ],
     "duration": "5:00",
     "audio": "episodes/ep002.mp3",
-    "article": "episodes/ep002.html"
+    "article": "episodes/ep002.html",
+    "language": "ja"
   },
   {
     "id": 1,
@@ -27,6 +28,7 @@
     ],
     "duration": "5:00",
     "audio": "episodes/ep001.mp3",
-    "article": "episodes/ep001.html"
+    "article": "episodes/ep001.html",
+    "language": "ja"
   }
 ]

@@ -609,9 +609,9 @@ body.player-active .content{padding-bottom:90px}
         </div>
         <div style="display:flex;gap:.5rem;align-items:center">
           <select id="statusFilter" onchange="loadContents()" style="padding:.3rem .6rem;border:1.5px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font)">
-            <option value="published">公開済み</option>
+            <option value="published" selected>公開済み</option>
             <option value="draft">下書き</option>
-            <option value="review" selected>レビュー中</option>
+            <option value="review">レビュー中</option>
             <option value="rejected">却下</option>
           </select>
         </div>
@@ -1184,11 +1184,28 @@ body.player-active .content{padding-bottom:90px}
      ================================================================ */
   window.actionApprove = async function(id) {
     try {
-      await apiFetch(`/api/review/${id}`, {
+      const res = await apiFetch(`/api/review/${id}`, {
         method: 'POST',
         body: JSON.stringify({ action: 'approve', feedback: '' }),
       });
       toast('コンテンツを承認・公開しました', 'success');
+
+      // Show deploy status if available
+      if (res.deploy) {
+        const d = res.deploy;
+        const pubOk = d.publish && d.publish.success;
+        const pushOk = d.git_push && d.git_push.success;
+        if (pubOk && pushOk) {
+          toast('デプロイ完了: サイト生成 + git push 成功', 'success');
+        } else if (pubOk && !pushOk) {
+          const err = (d.git_push && (d.git_push.stderr || d.git_push.error)) || 'unknown';
+          toast('サイト生成OK / git push失敗: ' + err, 'error');
+        } else {
+          const err = (d.publish && (d.publish.error || (d.publish.errors || []).join(', '))) || 'unknown';
+          toast('サイト生成失敗: ' + err, 'error');
+        }
+      }
+
       loadContents();
       loadReviews();
       loadStats();
@@ -1441,11 +1458,28 @@ body.player-active .content{padding-bottom:90px}
     const feedback = document.getElementById('modalFeedback').value;
     const labels = { approve: '承認', reject: '却下', revision: '修正依頼' };
     try {
-      await apiFetch(`/api/review/${currentReviewId}`, {
+      const res = await apiFetch(`/api/review/${currentReviewId}`, {
         method: 'POST',
         body: JSON.stringify({ action, feedback: feedback || null }),
       });
       toast(`${labels[action]}を送信しました（ID: ${shortId(currentReviewId)})`, action === 'approve' ? 'success' : action === 'reject' ? 'error' : 'info');
+
+      // Show deploy status for approve action
+      if (action === 'approve' && res.deploy) {
+        const d = res.deploy;
+        const pubOk = d.publish && d.publish.success;
+        const pushOk = d.git_push && d.git_push.success;
+        if (pubOk && pushOk) {
+          toast('デプロイ完了: サイト生成 + git push 成功', 'success');
+        } else if (pubOk && !pushOk) {
+          const err = (d.git_push && (d.git_push.stderr || d.git_push.error)) || 'unknown';
+          toast('サイト生成OK / git push失敗: ' + err, 'error');
+        } else {
+          const err = (d.publish && (d.publish.error || (d.publish.errors || []).join(', '))) || 'unknown';
+          toast('サイト生成失敗: ' + err, 'error');
+        }
+      }
+
       closeModal();
       loadContents();
       loadReviews();
@@ -1730,7 +1764,7 @@ body.player-active .content{padding-bottom:90px}
       }
 
       grid.innerHTML = audioFiles.map((f, i) => {
-        const title = formatAudioTitle(f.name);
+        const title = f.display_name || formatAudioTitle(f.name);
         const isPlaying = currentTrack && currentTrack.url === f.path;
         return `<div class="audio-card">
           <div class="audio-card-header">
@@ -1762,7 +1796,7 @@ body.player-active .content{padding-bottom:90px}
     const filename = 'content_' + id + '.mp3';
     const existing = audioFiles.find(f => f.name === filename);
     if (existing) {
-      playTrack(existing.path, formatAudioTitle(existing.name), existing.source);
+      playTrack(existing.path, existing.display_name || formatAudioTitle(existing.name), existing.source);
       toast('既存の音声ファイルを再生しています', 'info');
       return;
     }
@@ -1773,7 +1807,7 @@ body.player-active .content{padding-bottom:90px}
       await loadAudioFiles();
       const newFile = audioFiles.find(f => f.name === filename);
       if (newFile) {
-        playTrack(newFile.path, formatAudioTitle(newFile.name), newFile.source);
+        playTrack(newFile.path, newFile.display_name || formatAudioTitle(newFile.name), newFile.source);
       }
     } catch (e) {
       toast('音声生成に失敗しました', 'error');
@@ -1912,7 +1946,7 @@ body.player-active .content{padding-bottom:90px}
     const filename = 'content_' + cid + '.mp3';
     const file = audioFiles.find(f => f.name === filename);
     if (file) {
-      playTrack(file.path, formatAudioTitle(file.name), file.source);
+      playTrack(file.path, file.display_name || formatAudioTitle(file.name), file.source);
     } else {
       toast('音声ファイルが見つかりません', 'error');
     }
@@ -1956,7 +1990,7 @@ body.player-active .content{padding-bottom:90px}
     }
 
     try {
-      await apiFetch('/api/review/' + contentId, {
+      const res = await apiFetch('/api/review/' + contentId, {
         method: 'POST',
         body: JSON.stringify({
           action: action,
@@ -1966,6 +2000,21 @@ body.player-active .content{padding-bottom:90px}
 
       if (action === 'approve') {
         toast('承認しました！ コンテンツを公開します', 'success');
+        // Show deploy status
+        if (res.deploy) {
+          const d = res.deploy;
+          const pubOk = d.publish && d.publish.success;
+          const pushOk = d.git_push && d.git_push.success;
+          if (pubOk && pushOk) {
+            toast('デプロイ完了: サイト生成 + git push 成功', 'success');
+          } else if (pubOk && !pushOk) {
+            const err = (d.git_push && (d.git_push.stderr || d.git_push.error)) || 'unknown';
+            toast('サイト生成OK / git push失敗: ' + err, 'error');
+          } else {
+            const err = (d.publish && (d.publish.error || (d.publish.errors || []).join(', '))) || 'unknown';
+            toast('サイト生成失敗: ' + err, 'error');
+          }
+        }
       } else if (action === 'revision') {
         toast('修正依頼を送信しました', 'info');
       } else {
@@ -1993,16 +2042,78 @@ body.player-active .content{padding-bottom:90px}
 
   /* ================================================================
      GENERATION PROGRESS (user-friendly style)
+     When called as standalone button, fetches /api/dashboard.
+     When called from loadAll(), uses updateProgressFromDashboard() instead.
      ================================================================ */
   window.refreshProgress = async function() {
-    const log = document.getElementById('progressLog');
     try {
       const dashboard = await apiFetch('/api/dashboard');
+      updateProgressFromDashboard(dashboard);
+    } catch (e) {
+      document.getElementById('progressLog').innerHTML = '<div style="text-align:center;padding:1.5rem;color:#ef4444">\u30c7\u30fc\u30bf\u306e\u53d6\u5f97\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u30b5\u30fc\u30d0\u30fc\u304c\u8d77\u52d5\u3057\u3066\u3044\u308b\u304b\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002</div>';
+    }
+  };
+
+  window.clearProgress = function() {
+    document.getElementById('progressLog').innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text-secondary)">\u30ed\u30b0\u3092\u30af\u30ea\u30a2\u3057\u307e\u3057\u305f\u3002\u300c\u66f4\u65b0\u300d\u30dc\u30bf\u30f3\u3067\u6700\u65b0\u60c5\u5831\u3092\u53d6\u5f97\u3067\u304d\u307e\u3059\u3002</div>';
+  };
+
+  /* ================================================================
+     LOAD ALL — optimized to reduce redundant API calls
+     ================================================================ */
+  async function loadAll() {
+    // Phase 1: Fetch /api/dashboard once and share data across panels
+    let dashboardData = null;
+    try {
+      dashboardData = await apiFetch('/api/dashboard');
+    } catch (e) {
+      console.error('loadAll: /api/dashboard failed', e);
+    }
+
+    // Use dashboard data for stats + progress (avoids 2nd /api/dashboard call)
+    if (dashboardData) {
+      updateStatsFromDashboard(dashboardData);
+      updateProgressFromDashboard(dashboardData);
+    }
+
+    // Phase 2: Remaining calls that need their own endpoints
+    await Promise.allSettled([
+      loadHealth(),
+      loadContents(),
+      loadQualityTrend(),
+      loadReviews(),
+      loadAudioFiles(),
+      loadEvalItems(),
+    ]);
+  }
+  window.loadAll = loadAll;
+
+  /** Update stat cards from pre-fetched dashboard data */
+  function updateStatsFromDashboard(data) {
+    try {
+      const s = data.stats || {};
+      setStatCard('statTotal', s.total_contents || 0, false);
+      const byLang = s.by_language || {};
+      document.getElementById('statLangBreak').textContent = `JA: ${byLang.ja||0} / EN: ${byLang.en||0}`;
+      setStatCard('statPublished', s.published || 0, false);
+      document.getElementById('statPublishedToday').textContent = `本日: ${s.published_today||0}`;
+      setStatCard('statRejected', s.rejected || 0, false);
+      setStatCard('statQuality', s.avg_quality_score || '--', false);
+      setStatCard('statPending', s.pending_reviews || 0, false);
+      document.getElementById('reviewCountTop').textContent = `${s.pending_reviews||0}件`;
+      setStatCard('statAudio', s.audio_files || 0, false);
+      setStatCard('statTopics', s.topics_pending || 0, false);
+    } catch (e) {
+      console.error('updateStatsFromDashboard error:', e);
+    }
+  }
+
+  /** Update progress log from pre-fetched dashboard data */
+  function updateProgressFromDashboard(dashboard) {
+    const log = document.getElementById('progressLog');
+    try {
       const contents = dashboard.recent_contents || [];
-
       let html = '';
-
-      // System status - friendly card style
       const ollamaOk = dashboard.health?.ollama;
       const dbOk = dashboard.health?.db;
       html += `<div style="display:flex;gap:1rem;padding-bottom:.75rem;margin-bottom:.75rem;border-bottom:1px solid var(--border);font-size:.8rem;color:var(--text-secondary)">`;
@@ -2010,7 +2121,6 @@ body.player-active .content{padding-bottom:90px}
       html += `<span>${dbOk ? '\u2705' : '\u274c'} \u30c7\u30fc\u30bf\u30d9\u30fc\u30b9: ${dbOk ? '\u6b63\u5e38' : '\u30a8\u30e9\u30fc'}</span>`;
       if (dashboard.system?.uptime) html += `<span>\u7a3c\u50cd\u6642\u9593: ${dashboard.system.uptime}</span>`;
       html += `</div>`;
-
       if (contents.length > 0) {
         contents.slice(0, 10).forEach(c => {
           const time = c.created_at ? new Date(c.created_at).toLocaleTimeString('ja-JP') : '--:--';
@@ -2028,38 +2138,15 @@ body.player-active .content{padding-bottom:90px}
       } else {
         html += '<div style="text-align:center;padding:2rem;color:var(--text-secondary)">\u307e\u3060\u751f\u6210\u3055\u308c\u305f\u30b3\u30f3\u30c6\u30f3\u30c4\u306f\u3042\u308a\u307e\u305b\u3093\u3002<br>\u300c\u30af\u30a4\u30c3\u30af\u64cd\u4f5c\u300d\u304b\u3089\u751f\u6210\u3092\u59cb\u3081\u307e\u3057\u3087\u3046\uff01</div>';
       }
-
       const topics = dashboard.topics || [];
       if (topics.length > 0) {
         html += `<div style="padding-top:.75rem;margin-top:.75rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-secondary)">\u5f85\u6a5f\u4e2d\u30c8\u30d4\u30c3\u30af: ${topics.length}\u4ef6</div>`;
       }
-
       log.innerHTML = html;
     } catch (e) {
-      log.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#ef4444">\u30c7\u30fc\u30bf\u306e\u53d6\u5f97\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u30b5\u30fc\u30d0\u30fc\u304c\u8d77\u52d5\u3057\u3066\u3044\u308b\u304b\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002</div>';
+      log.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#ef4444">\u30c7\u30fc\u30bf\u306e\u53d6\u5f97\u306b\u5931\u6557\u3057\u307e\u3057\u305f</div>';
     }
-  };
-
-  window.clearProgress = function() {
-    document.getElementById('progressLog').innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text-secondary)">\u30ed\u30b0\u3092\u30af\u30ea\u30a2\u3057\u307e\u3057\u305f\u3002\u300c\u66f4\u65b0\u300d\u30dc\u30bf\u30f3\u3067\u6700\u65b0\u60c5\u5831\u3092\u53d6\u5f97\u3067\u304d\u307e\u3059\u3002</div>';
-  };
-
-  /* ================================================================
-     LOAD ALL
-     ================================================================ */
-  async function loadAll() {
-    await Promise.allSettled([
-      loadHealth(),
-      loadStats(),
-      loadContents(),
-      loadQualityTrend(),
-      loadReviews(),
-      loadAudioFiles(),
-      loadEvalItems(),
-      refreshProgress(),
-    ]);
   }
-  window.loadAll = loadAll;
 
   /* ================================================================
      INIT

@@ -9,6 +9,36 @@
 (function () {
   'use strict';
 
+  // ===== Language Switch =====
+  window.deepcastLang = localStorage.getItem('deepcastLang') || 'ja';
+
+  function filterByLang(episodes) {
+    return episodes.filter(function(ep) {
+      return !ep.language || ep.language === window.deepcastLang;
+    });
+  }
+
+  function initLangSwitch() {
+    document.querySelectorAll('.lang-switch').forEach(function(sw) {
+      sw.querySelectorAll('.lang-btn').forEach(function(btn) {
+        // Set active state on load
+        btn.classList.toggle('active', btn.dataset.lang === window.deepcastLang);
+        btn.addEventListener('click', function() {
+          if (btn.dataset.lang === window.deepcastLang) return;
+          window.deepcastLang = btn.dataset.lang;
+          localStorage.setItem('deepcastLang', window.deepcastLang);
+          // Update all lang buttons on page
+          document.querySelectorAll('.lang-btn').forEach(function(b) {
+            b.classList.toggle('active', b.dataset.lang === window.deepcastLang);
+          });
+          // Re-render episodes
+          initIndexEpisodes();
+          initAllEpisodesPage();
+        });
+      });
+    });
+  }
+
   // ===== iOS Safari audio unlock =====
   let unlocked = false;
   function unlockAudio() {
@@ -574,6 +604,9 @@
     // Popular tags (index page)
     initPopularTags();
 
+    // Language switch
+    initLangSwitch();
+
     // Episode loading (index page)
     initIndexEpisodes();
 
@@ -1011,14 +1044,16 @@
 
     fetch('episodes/episodes.json')
       .then(r => r.json())
-      .then(episodes => {
+      .then(allEps => {
+        // Auto-detect categories from content (on full set)
+        autoAssignCategories(allEps);
+        buildArticleMap(allEps);
+        // Filter by selected language
+        var episodes = filterByLang(allEps);
         if (!episodes.length) {
           episodeList.innerHTML = '<p class="loading-text">\u30a8\u30d4\u30bd\u30fc\u30c9\u306f\u307e\u3060\u3042\u308a\u307e\u305b\u3093\u3002</p>';
           return;
         }
-        // Auto-detect categories from content
-        autoAssignCategories(episodes);
-        buildArticleMap(episodes);
         // Build filter buttons dynamically based on existing categories
         var filterContainer = document.querySelector('.episode-filters');
         if (filterContainer) buildFilterButtons(filterContainer, episodes);
@@ -1107,10 +1142,12 @@
 
     fetch('episodes/episodes.json')
       .then(r => r.json())
-      .then(episodes => {
-        // Auto-detect categories from content
-        autoAssignCategories(episodes);
-        buildArticleMap(episodes);
+      .then(rawEpisodes => {
+        // Auto-detect categories from content (on full set)
+        autoAssignCategories(rawEpisodes);
+        buildArticleMap(rawEpisodes);
+        // Filter by selected language
+        var episodes = filterByLang(rawEpisodes);
         // Build filter buttons dynamically
         var filterContainer = document.querySelector('.episode-filters');
         if (filterContainer) {

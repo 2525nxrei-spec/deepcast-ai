@@ -108,6 +108,17 @@ input, textarea, select { font: inherit; }
 .hamburger { display: none; flex-direction: column; gap: 4px; }
 .hamburger span { width: 18px; height: 1.5px; background: var(--text); transition: all 0.3s; }
 
+/* ===== LANGUAGE SWITCH ===== */
+.lang-switch { display: inline-flex; gap: 2px; border: 1px solid var(--border); border-radius: var(--radius-full); padding: 2px; }
+.lang-btn {
+  padding: 3px 10px; border-radius: var(--radius-full);
+  font-size: 11px; font-weight: 500; color: var(--text-muted);
+  letter-spacing: 0.02em; transition: all 0.25s var(--ease);
+  line-height: 1.4;
+}
+.lang-btn:hover { color: var(--text); }
+.lang-btn.active { background: var(--green); color: #fff; }
+
 /* ===== HERO ===== */
 .hero {
   display: flex; align-items: center; justify-content: center;
@@ -743,7 +754,12 @@ body.player-active .footer { padding-bottom: 56px; }
   .pricing-header { margin-bottom: 10px; }
   .pricing-price { margin-bottom: 16px; }
   .plan-features { margin-bottom: 20px; }
-  .nav-links, .nav-actions { display: none; }
+  .nav-links { display: none; }
+  .nav-actions { display: none; }
+  .nav-actions .lang-switch {
+    display: inline-flex;
+    position: absolute; right: 52px; top: 50%; transform: translateY(-50%);
+  }
   .hamburger { display: flex; }
   .nav-links.active {
     display: flex; flex-direction: column;

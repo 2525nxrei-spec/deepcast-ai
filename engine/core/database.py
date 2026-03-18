@@ -139,12 +139,19 @@ class DatabaseManager:
     ) -> int:
         """コンテンツを保存し、新規 ID を返す."""
         db = await self._get_connection()
+        from datetime import datetime, timezone
+
+        published_at = (
+            datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            if status == "published"
+            else None
+        )
         cursor = await db.execute(
             """
             INSERT INTO contents
                 (title, body, language, category, tags,
-                 quality_score, status, topic_source, metadata)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 quality_score, status, topic_source, metadata, published_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 title,
@@ -156,6 +163,7 @@ class DatabaseManager:
                 status,
                 topic_source,
                 json.dumps(metadata) if metadata else None,
+                published_at,
             ),
         )
         await db.commit()
