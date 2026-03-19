@@ -15,7 +15,7 @@
       <itunes:name>DeepCast AI</itunes:name>
       <itunes:email>2525nxrei@gmail.com</itunes:email>
     </itunes:owner>
-    <itunes:image href="https://deepcast-ai.com/assets/icon-512.png"/>
+    <itunes:image href="https://deepcast-ai.com/assets/og-image.png"/>
     <itunes:category text="Technology"/>
     <itunes:category text="Science"/>
     <itunes:category text="Business"/>
@@ -23,48 +23,47 @@
     <itunes:type>episodic</itunes:type>
     <itunes:keywords>AIポッドキャスト,AI生成,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,5分</itunes:keywords>
 
-  
 <item>
-  <title>#4 時代の変化 — 知識工作者の今と未来</title>
-  <description>## えっ、マジで？知識工作者ってこんなに重要なのか！  ぶっちゃけ、最近AIがどんどんどんどん進歩してて、これからの就労市場はめちゃくちゃ変わるとか。でも、その中でも知識工作者の役割ってどうなっていくの？  ### 1. 知識工作者って何</description>
-  <enclosure url="https://deepcast-ai.com/data\audio\時代の変化 — 知識工作者の今と未来_1773844231.mp3" type="audio/mpeg" length="0"/>
-  <pubDate>Thu, 19 Mar 2026 18:32:31 +0900</pubDate>
+  <title>#4 時代の変化 — 知識労働者の今と未来</title>
+  <description>AI時代の到来で知識労働者の役割はどう変わるのか。スキルの半減期、リスキリング、そして人間にしかできない仕事の本質について考えます。</description>
+  <enclosure url="https://audio.deepcast-ai.com/ep004.mp3" type="audio/mpeg" length="8033009"/>
+  <pubDate>Wed, 19 Mar 2026 18:32:31 +0900</pubDate>
   <itunes:duration>5:00</itunes:duration>
   <itunes:episode>4</itunes:episode>
-  <itunes:keywords>知識工作者,AI,就労市場,技能需求,未来趋势</itunes:keywords>
+  <itunes:keywords>知識労働,AI時代,キャリア,リスキリング</itunes:keywords>
   <guid isPermaLink="false">deepcast-ep004</guid>
 </item>
 
 <item>
   <title>#3 AI倫理の現在 — 消費者保護と社会的責任</title>
-  <description># AI倫理の現在 — 消費者保護と社会的責任  ## えっ、マジで？AIってこんなに問題あるの？  ぶっちゃけ、AIが私たちの生活を便利にするのはもちろんだけど、その反面で、消費者の権利や社会全体の福祉を脅かすようなことが起きているかもし</description>
-  <enclosure url="https://deepcast-ai.com/episodes/ep003.mp3" type="audio/mpeg" length="0"/>
-  <pubDate>Thu, 19 Mar 2026 18:32:31 +0900</pubDate>
-  <itunes:duration>5:00</itunes:duration>
+  <description>AIが私たちの生活を便利にする一方で、消費者の権利や社会全体の福祉に関わる課題も浮上しています。AI倫理の最前線を解説します。</description>
+  <enclosure url="https://audio.deepcast-ai.com/ep003.mp3" type="audio/mpeg" length="8676875"/>
+  <pubDate>Wed, 19 Mar 2026 18:32:31 +0900</pubDate>
+  <itunes:duration>6:00</itunes:duration>
   <itunes:episode>3</itunes:episode>
   <itunes:keywords>AI,倫理,消費者保護,社会的責任</itunes:keywords>
   <guid isPermaLink="false">deepcast-ep003</guid>
 </item>
 
 <item>
-  <title>#2 実はヤバい！サステナブルファイナンスとESG投資の真実</title>
-  <description>## えっ、マジで？会社のお金の使い方が変わるって知ってましたか？  最近、ニュースでもよく耳にする「サステナブルファイナンス」と「ESG投資」。ぶっちゃけ、これって普通の人にとってどんな意味があるんでしょうか？  ### 1. まずはサス</description>
-  <enclosure url="https://deepcast-ai.com/episodes/ep002.mp3" type="audio/mpeg" length="0"/>
+  <title>#2 知っておきたいサステナブルファイナンスとESG投資の真実</title>
+  <description>会社のお金の使い方が変わりつつあることをご存じですか？サステナブルファイナンスとESG投資が私たちの暮らしにどう関わるのか、分かりやすく解説します。</description>
+  <enclosure url="https://audio.deepcast-ai.com/ep002.mp3" type="audio/mpeg" length="10883073"/>
   <pubDate>Wed, 18 Mar 2026 22:27:54 +0900</pubDate>
-  <itunes:duration>5:00</itunes:duration>
+  <itunes:duration>7:00</itunes:duration>
   <itunes:episode>2</itunes:episode>
-  <itunes:keywords>sustainable finance,ESG investing,corporate social responsibility</itunes:keywords>
+  <itunes:keywords>サステナブルファイナンス,ESG投資,企業の社会的責任</itunes:keywords>
   <guid isPermaLink="false">deepcast-ep002</guid>
 </item>
 
 <item>
   <title>#1 AIと倫理 — 人工知能の進化とともに考える未来社会</title>
-  <description># AIと倫理 — 人工知能の進化とともに考える未来社会  ## えっ、マジで？AIが私たちの生活にこんなに影響を与えてるのか！  ぶっちゃけ、最近AIってめっちゃ話題になってるよね。でも、その実態ってよく分かんないじゃないですか。だから、</description>
-  <enclosure url="https://deepcast-ai.com/episodes/ep001.mp3" type="audio/mpeg" length="0"/>
+  <description>AIと倫理について深く掘り下げます。人工知能が私たちの生活に大きな影響を与えている今、倫理的な課題とどう向き合うべきか。偏見・プライバシー・責任あるAI開発について考えます。</description>
+  <enclosure url="https://audio.deepcast-ai.com/ep001.mp3" type="audio/mpeg" length="9157737"/>
   <pubDate>Wed, 18 Mar 2026 22:27:32 +0900</pubDate>
-  <itunes:duration>5:00</itunes:duration>
+  <itunes:duration>6:00</itunes:duration>
   <itunes:episode>1</itunes:episode>
-  <itunes:keywords>AI,倫理,未来社会,道德</itunes:keywords>
+  <itunes:keywords>AI,倫理,未来社会</itunes:keywords>
   <guid isPermaLink="false">deepcast-ep001</guid>
 </item>
   </channel>

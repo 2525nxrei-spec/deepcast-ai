@@ -7,7 +7,7 @@
     "category": "business",
     "tags": ["知識労働", "AI時代", "キャリア", "リスキリング"],
     "duration": "5:00",
-    "audio": "/episodes/ep004.mp3",
+    "audio": "https://audio.deepcast-ai.com/ep004.mp3",
     "article": "episodes/ep004.html",
     "language": "ja"
   },
@@ -19,7 +19,7 @@
     "category": "tech",
     "tags": ["AI", "倫理", "消費者保護", "社会的責任"],
     "duration": "6:00",
-    "audio": "/episodes/ep003.mp3",
+    "audio": "https://audio.deepcast-ai.com/ep003.mp3",
     "article": "episodes/ep003.html",
     "language": "ja"
   },
@@ -31,7 +31,7 @@
     "category": "business",
     "tags": ["サステナブルファイナンス", "ESG投資", "企業の社会的責任"],
     "duration": "7:00",
-    "audio": "/episodes/ep002.mp3",
+    "audio": "https://audio.deepcast-ai.com/ep002.mp3",
     "article": "episodes/ep002.html",
     "language": "ja"
   },
@@ -43,7 +43,7 @@
     "category": "tech",
     "tags": ["AI", "倫理", "未来社会"],
     "duration": "6:00",
-    "audio": "/episodes/ep001.mp3",
+    "audio": "https://audio.deepcast-ai.com/ep001.mp3",
     "article": "episodes/ep001.html",
     "language": "ja"
   }
