@@ -237,18 +237,8 @@ class VoiceEngine:
         try:
             result = await handler(text, cfg)
         except Exception as exc:
-            if cfg.backend != TTSBackend.EDGE:
-                logger.warning(
-                    "voice_engine.synthesize.fallback",
-                    original_backend=cfg.backend.value,
-                    error=str(exc),
-                )
-                fallback_cfg = cfg.model_copy(
-                    update={"backend": TTSBackend.EDGE},
-                )
-                result = await self._synthesize_edge(text, fallback_cfg)
-            else:
-                raise
+            # Edge-TTSフォールバック無効。Gemini失敗時はそのままエラーにする
+            raise
 
         logger.info(
             "voice_engine.synthesize.done",
@@ -364,9 +354,9 @@ class VoiceEngine:
         # --- 音声合成 ---
         backend = TTSBackend(settings.TTS_BACKEND)
 
-        # Gemini TTS対話モード: ホスト/アシスタントを別ボイスで合成
+        # Gemini TTS: 台本全体を1リクエストで合成（1エピソード=1API呼び出し）
         if backend == TTSBackend.GEMINI and "ホスト:" in full_script:
-            return await self._synthesize_gemini_dialogue(full_script, language, title=title)
+            return await self._synthesize_gemini_single(full_script, language, title=title)
 
         # Edge-TTS対話モード: ホスト/アシスタントを別ボイスで合成
         if backend == TTSBackend.EDGE and "ホスト:" in full_script:
@@ -619,6 +609,107 @@ class VoiceEngine:
             tmp.unlink(missing_ok=True)
 
         logger.info("voice_engine.edge_dialogue.done", path=str(final_path), segments=len(lines))
+        return final_path
+
+    async def _synthesize_gemini_single(
+        self, script: str, language: str, title: str = "",
+    ) -> Path:
+        """Gemini TTS で台本全体を1リクエストで合成する.
+
+        対話形式の台本をEnceladusボイスで一括読み上げ。
+        ホストとアシスタントの演じ分けはプロンプトで指示。
+        1エピソード=1APIリクエストでクォータ効率最大。
+        """
+        from google import genai
+
+        logger.info(
+            "voice_engine.gemini_single.start",
+            language=language,
+            script_length=len(script),
+        )
+
+        # --- 出力パス ---
+        out_dir = self._ensure_output_dir(settings.TTS_OUTPUT_DIR)
+        ts = int(time.time() * 1000)
+        if title:
+            safe_title = re.sub(r'[\\/*?:"<>|]', '', title)[:40].strip()
+            final_filename = f"{safe_title}_{ts}.mp3"
+        else:
+            final_filename = f"podcast_{ts}.mp3"
+        final_path = out_dir / final_filename
+
+        # --- TTS プロンプト ---
+        tts_prompt = (
+            "以下のポッドキャスト台本を自然に読み上げてください。\n"
+            "2人の登場人物がいます。\n"
+            "ホストは低めで渋い40代男性の深夜ラジオDJ風に、落ち着いて語ります。\n"
+            "アシスタントは明るく好奇心旺盛な若い男性で、テンポよく話します。\n"
+            "「ホスト:」「アシスタント:」のラベルは読み上げず、声のトーンと話し方で演じ分けてください。\n"
+            "会話の間を自然に取り、聴きやすいテンポで読んでください。\n\n"
+            + script
+        )
+
+        # --- Gemini TTS 1リクエスト ---
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        wav_path = out_dir / f"_gemtts_{ts}_full.wav"
+
+        try:
+            def _tts_full() -> None:
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash-preview-tts",
+                    contents=tts_prompt,
+                    config=genai.types.GenerateContentConfig(
+                        response_modalities=["AUDIO"],
+                        speech_config=genai.types.SpeechConfig(
+                            voice_config=genai.types.VoiceConfig(
+                                prebuilt_voice_config=genai.types.PrebuiltVoiceConfig(
+                                    voice_name="Enceladus",
+                                )
+                            )
+                        ),
+                    ),
+                )
+                if (
+                    not response.candidates
+                    or not response.candidates[0].content
+                    or not response.candidates[0].content.parts
+                ):
+                    raise RuntimeError("Gemini TTS returned empty response")
+                audio_data = response.candidates[0].content.parts[0].inline_data.data
+                data_size = len(audio_data)
+                header = struct.pack(
+                    '<4sI4s4sIHHIIHH4sI',
+                    b'RIFF', 36 + data_size, b'WAVE',
+                    b'fmt ', 16, 1, 1, 24000, 24000 * 2, 2, 16,
+                    b'data', data_size,
+                )
+                wav_path.write_bytes(header + audio_data)
+
+            await asyncio.to_thread(_tts_full)
+
+            # --- ffmpeg: WAV → MP3 (loudnorm + highpass + lowpass + atempo) ---
+            result = await asyncio.to_thread(
+                subprocess.run,
+                [
+                    "ffmpeg", "-y", "-i", str(wav_path),
+                    "-af", "highpass=f=80,lowpass=f=12000,loudnorm=I=-16:TP=-1.5:LRA=11,atempo=1.08",
+                    "-ar", "44100", "-b:a", "192k",
+                    str(final_path),
+                ],
+                capture_output=True,
+            )
+            if result.returncode != 0:
+                error_msg = result.stderr.decode("utf-8", errors="replace")
+                raise RuntimeError(f"ffmpeg failed: {error_msg[:300]}")
+
+        finally:
+            wav_path.unlink(missing_ok=True)
+
+        logger.info(
+            "voice_engine.gemini_single.done",
+            path=str(final_path),
+            size=final_path.stat().st_size if final_path.exists() else 0,
+        )
         return final_path
 
     async def _synthesize_gemini_dialogue(
