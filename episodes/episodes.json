@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 2,
+    "title": "知っておきたいサステナブルファイナンスとESG投資の真実",
+    "description": "会社のお金の使い方が変わりつつあることをご存じですか？サステナブルファイナンスとESG投資が私たちの暮らしにどう関わるのか、分かりやすく解説します。",
+    "date": "2026.03.19",
+    "category": "business",
+    "tags": ["サステナブルファイナンス", "ESG投資", "企業の社会的責任"],
+    "duration": "7:00",
+    "audio": "/episodes/ep002.mp3",
+    "article": "episodes/ep002.html",
+    "language": "ja"
+  },
+  {
+    "id": 1,
+    "title": "AIと倫理 — 人工知能の進化とともに考える未来社会",
+    "description": "AIと倫理について深く掘り下げます。人工知能が私たちの生活に大きな影響を与えている今、倫理的な課題とどう向き合うべきか。偏見・プライバシー・責任あるAI開発について考えます。",
+    "date": "2026.03.19",
+    "category": "tech",
+    "tags": ["AI", "倫理", "未来社会"],
+    "duration": "6:00",
+    "audio": "/episodes/ep001.mp3",
+    "article": "episodes/ep001.html",
+    "language": "ja"
+  }
+]

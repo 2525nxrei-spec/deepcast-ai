@@ -1,7 +1,6 @@
-const CACHE_NAME = 'deepcast-v12';
+const CACHE_NAME = 'deepcast-v13';
 const ASSETS = [
   '/',
-  '/index.html',
   '/css/style.css',
   '/js/spa-router.js',
   '/episodes/episodes.json',
