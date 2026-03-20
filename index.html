@@ -35,7 +35,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon.svg">
-  <link rel="stylesheet" href="css/style.css?v=20260317">
+  <link rel="stylesheet" href="css/style.css?v=20260321">
   <script type="application/ld+json">
   [
     {
@@ -45,7 +45,7 @@
       "url": "https://deepcast-ai.com/",
       "description": "【完全無料】AIが生み出す5分間の深い洞察。AIの高度な推論で制作した高品質ポッドキャスト。毎日更新・登録不要。テクノロジー・ビジネス・サイエンス・社会の4カテゴリで配信。",
       "webFeed": "https://deepcast-ai.com/feed.xml",
-      "image": "https://deepcast-ai.com/assets/og-image.svg",
+      "image": "https://deepcast-ai.com/assets/og-image.png",
       "author": {
         "@type": "Organization",
         "name": "DeepCast AI",
@@ -104,7 +104,7 @@
   <script>
   // Generate PodcastEpisode structured data from episodes.json
   (function() {
-    fetch('episodes/episodes.json')
+    fetch('/episodes/episodes.json')
       .then(function(r) { return r.json(); })
       .then(function(episodes) {
         var items = (Array.isArray(episodes) ? episodes : episodes.episodes || []).slice(0, 10);
@@ -776,6 +776,6 @@
     </div>
   </div>
 
-  <script src="js/spa-router.js?v=20260317"></script>
+  <script src="js/spa-router.js?v=20260321"></script>
 </body>
 </html>

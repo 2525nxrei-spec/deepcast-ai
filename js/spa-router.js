@@ -1054,7 +1054,7 @@
     // Only run on index page (index has filters but no search bar)
     if (document.getElementById('episodeSearch')) return; // all-episodes page
 
-    fetch('episodes/episodes.json')
+    fetch('/episodes/episodes.json')
       .then(r => r.json())
       .then(allEps => {
         // Auto-detect categories from content (on full set)
@@ -1152,7 +1152,7 @@
       displayEpisodes(filtered);
     }
 
-    fetch('episodes/episodes.json')
+    fetch('/episodes/episodes.json')
       .then(r => r.json())
       .then(rawEpisodes => {
         // Auto-detect categories from content (on full set)
