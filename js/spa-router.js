@@ -187,19 +187,14 @@
     var src = item.audio;
     if (src && !src.startsWith('http') && !src.startsWith('/')) src = '/' + src;
     audioEl.src = src;
-    audioEl.load();
-    var tryPlayNext = function() {
-      audioEl.play().catch(function() {
-        var card = item.btn.closest('.episode-card');
-        if (card) {
-          var timeEl = card.querySelector('.progress-time');
-          if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
-        }
-        currentPlayBtn = null;
-      });
-    };
-    if (audioEl.readyState >= 2) { tryPlayNext(); }
-    else { audioEl.addEventListener('canplay', tryPlayNext, { once: true }); }
+    audioEl.play().catch(function() {
+      var card = item.btn.closest('.episode-card');
+      if (card) {
+        var timeEl = card.querySelector('.progress-time');
+        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+      }
+      currentPlayBtn = null;
+    });
     item.btn.classList.add('playing');
     updatePlayIcons(true);
     setMediaSession(item.title);
@@ -232,16 +227,13 @@
         resolvedSrc = '/' + audioSrc;
       }
       audioEl.src = resolvedSrc;
-      audioEl.load();
-      var tryPlay = function() {
-        audioEl.play().catch(function(err) {
-          console.warn('Audio play failed:', err);
-          if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
-          currentPlayBtn = null;
-        });
-      };
-      if (audioEl.readyState >= 2) { tryPlay(); }
-      else { audioEl.addEventListener('canplay', tryPlay, { once: true }); }
+      // play()をクリック直後に呼ぶ（ユーザージェスチャーコンテキスト内で実行）
+      // ブラウザはデータ到着を待って自動的に再生を開始する
+      audioEl.play().catch(function(err) {
+        console.warn('Audio play failed:', err);
+        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+        currentPlayBtn = null;
+      });
       btn.classList.add('playing');
       updatePlayIcons(true);
       setMediaSession(title);
