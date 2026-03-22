@@ -1,0 +1,378 @@
+// ===================================================================
+//  DeepCast AI - Audio Player (persistent across SPA navigations)
+//  オーディオ再生、プレイリスト、MediaSession、ミニプレイヤー管理
+// ===================================================================
+
+(function () {
+  'use strict';
+
+  const audioEl = new Audio();
+  audioEl.preload = 'metadata';
+
+  let currentPlayBtn = null;
+  let currentAudioSrc = '';
+  let currentTitleText = '';
+  let playlist = [];
+  let playlistIndex = -1;
+  // オーディオファイル名 → 記事URLのマッピング（再生終了後の自動遷移用）
+  let audioToArticle = {};
+
+  // ファイル名のみ取得（パス比較用）
+  function audioFileName(src) {
+    if (!src) return '';
+    return src.split('/').pop().split('?')[0];
+  }
+
+  function getMiniEl(id) {
+    return document.getElementById(id);
+  }
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return m + ':' + s.toString().padStart(2, '0');
+  }
+
+  function showMiniPlayer() {
+    const mp = getMiniEl('miniPlayer');
+    if (mp) { mp.classList.add('active'); document.body.classList.add('player-active'); }
+  }
+
+  function hideMiniPlayer() {
+    const mp = getMiniEl('miniPlayer');
+    if (mp) { mp.classList.remove('active'); document.body.classList.remove('player-active'); }
+  }
+
+  function updatePlayIcons(playing) {
+    const icon = playing ? '&#10074;&#10074;' : '&#9654;';
+    if (currentPlayBtn) currentPlayBtn.innerHTML = '<span class="play-icon">' + icon + '</span>';
+    const mpb = getMiniEl('miniPlayBtn');
+    if (mpb) mpb.innerHTML = '<span class="play-icon">' + icon + '</span>';
+  }
+
+  function resetCardUI(btn) {
+    if (!btn) return;
+    const card = btn.closest('.episode-card');
+    if (!card) return;
+    btn.innerHTML = '<span class="play-icon">&#9654;</span>';
+    btn.classList.remove('playing');
+    const fill = card.querySelector('.progress-fill');
+    if (fill) fill.style.width = '0%';
+  }
+
+  function stopCurrent() {
+    resetCardUI(currentPlayBtn);
+    currentPlayBtn = null;
+    currentAudioSrc = '';
+    currentTitleText = '';
+    playlistIndex = -1;
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    hideMiniPlayer();
+  }
+
+  function setMediaSession(title) {
+    if (!('mediaSession' in navigator)) return;
+    var base = location.origin + '/';
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title, artist: 'DeepCast AI', album: 'AIポッドキャスト',
+      artwork: [
+        { src: base + 'assets/cover-podcast.svg', sizes: '512x512', type: 'image/svg+xml' },
+        { src: base + 'assets/icon.svg', sizes: '96x96', type: 'image/svg+xml' }
+      ]
+    });
+    navigator.mediaSession.setActionHandler('play', function() { audioEl.play(); updatePlayIcons(true); });
+    navigator.mediaSession.setActionHandler('pause', function() { audioEl.pause(); updatePlayIcons(false); });
+    navigator.mediaSession.setActionHandler('stop', stopCurrent);
+    navigator.mediaSession.setActionHandler('seekbackward', function() { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
+    navigator.mediaSession.setActionHandler('seekforward', function() { audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 10); });
+    navigator.mediaSession.setActionHandler('seekto', function(d) { if (d.seekTime != null) audioEl.currentTime = d.seekTime; });
+    navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+    navigator.mediaSession.setActionHandler('nexttrack', playNext);
+  }
+
+  function playNext() {
+    if (playlist.length === 0) return;
+    const nextIdx = playlistIndex + 1;
+    if (nextIdx < playlist.length) playFromPlaylist(nextIdx);
+    else stopCurrent();
+  }
+
+  function playPrev() {
+    if (playlist.length === 0) return;
+    if (audioEl.currentTime > 3 && playlistIndex >= 0) { audioEl.currentTime = 0; return; }
+    const prevIdx = playlistIndex - 1;
+    if (prevIdx >= 0) playFromPlaylist(prevIdx);
+    else audioEl.currentTime = 0;
+  }
+
+  function playFromPlaylist(idx) {
+    if (idx < 0 || idx >= playlist.length) return;
+    const item = playlist[idx];
+    resetCardUI(currentPlayBtn);
+    currentPlayBtn = item.btn;
+    currentAudioSrc = item.audio;
+    currentTitleText = item.title;
+    playlistIndex = idx;
+    var src = item.audio;
+    if (src && !src.startsWith('http') && !src.startsWith('/')) src = '/' + src;
+    audioEl.src = src;
+    audioEl.play().catch(function() {
+      var card = item.btn.closest('.episode-card');
+      if (card) {
+        var timeEl = card.querySelector('.progress-time');
+        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+      }
+      currentPlayBtn = null;
+    });
+    item.btn.classList.add('playing');
+    updatePlayIcons(true);
+    setMediaSession(item.title);
+    const mt = getMiniEl('miniTitle');
+    if (mt) mt.textContent = item.title;
+    showMiniPlayer();
+  }
+
+  function bindPlayer(btn, audioSrc, title) {
+    btn.addEventListener('click', function() {
+      const card = btn.closest('.episode-card');
+      const timeEl = card ? card.querySelector('.progress-time') : null;
+      if (currentPlayBtn === btn) {
+        if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
+        else { audioEl.pause(); updatePlayIcons(false); }
+        return;
+      }
+      resetCardUI(currentPlayBtn);
+      audioEl.pause();
+      audioEl.currentTime = 0;
+      if (!audioSrc) { if (timeEl) timeEl.textContent = '音声ファイル未設定'; return; }
+      const idx = playlist.findIndex(function(p) { return p.btn === btn; });
+      playlistIndex = idx >= 0 ? idx : -1;
+      currentPlayBtn = btn;
+      currentAudioSrc = audioSrc;
+      currentTitleText = title;
+      // 相対パスをルートからの絶対パスに変換（SPA遷移でbaseがズレるのを防止）
+      var resolvedSrc = audioSrc;
+      if (audioSrc && !audioSrc.startsWith('http') && !audioSrc.startsWith('/')) {
+        resolvedSrc = '/' + audioSrc;
+      }
+      audioEl.src = resolvedSrc;
+      // play()をクリック直後に呼ぶ（ユーザージェスチャーコンテキスト内で実行）
+      audioEl.play().catch(function(err) {
+        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+        currentPlayBtn = null;
+      });
+      btn.classList.add('playing');
+      updatePlayIcons(true);
+      setMediaSession(title);
+      const mt = getMiniEl('miniTitle');
+      if (mt) mt.textContent = title;
+      showMiniPlayer();
+    });
+  }
+
+  function buildPlaylist() {
+    playlist = [];
+    const episodeList = document.getElementById('episodeList');
+    if (!episodeList) return;
+    episodeList.querySelectorAll('.play-btn').forEach(function(btn) {
+      if (btn.closest('.episode-card').style.display !== 'none') {
+        playlist.push({ btn: btn, audio: btn.dataset.audio || '', title: btn.dataset.title || '' });
+      }
+    });
+  }
+
+  // --- timeupdate イベント ---
+  audioEl.addEventListener('timeupdate', function() {
+    if (!audioEl.duration) return;
+    const pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
+    const timeStr = formatTime(audioEl.currentTime) + ' / ' + formatTime(audioEl.duration);
+    // ミニプレイヤー
+    const mpf = getMiniEl('miniProgressFill');
+    const mtime = getMiniEl('miniTime');
+    if (mpf) mpf.style.width = pct;
+    if (mtime) mtime.textContent = timeStr;
+    // エピソードカード（ホーム/全エピソードページ）
+    if (currentPlayBtn) {
+      const card = currentPlayBtn.closest('.episode-card');
+      if (card) {
+        const fill = card.querySelector('.progress-fill');
+        const timeEl = card.querySelector('.progress-time');
+        if (fill) fill.style.width = pct;
+        if (timeEl) timeEl.textContent = timeStr;
+      }
+    }
+    // 記事ページプレイヤー
+    const artFill = document.getElementById('articleProgressFill');
+    const artTime = document.getElementById('articleProgressTime');
+    if (artFill || artTime) {
+      const artBtn = document.getElementById('articlePlayBtn');
+      if (artBtn && audioFileName(artBtn.dataset.audio) === audioFileName(currentAudioSrc)) {
+        if (artFill) artFill.style.width = pct;
+        if (artTime) artTime.textContent = timeStr;
+      }
+    }
+    // 同じ音声の全再生ボタンの進捗を同期
+    if (currentAudioSrc) {
+      document.querySelectorAll('.play-btn[data-audio]').forEach(function(btn) {
+        if (btn === currentPlayBtn) return;
+        if (audioFileName(btn.dataset.audio) === audioFileName(currentAudioSrc)) {
+          var card = btn.closest('.episode-card');
+          if (card) {
+            var fill = card.querySelector('.progress-fill');
+            var tEl = card.querySelector('.progress-time');
+            if (fill) fill.style.width = pct;
+            if (tEl) tEl.textContent = timeStr;
+          }
+        }
+      });
+    }
+    if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
+      try { navigator.mediaSession.setPositionState({ duration: audioEl.duration, playbackRate: audioEl.playbackRate, position: audioEl.currentTime }); } catch(e) {}
+    }
+  });
+
+  // --- 再生終了 → 次のエピソードへ自動遷移＆自動再生 ---
+  audioEl.addEventListener('ended', function() {
+    var finishedAudio = currentAudioSrc;
+    resetCardUI(currentPlayBtn);
+    currentPlayBtn = null;
+    updatePlayIcons(false);
+
+    // アクティブタブ時のみ記事ページへ遷移（バックグラウンドではスキップ）
+    if (document.visibilityState === 'visible') {
+      var articleUrl = audioToArticle[audioFileName(finishedAudio)];
+      if (articleUrl) {
+        var normPath = function(p) { return p.replace(/\/index\.html$/, '/').replace(/^\//, '').replace(/\/$/, '') || ''; };
+        var currentPath = normPath(location.pathname);
+        var targetPath = normPath(articleUrl);
+        if (currentPath !== targetPath) {
+          // SPAルーター経由で遷移
+          if (window.DeepCastRouter && window.DeepCastRouter.navigateTo) {
+            window.DeepCastRouter.navigateTo(articleUrl, true);
+          }
+        }
+      }
+    }
+
+    // 次のエピソードを自動再生（ページ遷移が落ち着くまで少し待つ）
+    const nextIdx = playlistIndex + 1;
+    if (nextIdx < playlist.length) {
+      setTimeout(function() { playFromPlaylist(nextIdx); }, 800);
+    } else {
+      playlistIndex = -1;
+      hideMiniPlayer();
+    }
+  });
+
+  // --- ミニプレイヤーのコントロールをバインド（イベント委譲方式） ---
+  // ミニプレイヤーは#miniPlayer要素に1度だけイベント委譲を設定し、
+  // SPA遷移でDOMが置き換わってもリスナーが蓄積しないようにする
+  var miniPlayerDelegated = false;
+
+  function bindMiniPlayer() {
+    var mp = getMiniEl('miniPlayer');
+
+    // イベント委譲は初回のみ設定（SPA遷移で再設定不要）
+    if (mp && !miniPlayerDelegated) {
+      mp.addEventListener('click', function(e) {
+        var target = e.target.closest('#miniPlayBtn, #miniCloseBtn, #miniProgressBar');
+        if (!target) return;
+
+        if (target.id === 'miniPlayBtn') {
+          if (!audioEl.src) return;
+          if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
+          else { audioEl.pause(); updatePlayIcons(false); }
+        } else if (target.id === 'miniCloseBtn') {
+          stopCurrent();
+        } else if (target.id === 'miniProgressBar') {
+          if (!audioEl.duration) return;
+          var rect = target.getBoundingClientRect();
+          audioEl.currentTime = ((e.clientX - rect.left) / rect.width) * audioEl.duration;
+        }
+      });
+      miniPlayerDelegated = true;
+    }
+
+    // 再生中ならミニプレイヤーの状態を復元
+    if (currentAudioSrc && audioEl.src) {
+      const mt = getMiniEl('miniTitle');
+      if (mt) mt.textContent = currentTitleText;
+      if (!audioEl.paused) {
+        showMiniPlayer();
+        updatePlayIcons(true);
+      } else if (audioEl.currentTime > 0) {
+        showMiniPlayer();
+        updatePlayIcons(false);
+      }
+    }
+  }
+
+  // --- SPA遷移後に再生中ボタンを新しいDOMに再関連付け ---
+  function reassociatePlayingButton() {
+    // 全再生ボタンをリセット
+    document.querySelectorAll('.play-btn').forEach(function(btn) {
+      btn.classList.remove('playing');
+      btn.innerHTML = '<span class="play-icon">&#9654;</span>';
+      var card = btn.closest('.episode-card');
+      if (card) {
+        var fill = card.querySelector('.progress-fill');
+        if (fill) fill.style.width = '0%';
+      }
+    });
+
+    if (!currentAudioSrc || (audioEl.paused && audioEl.currentTime === 0)) return;
+    var btns = document.querySelectorAll('.play-btn[data-audio]');
+    var found = false;
+    btns.forEach(function(btn) {
+      if (audioFileName(btn.dataset.audio) === audioFileName(currentAudioSrc)) {
+        currentPlayBtn = btn;
+        btn.classList.add('playing');
+        updatePlayIcons(!audioEl.paused);
+        var card = btn.closest('.episode-card');
+        if (card && audioEl.duration) {
+          var fill = card.querySelector('.progress-fill');
+          var timeEl = card.querySelector('.progress-time');
+          var pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
+          if (fill) fill.style.width = pct;
+          if (timeEl) timeEl.textContent = formatTime(audioEl.currentTime) + ' / ' + formatTime(audioEl.duration);
+        }
+        found = true;
+      }
+    });
+    if (!found) {
+      currentPlayBtn = null;
+    }
+    buildPlaylist();
+    if (currentPlayBtn) {
+      const idx = playlist.findIndex(function(p) { return p.btn === currentPlayBtn; });
+      playlistIndex = idx >= 0 ? idx : -1;
+    }
+  }
+
+  // --- グローバルオブジェクトとして公開 ---
+  window.DeepCastAudio = {
+    audioEl: audioEl,
+    get currentPlayBtn() { return currentPlayBtn; },
+    set currentPlayBtn(v) { currentPlayBtn = v; },
+    get playlist() { return playlist; },
+    set playlist(v) { playlist = v; },
+    get playlistIndex() { return playlistIndex; },
+    set playlistIndex(v) { playlistIndex = v; },
+    get audioToArticle() { return audioToArticle; },
+    bindPlayer: bindPlayer,
+    buildPlaylist: buildPlaylist,
+    stopCurrent: stopCurrent,
+    formatTime: formatTime,
+    resetCardUI: resetCardUI,
+    showMiniPlayer: showMiniPlayer,
+    hideMiniPlayer: hideMiniPlayer,
+    updatePlayIcons: updatePlayIcons,
+    playFromPlaylist: playFromPlaylist,
+    setMediaSession: setMediaSession,
+    bindMiniPlayer: bindMiniPlayer,
+    reassociatePlayingButton: reassociatePlayingButton,
+    audioFileName: audioFileName
+  };
+
+})();

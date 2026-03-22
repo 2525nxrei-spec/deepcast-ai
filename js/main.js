@@ -1,24 +1,29 @@
-// ===== DeepCast AI - Index Page Script =====
-// Audio player logic is in spa-router.js (persistent across pages)
-// This file only handles index-page-specific initializations
-// that are NOT handled by spa-router.js's reinitPage().
+// ===================================================================
+//  DeepCast AI - Entry Point
+//  iOS Safari音声アンロック、Service Worker登録
+//  各モジュール: audio-player.js → page-init.js → spa-router.js
+// ===================================================================
 
-// Note: spa-router.js handles:
-// - Service Worker registration
-// - iOS audio unlock
-// - Audio player (play/pause/playlist/mini player)
-// - Hamburger menu
-// - FAQ accordion
-// - Stat counter animation
-// - Floating formulas
-// - Reveal animations
-// - Modal / signup form
-// - Request form
-// - Popular tags
-// - Episode loading (index + all-episodes)
-// - SNS coming soon toast
-// - Smooth scroll
-// - SPA routing
+(function () {
+  'use strict';
 
-// This file is intentionally minimal now.
-// All functionality has been consolidated into spa-router.js.
+  // ===== iOS Safari 音声アンロック =====
+  var unlocked = false;
+  function unlockAudio() {
+    if (unlocked) return;
+    unlocked = true;
+    var a = new Audio();
+    a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+    a.play().then(function() { a.pause(); }).catch(function() {});
+    document.removeEventListener('touchstart', unlockAudio, true);
+    document.removeEventListener('click', unlockAudio, true);
+  }
+  document.addEventListener('touchstart', unlockAudio, true);
+  document.addEventListener('click', unlockAudio, true);
+
+  // ===== Service Worker 登録 =====
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function() {});
+  }
+
+})();

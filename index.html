@@ -35,7 +35,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon.svg">
-  <link rel="stylesheet" href="css/style.css?v=20260321">
+  <link rel="stylesheet" href="css/style.css?v=20260323">
   <script type="application/ld+json">
   [
     {
@@ -115,8 +115,8 @@
             "name": ep.title,
             "description": ep.description || ep.summary || "",
             "url": "https://deepcast-ai.com/all-episodes.html#" + (ep.id || ""),
-            "datePublished": ep.date || ep.pubDate || "",
-            "timeRequired": "PT" + (ep.duration || "5M").replace(":", "M") + (ep.duration && ep.duration.indexOf(":") !== -1 ? "S" : ""),
+            "datePublished": (ep.date || ep.pubDate || "").replace(/\./g, "-"),
+            "timeRequired": (function(d) { d = d || "5:00"; if (d.indexOf(":") !== -1) { var p = d.split(":"); return "PT" + p[0] + "M" + p[1] + "S"; } return "PT" + d + (/\d$/.test(d) ? "M" : ""); })(ep.duration),
             "associatedMedia": {
               "@type": "MediaObject",
               "contentUrl": ep.audioUrl || ep.audio || ""
@@ -776,6 +776,9 @@
     </div>
   </div>
 
-  <script src="js/spa-router.js?v=20260321"></script>
+  <script src="js/audio-player.js?v=20260323"></script>
+  <script src="js/page-init.js?v=20260323"></script>
+  <script src="js/spa-router.js?v=20260323"></script>
+  <script src="js/main.js?v=20260323"></script>
 </body>
 </html>

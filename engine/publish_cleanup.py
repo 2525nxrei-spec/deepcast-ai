@@ -18,10 +18,14 @@ from datetime import datetime
 from pathlib import Path
 
 # ──────────────────────────────────────────
-# PATHS
+# PATHS（環境変数 or settings.py から取得、ハードコードしない）
 # ──────────────────────────────────────────
-ENGINE_DIR = Path(r"G:\マイドライブ\0_deep cast\engine")
-SITE_DIR = Path(r"G:\マイドライブ\0_deep cast")
+try:
+    from config.settings import settings as _settings
+    SITE_DIR = Path(_settings.SITE_ROOT)
+except ImportError:
+    SITE_DIR = Path(os.environ.get("SITE_ROOT", str(Path(__file__).resolve().parent.parent)))
+ENGINE_DIR = SITE_DIR / "engine"
 EPISODES_DIR = SITE_DIR / "episodes"
 DB_PATH = ENGINE_DIR / "data" / "deepcast.db"
 AUDIO_SRC_DIR = ENGINE_DIR / "data" / "audio"

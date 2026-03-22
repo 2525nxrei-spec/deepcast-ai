@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import re
+import shutil
 import struct
 import subprocess
 import time
@@ -16,8 +17,16 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+import edge_tts
+import httpx
 import structlog
+from google import genai
 from pydantic import BaseModel
+
+try:
+    from TTS.api import TTS as CoquiTTS
+except ImportError:
+    CoquiTTS = None  # type: ignore[assignment, misc]
 
 from config.settings import settings
 from core.llm_client import LLMClient
@@ -72,9 +81,9 @@ _EDGE_VOICES: dict[str, str] = {
 _PODCAST_SYSTEM_PROMPT_JA = (
     "あなたは日本語ラジオ番組の台本ライターです。\n"
     "【絶対ルール】出力は必ず日本語のみ。英語で書くのは禁止。\n"
-    "【形式】2人のパーソナリティ（ホストとアシスタント）の対話形式で書く。\n"
-    "- ホスト（男性、渋めの40代）：話題を振り、深掘りする役。ラジオDJのような落ち着いた雰囲気。博識で、意外な角度から話を展開する。\n"
-    "- アシスタント（男性、明るい20代）：リスナー目線で質問したり、驚いたり共感する役。好奇心旺盛なお兄さん。鋭い疑問を投げかける。\n"
+    "【形式】2人のパーソナリティ（山口と田中）の対話形式で書く。\n"
+    "- 山口（男性、渋めの40代）：メインホスト。話題を振り、深掘りする役。ラジオDJのような落ち着いた雰囲気。博識で、意外な角度から話を展開する。低めの声でゆっくり話す。\n"
+    "- 田中（男性、明るい20代）：アシスタント。リスナー目線で質問したり、驚いたり共感する役。好奇心旺盛で元気がいい。テンポよく、やや高めの声で話す。\n"
     "\n"
     "【内容の深さ — 最重要】\n"
     "- 表面的な解説で終わらせない。「へえ、知らなかった」とリスナーが思う情報を必ず含める\n"
@@ -89,12 +98,14 @@ _PODCAST_SYSTEM_PROMPT_JA = (
     "- 「ぶっちゃけ」「マジで」「ヤバい」は使わない\n"
     "- 代わりに「実はこれ、面白いんですよ」「へえ、そうなんですね！」「ここが重要なポイントで」のような自然な会話\n"
     "- 専門用語は対話の中で自然に説明する（アシスタントが「それってどういうことですか？」と聞く）\n"
-    "- 間（ま）を意識して、聴きやすいテンポにする\n"
+    "- 間（ま）を多めに取り、ゆったりと聴きやすいテンポにする。早口は絶対NG\n"
     "\n"
     "【フォーマット】\n"
-    "ホスト: セリフ\n"
-    "アシスタント: セリフ\n"
-    "の形式で書く。名前の後にコロンをつけて改行する。\n"
+    "山口: セリフ\n"
+    "田中: セリフ\n"
+    "の形式で書く。各セリフは必ず「山口:」または「田中:」で始める。名前の後にコロンをつけて改行する。\n"
+    "- パーソナリティ名は必ず「山口」「田中」を使う。「○○」や空白のプレースホルダーは絶対に使わない\n"
+    "- 挨拶は時間帯に依存しないものを使う（「こんにちは」「どうも」等OK。「こんばんは」「おはようございます」「深夜の」等NG）\n"
     "- 出力はプレーンテキストのみ。マークダウンやHTMLタグは使わない\n"
     "- 1ターンのセリフは2〜3文程度。長すぎないこと。\n"
 )
@@ -290,7 +301,6 @@ class VoiceEngine:
 
         # Gemini Flash で台本生成（ローカルLLMより圧倒的に高速）
         try:
-            from google import genai
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
             def _generate_script():
@@ -314,14 +324,14 @@ class VoiceEngine:
         # --- イントロ・アウトロ追加 ---
         if language == "ja":
             intro = (
-                f"ホスト: みなさん、こんにちは。DeepCastの時間です。今日は「{title}」について話していきましょう。\n"
-                f"アシスタント: 楽しみですね！早速いきましょう。\n\n"
+                f"山口: みなさん、こんにちは。DeepCastの時間です。今日は「{title}」について話していきましょう。\n"
+                f"田中: 楽しみですね！早速いきましょう。\n\n"
             )
             outro = (
-                "\n\nホスト: ということで、今日はこのあたりで。いかがでしたか？\n"
-                "アシスタント: すごく勉強になりました！リスナーのみなさんもぜひ考えてみてくださいね。\n"
-                "ホスト: それでは、また次回のDeepCastでお会いしましょう。\n"
-                "アシスタント: ありがとうございました！"
+                "\n\n山口: ということで、今日はこのあたりで。いかがでしたか？\n"
+                "田中: すごく勉強になりました！リスナーのみなさんもぜひ考えてみてくださいね。\n"
+                "山口: それでは、また次回のDeepCastでお会いしましょう。\n"
+                "田中: ありがとうございました！"
             )
         else:
             intro = (
@@ -354,12 +364,12 @@ class VoiceEngine:
         # --- 音声合成 ---
         backend = TTSBackend(settings.TTS_BACKEND)
 
-        # Gemini TTS: 台本全体を1リクエストで合成（1エピソード=1API呼び出し）
-        if backend == TTSBackend.GEMINI and "ホスト:" in full_script:
-            return await self._synthesize_gemini_single(full_script, language, title=title)
+        # Gemini TTS: 台本分割方式で合成（長尺の品質劣化を防止）
+        if backend == TTSBackend.GEMINI and "山口:" in full_script:
+            return await self._synthesize_gemini_chunked(full_script, language, title=title)
 
-        # Edge-TTS対話モード: ホスト/アシスタントを別ボイスで合成
-        if backend == TTSBackend.EDGE and "ホスト:" in full_script:
+        # Edge-TTS対話モード: 山口/田中を別ボイスで合成
+        if backend == TTSBackend.EDGE and "山口:" in full_script:
             return await self._synthesize_edge_dialogue(full_script, language, title=title)
 
         speaker = _EDGE_VOICES.get(language, _EDGE_VOICES["ja"])
@@ -432,26 +442,14 @@ class VoiceEngine:
         """
         results: dict[str, bool] = {}
 
-        # edge-tts
-        try:
-            import edge_tts  # noqa: F401
+        # edge-tts（グローバルimport済み）
+        results["edge_tts"] = True
 
-            results["edge_tts"] = True
-        except ImportError:
-            results["edge_tts"] = False
-
-        # Coqui TTS
-        try:
-            from TTS.api import TTS as CoquiTTS  # noqa: F401
-
-            results["coqui"] = True
-        except ImportError:
-            results["coqui"] = False
+        # Coqui TTS（グローバルでtry-import済み）
+        results["coqui"] = CoquiTTS is not None
 
         # Style-BERT-VITS2 (check if server is running)
         try:
-            import httpx
-
             async with httpx.AsyncClient(timeout=3.0) as client:
                 resp = await client.get(f"{settings.STYLE_BERT_URL}/")
                 results["style_bert"] = resp.status_code == 200
@@ -491,8 +489,6 @@ class VoiceEngine:
         Returns:
             音声ファイルのパス.
         """
-        import edge_tts
-
         out_dir = self._ensure_output_dir(config.output_dir)
         filename = self._generate_filename(text, config.language, config.output_format, title=config.title)
         out_path = out_dir / filename
@@ -548,14 +544,12 @@ class VoiceEngine:
     ) -> Path:
         """Edge-TTSで対話形式の台本を2ボイスで合成する.
 
-        「ホスト: セリフ」→ Enceladus（渋め）、「アシスタント: セリフ」→ Zephyr（明るめ）で
+        「山口: セリフ」→ KeitaNeural（渋め）、「田中: セリフ」→ KeitaNeural（明るめ）で
         各セリフを個別に合成し、結合して1つのMP3にする。
         """
-        import edge_tts
-
         voice_map = {
-            "ja": {"ホスト": "ja-JP-KeitaNeural", "アシスタント": "ja-JP-KeitaNeural"},
-            "en": {"ホスト": "en-US-GuyNeural", "アシスタント": "en-US-GuyNeural"},
+            "ja": {"山口": "ja-JP-KeitaNeural", "田中": "ja-JP-KeitaNeural"},
+            "en": {"山口": "en-US-GuyNeural", "田中": "en-US-GuyNeural"},
         }
         voices = voice_map.get(language, voice_map["ja"])
 
@@ -565,22 +559,22 @@ class VoiceEngine:
             line = line.strip()
             if not line:
                 continue
-            if line.startswith("ホスト:") or line.startswith("ホスト："):
+            if line.startswith("山口:") or line.startswith("山口："):
                 text = line.split(":", 1)[-1].split("：", 1)[-1].strip()
                 if text:
-                    lines.append((voices["ホスト"], text))
-            elif line.startswith("アシスタント:") or line.startswith("アシスタント："):
+                    lines.append((voices["山口"], text))
+            elif line.startswith("田中:") or line.startswith("田中："):
                 text = line.split(":", 1)[-1].split("：", 1)[-1].strip()
                 if text:
-                    lines.append((voices["アシスタント"], text))
+                    lines.append((voices["田中"], text))
             else:
-                # ラベルなし行は直前の話者を継続、なければホスト
-                voice = lines[-1][0] if lines else voices["ホスト"]
+                # ラベルなし行は直前の話者を継続、なければ山口
+                voice = lines[-1][0] if lines else voices["山口"]
                 lines.append((voice, line))
 
         if not lines:
             logger.warning("voice_engine.dialogue.no_lines")
-            lines = [(voices["ホスト"], script)]
+            lines = [(voices["山口"], script)]
 
         out_dir = self._ensure_output_dir(settings.TTS_OUTPUT_DIR)
         ts = int(time.time() * 1000)
@@ -611,17 +605,139 @@ class VoiceEngine:
         logger.info("voice_engine.edge_dialogue.done", path=str(final_path), segments=len(lines))
         return final_path
 
+    async def _synthesize_gemini_chunked(
+        self, script: str, language: str, title: str = "",
+    ) -> Path:
+        """Gemini TTS で台本を分割して合成する（品質劣化防止）.
+
+        台本を約1500文字ごとに対話の区切りで分割し、
+        各パートをシングル方式で合成→結合。
+        2:30以降の音質劣化を防ぎつつ、声の一貫性を保つ。
+        """
+        MAX_CHUNK_CHARS = 1500
+
+        # 台本を対話の区切りで分割
+        chunks = self._split_script_at_dialogue(script, MAX_CHUNK_CHARS)
+
+        if len(chunks) <= 1:
+            # 短い台本はそのままシングル方式
+            return await self._synthesize_gemini_single(script, language, title=title)
+
+        logger.info(
+            "voice_engine.gemini_chunked.start",
+            chunks=len(chunks),
+            language=language,
+        )
+
+        out_dir = self._ensure_output_dir(settings.TTS_OUTPUT_DIR)
+        ts = int(time.time() * 1000)
+        if title:
+            safe_title = re.sub(r'[\\/*?:"<>|]', '', title)[:40].strip()
+            final_filename = f"{safe_title}_{ts}.mp3"
+        else:
+            final_filename = f"podcast_{ts}.mp3"
+        final_path = out_dir / final_filename
+
+        temp_paths: list[Path] = []
+        try:
+            for i, chunk in enumerate(chunks):
+                chunk_title = f"{title}_part{i}" if title else f"part{i}"
+                chunk_path = await self._synthesize_gemini_single(
+                    chunk, language, title=chunk_title,
+                )
+                temp_paths.append(chunk_path)
+                logger.info(
+                    "voice_engine.gemini_chunked.part_done",
+                    part=i + 1, total=len(chunks),
+                )
+                # レート制限防止
+                if i < len(chunks) - 1:
+                    await asyncio.sleep(2)
+
+            # 0.3秒の無音MP3を生成
+            silence_path = out_dir / f"_gemchunk_{ts}_silence.mp3"
+            await asyncio.to_thread(
+                subprocess.run,
+                [
+                    "ffmpeg", "-y",
+                    "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono",
+                    "-t", "0.3", "-b:a", "256k",
+                    str(silence_path),
+                ],
+                capture_output=True,
+            )
+
+            # concat リスト作成
+            concat_list_path = out_dir / f"_gemchunk_{ts}_concat.txt"
+            concat_lines: list[str] = []
+            for j, mp3_path in enumerate(temp_paths):
+                concat_lines.append(f"file '{mp3_path.resolve().as_posix()}'")
+                if j < len(temp_paths) - 1:
+                    concat_lines.append(f"file '{silence_path.resolve().as_posix()}'")
+            concat_list_path.write_text("\n".join(concat_lines), encoding="utf-8")
+
+            # 結合（loudnormなし — 各パートで既に適用済み）
+            result = await asyncio.to_thread(
+                subprocess.run,
+                [
+                    "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+                    "-i", str(concat_list_path),
+                    "-c", "copy",
+                    str(final_path),
+                ],
+                capture_output=True,
+            )
+            if result.returncode != 0:
+                error_msg = result.stderr.decode("utf-8", errors="replace")
+                raise RuntimeError(f"ffmpeg concat failed: {error_msg[:300]}")
+
+        finally:
+            for p in temp_paths:
+                p.unlink(missing_ok=True)
+            silence_path.unlink(missing_ok=True) if 'silence_path' in dir() else None
+            concat_list_path.unlink(missing_ok=True) if 'concat_list_path' in dir() else None
+
+        logger.info(
+            "voice_engine.gemini_chunked.done",
+            path=str(final_path),
+            chunks=len(chunks),
+        )
+        return final_path
+
+    @staticmethod
+    def _split_script_at_dialogue(script: str, max_chars: int) -> list[str]:
+        """台本を対話の区切り（山口:/田中:）で分割する."""
+        lines = script.split("\n")
+        chunks: list[str] = []
+        current_chunk: list[str] = []
+        current_len = 0
+
+        for line in lines:
+            line_len = len(line) + 1  # +1 for newline
+            # チャンクサイズ超過 & 話者ラベルの行で分割
+            if (current_len + line_len > max_chars
+                    and current_len > 0
+                    and (line.startswith("山口:") or line.startswith("山口：")
+                         or line.startswith("田中:") or line.startswith("田中："))):
+                chunks.append("\n".join(current_chunk))
+                current_chunk = []
+                current_len = 0
+            current_chunk.append(line)
+            current_len += line_len
+
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
+
+        return chunks
+
     async def _synthesize_gemini_single(
         self, script: str, language: str, title: str = "",
     ) -> Path:
-        """Gemini TTS で台本全体を1リクエストで合成する.
+        """Gemini TTS で短い台本を1リクエストで合成する.
 
-        対話形式の台本をEnceladusボイスで一括読み上げ。
-        ホストとアシスタントの演じ分けはプロンプトで指示。
-        1エピソード=1APIリクエストでクォータ効率最大。
+        1500文字以内の台本をEnceladusボイスで一括読み上げ。
+        山口と田中の演じ分けはプロンプトで指示。
         """
-        from google import genai
-
         logger.info(
             "voice_engine.gemini_single.start",
             language=language,
@@ -641,11 +757,12 @@ class VoiceEngine:
         # --- TTS プロンプト ---
         tts_prompt = (
             "以下のポッドキャスト台本を自然に読み上げてください。\n"
-            "2人の登場人物がいます。\n"
-            "ホストは低めで渋い40代男性のラジオDJ風に、落ち着いて語ります。\n"
-            "アシスタントは明るく好奇心旺盛な若い男性で、テンポよく話します。\n"
-            "「ホスト:」「アシスタント:」のラベルは読み上げず、声のトーンと話し方で演じ分けてください。\n"
-            "会話の間を自然に取り、聴きやすいテンポで読んでください。\n\n"
+            "【重要】全体的にゆっくりめのペースで話してください。急がず、一文一文丁寧に。\n"
+            "2人の登場人物がいます。はっきり声を変えて演じ分けてください。\n"
+            "山口：40代男性。低く太い声で、特にゆっくり落ち着いて話す。渋みのあるトーン。文と文の間に十分な間を取る。\n"
+            "田中：20代男性。明るく高めの声で、やや元気に話す。ただし早口にならず聴き取りやすい速度で。\n"
+            "「山口:」「田中:」のラベルは読み上げず、声の高さ・テンポ・トーンで2人を明確に区別してください。\n"
+            "会話の間を多めに取り、リラックスして聴けるテンポで読んでください。\n\n"
             + script
         )
 
@@ -692,8 +809,8 @@ class VoiceEngine:
                 subprocess.run,
                 [
                     "ffmpeg", "-y", "-i", str(wav_path),
-                    "-af", "highpass=f=80,lowpass=f=12000,loudnorm=I=-16:TP=-1.5:LRA=11,atempo=1.08",
-                    "-ar", "44100", "-b:a", "192k",
+                    "-af", "aresample=resampler=soxr,highpass=f=50,lowpass=f=15000,loudnorm=I=-16:TP=-3:LRA=13,atempo=1.0",
+                    "-ar", "48000", "-b:a", "256k",
                     str(final_path),
                 ],
                 capture_output=True,
@@ -717,28 +834,26 @@ class VoiceEngine:
     ) -> Path:
         """Gemini TTS で対話形式の台本を2ボイスで合成する.
 
-        ホスト → Enceladus（低め渋い40代男性DJ）、
-        アシスタント → Zephyr（明るく好奇心旺盛な若い男性）で
+        山口 → Enceladus（低め渋い40代男性DJ）、
+        田中 → Zephyr（明るく好奇心旺盛な若い男性）で
         各セリフを個別に合成し、loudnorm + silence挿入 + atempo で仕上げる。
         """
-        from google import genai
-
         # --- 台本をセリフ単位にパース ---
         segments: list[tuple[str, str]] = []  # (role, text)
         for line in script.split("\n"):
             line = line.strip()
             if not line:
                 continue
-            if line.startswith("ホスト:") or line.startswith("ホスト："):
+            if line.startswith("山口:") or line.startswith("山口："):
                 text = line.split(":", 1)[-1].split("：", 1)[-1].strip()
                 if text:
                     segments.append(("host", text))
-            elif line.startswith("アシスタント:") or line.startswith("アシスタント："):
+            elif line.startswith("田中:") or line.startswith("田中："):
                 text = line.split(":", 1)[-1].split("：", 1)[-1].strip()
                 if text:
                     segments.append(("assistant", text))
             else:
-                # ラベルなし行は直前の話者を継続、なければホスト
+                # ラベルなし行は直前の話者を継続、なければ山口
                 role = segments[-1][0] if segments else "host"
                 segments.append((role, line))
 
@@ -750,10 +865,12 @@ class VoiceEngine:
         batched: list[tuple[str, str]] = []
         for role, text in segments:
             if batched and batched[-1][0] == role:
-                # 同じ話者が続く → テキストを結合（文の切れ目を保持）
                 batched[-1] = (role, batched[-1][1] + "\n" + text)
             else:
                 batched.append((role, text))
+
+        # --- 話者ごとにボイスを使い分け（山口=Enceladus, 田中=Zephyr） ---
+        # 同一話者の連続セリフはバッチ化済み。各バッチを話者のボイスで合成。
         segments = batched
 
         logger.info(
@@ -772,15 +889,15 @@ class VoiceEngine:
             final_filename = f"dialogue_{ts}.mp3"
         final_path = out_dir / final_filename
 
-        # --- ボイス設定 ---
+        # --- 話者ごとのボイス・プロンプト設定 ---
         voice_config = {
             "host": {
                 "voice_name": "Enceladus",
-                "prompt_prefix": "以下のセリフを、低めで渋い40代男性のラジオDJのように、落ち着いて語りかけるように読んでください。\n\n",
+                "prompt_prefix": "以下のセリフを、低めで渋い40代男性のラジオDJのように、落ち着いてゆっくり語りかけるように読んでください。急がず、一文一文丁寧に間を取って。\n\n",
             },
             "assistant": {
                 "voice_name": "Zephyr",
-                "prompt_prefix": "以下のセリフを、明るく好奇心旺盛な若い男性として、テンポよく読んでください。\n\n",
+                "prompt_prefix": "以下のセリフを、明るく好奇心旺盛な20代男性として、元気にテンポよく読んでください。ただし早口にならず聴き取りやすい速度で。\n\n",
             },
         }
 
@@ -789,7 +906,7 @@ class VoiceEngine:
         temp_mp3_paths: list[Path] = []
 
         try:
-            # --- 各セリフを個別にTTS合成 ---
+            # --- 各セグメントを話者ごとのボイスでTTS合成 ---
             for i, (role, text) in enumerate(segments):
                 vc = voice_config[role]
                 tts_prompt = vc["prompt_prefix"] + text
@@ -823,9 +940,25 @@ class VoiceEngine:
                     seg_path.write_bytes(header + audio_data)
 
                 wav_path = out_dir / f"_gemtts_{ts}_{i:04d}.wav"
-                await asyncio.to_thread(
-                    _tts_segment, tts_prompt, vc["voice_name"], wav_path,
-                )
+
+                # リトライ付きTTS呼び出し（空レスポンス対策）
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        await asyncio.to_thread(
+                            _tts_segment, tts_prompt, vc["voice_name"], wav_path,
+                        )
+                        break
+                    except RuntimeError as e:
+                        if attempt < max_retries - 1:
+                            logger.warning(
+                                "voice_engine.gemini_dialogue.retry",
+                                segment=i, attempt=attempt + 1, error=str(e),
+                            )
+                            await asyncio.sleep(3)
+                        else:
+                            raise
+
                 temp_wav_paths.append(wav_path)
 
                 logger.debug(
@@ -834,6 +967,10 @@ class VoiceEngine:
                     role=role,
                 )
 
+                # レート制限防止: セグメント間に2秒待機
+                if i < len(segments) - 1:
+                    await asyncio.sleep(2)
+
             # --- ffmpeg: 各WAVセグメントをMP3に変換（loudnorm + フィルタ） ---
             for wav_path in temp_wav_paths:
                 mp3_path = wav_path.with_suffix(".mp3")
@@ -841,8 +978,8 @@ class VoiceEngine:
                     subprocess.run,
                     [
                         "ffmpeg", "-y", "-i", str(wav_path),
-                        "-af", "highpass=f=80,lowpass=f=12000,loudnorm=I=-16:TP=-1.5:LRA=11",
-                        "-ar", "44100", "-b:a", "192k",
+                        "-af", "highpass=f=50,lowpass=f=15000",
+                        "-ar", "48000", "-b:a", "256k",
                         str(mp3_path),
                     ],
                     capture_output=True,
@@ -860,8 +997,8 @@ class VoiceEngine:
                 subprocess.run,
                 [
                     "ffmpeg", "-y",
-                    "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono",
-                    "-t", "0.5", "-b:a", "192k",
+                    "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono",
+                    "-t", "0.3", "-b:a", "256k",
                     str(silence_path),
                 ],
                 capture_output=True,
@@ -888,8 +1025,8 @@ class VoiceEngine:
                 [
                     "ffmpeg", "-y", "-f", "concat", "-safe", "0",
                     "-i", str(concat_list_path),
-                    "-af", "atempo=1.08",
-                    "-b:a", "192k", "-ar", "44100",
+                    "-af", "loudnorm=I=-16:TP=-3:LRA=13",
+                    "-b:a", "256k", "-ar", "48000",
                     str(final_path),
                 ],
                 capture_output=True,
@@ -938,7 +1075,8 @@ class VoiceEngine:
         Returns:
             音声ファイルのパス.
         """
-        from TTS.api import TTS as CoquiTTS
+        if CoquiTTS is None:
+            raise ImportError("CoquiTTS (TTS package) is not installed")
 
         out_dir = self._ensure_output_dir(config.output_dir)
         filename = self._generate_filename(text, config.language, "wav")
@@ -985,8 +1123,6 @@ class VoiceEngine:
         Returns:
             音声ファイルのパス.
         """
-        import httpx
-
         base_url = settings.STYLE_BERT_URL
         out_dir = self._ensure_output_dir(config.output_dir)
         filename = self._generate_filename(text, config.language, config.output_format, title=config.title)
@@ -1106,9 +1242,6 @@ class VoiceEngine:
         Returns:
             音声ファイルのパス.
         """
-        import struct
-        from google import genai
-
         out_dir = self._ensure_output_dir(config.output_dir)
         filename = self._generate_filename(text, config.language, "wav", title=getattr(config, '_title', ''))
         out_path = out_dir / filename
@@ -1194,7 +1327,6 @@ class VoiceEngine:
             return
 
         if len(input_paths) == 1:
-            import shutil
             shutil.copy2(str(input_paths[0]), str(output_path))
             return
 
@@ -1223,7 +1355,6 @@ class VoiceEngine:
                     error=error_msg,
                 )
                 # 結合失敗時は最初のチャンクだけコピー
-                import shutil
                 shutil.copy2(str(input_paths[0]), str(output_path))
         finally:
             list_file.unlink(missing_ok=True)

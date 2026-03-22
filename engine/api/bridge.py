@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+import aiosqlite
 import structlog
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,6 +20,7 @@ from fastapi.responses import HTMLResponse, FileResponse, Response
 from pydantic import BaseModel
 
 from config.settings import settings
+from core.database import DatabaseManager
 
 _startup_time: float = 0.0
 
@@ -36,8 +38,6 @@ async def _init_database() -> None:
     """Initialize the SQLite database connection."""
     global _db_connected
     try:
-        import aiosqlite
-
         async with aiosqlite.connect(settings.DB_PATH) as db:
             await db.execute("SELECT 1")
         _db_connected = True
@@ -150,8 +150,6 @@ async def _query_contents(
 ):
     """Fetch contents from SQLite."""
     try:
-        import aiosqlite
-
         conditions: list[str] = ["status = ?"]
         params: list = [status]
 
@@ -188,8 +186,6 @@ async def _query_contents(
 async def _get_content_by_id(content_id: str):
     """Fetch a single content row by ID."""
     try:
-        import aiosqlite
-
         async with aiosqlite.connect(settings.DB_PATH) as db:
             db.row_factory = aiosqlite.Row
             async with db.execute(
@@ -309,8 +305,6 @@ async def contents_list(
 @app.post("/api/generate", dependencies=[Depends(verify_api_key)])
 async def generate_content(body: GenerateRequest):
     """Trigger immediate content generation via the autonomous pipeline."""
-    import asyncio
-
     task_id = str(uuid.uuid4())
     logger.info(
         "generate.requested",
@@ -323,7 +317,6 @@ async def generate_content(body: GenerateRequest):
     # バックグラウンドで生成を実行
     async def _run_generation():
         try:
-            from core.database import DatabaseManager
             from core.llm_client import LLMClient
             from engine.generator import ContentGenerator
             from engine.evaluator import ContentEvaluator
@@ -364,8 +357,6 @@ async def quality_trend(
 ):
     """Return quality score trend data over the given number of days."""
     try:
-        import aiosqlite
-
         conditions = ["status = 'published'", "created_at >= datetime('now', ?)"]
         params: list = [f"-{days} days"]
 
@@ -412,8 +403,6 @@ async def dashboard():
 async def dashboard_data():
     """Return aggregated dashboard data in a single request."""
     try:
-        import aiosqlite
-
         async with aiosqlite.connect(settings.DB_PATH) as db:
             db.row_factory = aiosqlite.Row
 
@@ -553,8 +542,6 @@ async def review_content(content_id: str, body: ReviewRequest):
     content = await _get_content_by_id(content_id)
 
     try:
-        import aiosqlite
-
         async with aiosqlite.connect(settings.DB_PATH) as db:
             now = datetime.now(timezone.utc).isoformat()
 
@@ -622,7 +609,6 @@ async def _publish_and_deploy(content_id: str) -> dict:
 
     # --- 1. Publish (generate HTML/JSON/RSS/sitemap) ---
     try:
-        from core.database import DatabaseManager
         from manager.publisher import Publisher
 
         db = DatabaseManager()
@@ -755,8 +741,6 @@ async def analyze_trends(
     language: Optional[str] = Query("ja", pattern="^(ja|en)$"),
 ):
     """Run trend analysis: content gaps, topic predictions, performance patterns."""
-    import asyncio
-
     task_id = str(uuid.uuid4())
     logger.info("trends.analyze.requested", task_id=task_id, language=language)
 
@@ -815,8 +799,6 @@ async def list_audio_files(api_key: str = Depends(verify_api_key)):
     # Build a lookup: audio filename -> content title from the database
     audio_title_map: dict[str, str] = {}
     try:
-        import aiosqlite
-
         async with aiosqlite.connect(settings.DB_PATH) as db:
             db.row_factory = aiosqlite.Row
             async with db.execute(

@@ -1,12 +1,24 @@
-const CACHE_NAME = 'deepcast-v16';
+const CACHE_NAME = 'deepcast-v18';
 const ASSETS = [
   '/',
   '/css/style.css',
+  '/js/audio-player.js',
+  '/js/page-init.js',
   '/js/spa-router.js',
+  '/js/main.js',
   '/episodes/episodes.json',
   '/manifest.json',
   '/all-episodes.html',
-  '/feed.xml'
+  '/feed.xml',
+  '/about.html',
+  '/contact.html',
+  '/privacy.html',
+  '/terms.html',
+  '/tokushoho.html',
+  '/copyright.html',
+  '/assets/icon.svg',
+  '/assets/cover-podcast.svg',
+  '/assets/og-image.png'
 ];
 
 // Install: cache shell assets

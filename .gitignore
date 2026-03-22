@@ -25,6 +25,20 @@ engine/data/
 # Python
 __pycache__/
 *.pyc
+*.pyo
+
+# Audio
+engine/data/audio/
+
+# Node
+node_modules/
 
 # Audio test files
 engine/data/audio/test_*
+
+# Claude / session files
+CLAUDE.md
+作業ログ.md
+
+# Audio backup
+音声ファイル/

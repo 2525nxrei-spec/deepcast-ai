@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from pydantic_settings import BaseSettings
 
 
@@ -40,8 +42,15 @@ class Settings(BaseSettings):
     STYLE_BERT_URL: str = "http://localhost:5000"
     GEMINI_API_KEY: str = ""
 
+    # --- Cloudflare R2 ---
+    R2_ACCESS_KEY_ID: str = ""
+    R2_SECRET_ACCESS_KEY: str = ""
+    R2_ENDPOINT: str = ""
+    R2_BUCKET: str = "deepcast-audio"
+    R2_PUBLIC_URL: str = "https://audio.deepcast-ai.com"
+
     # --- Publisher ---
-    SITE_ROOT: str = "G:/マイドライブ/0_deep cast"
+    SITE_ROOT: str = os.environ.get("SITE_ROOT", "G:/マイドライブ/0_deep cast")
     SITE_URL: str = "https://deepcast-ai.com"
     AUTO_GIT_PUSH: bool = False  # Safety: manual push by default
 

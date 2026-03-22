@@ -434,7 +434,6 @@ class ContentGenerator:
         text = raw.strip()
         # Strip markdown fences
         if "```" in text:
-            import re
             m = re.search(r"```(?:json)?\s*\n?(.*?)```", text, re.DOTALL)
             if m:
                 text = m.group(1).strip()
@@ -456,7 +455,6 @@ class ContentGenerator:
     @staticmethod
     def _try_fix_json(text: str) -> str:
         """不正なJSONの一般的な問題を修復する."""
-        import re
         # Remove trailing commas before } or ]
         text = re.sub(r',\s*([}\]])', r'\1', text)
         # Fix single quotes to double quotes

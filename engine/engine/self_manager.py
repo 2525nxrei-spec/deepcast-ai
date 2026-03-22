@@ -349,9 +349,8 @@ class SelfManager:
             # keywords might be stored as JSON string in DB
             kw = topic_data.get("keywords", [])
             if isinstance(kw, str):
-                import json as _json
                 try:
-                    kw = _json.loads(kw)
+                    kw = json.loads(kw)
                 except (ValueError, TypeError):
                     kw = [kw]
             topic_idea = TopicIdea(

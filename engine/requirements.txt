@@ -8,5 +8,8 @@ aiosqlite
 python-dotenv
 structlog
 edge-tts
+google-generativeai
+TTS
+piper-tts
 pytest
 pytest-asyncio
