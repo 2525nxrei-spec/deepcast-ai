@@ -1,11 +1,44 @@
 [
   {
+    "id": 6,
+    "title": "スマホを見た瞬間に集中力が死ぬ科学的メカニズム — そして\"回復\"に23分かかる理由",
+    "description": "皆さん、こんにちは！「ブレイン・ハック・ラボ」へようこそ。  突然ですが、あなたは今、集中して何かをしている最中に、ふとスマホが視界に入っただけで、思考が途切れた経験はありませんか？あるいは、通知音が鳴った瞬間、無意識のうちに手が伸び、気づけば全く別のアプリを開いている…そんな日々の小さな「集中力泥...",
+    "date": "2026.03.23",
+    "category": "tech",
+    "tags": [
+      "スマホを見た瞬間に集中力が死ぬ科学的メカニズム  そして\"回復\"に23分かかる理由"
+    ],
+    "duration": "10:51",
+    "audio": "https://audio.deepcast-ai.com/ep006.mp3",
+    "article": "episodes/ep006.html",
+    "language": "ja"
+  },
+  {
+    "id": 5,
+    "title": "なぜ独裁国家ほどAI開発に積極的なのか",
+    "description": "皆さん、こんにちは！「テクノロジーの深層」へようこそ。 AI、人工知能。この言葉を聞くと、私たちは便利さや効率化、あるいはSF映画のような未来を想像するかもしれません。しかし、現在のAI開発競争の最前線を見渡すと、ある興味深い、そして少し不穏な傾向が浮かび上がってきます。それは、「なぜ、民主主義国家...",
+    "date": "2026.03.23",
+    "category": "tech",
+    "tags": [
+      "なぜ独裁国家ほどAI開発に積極的なのか"
+    ],
+    "duration": "11:07",
+    "audio": "https://audio.deepcast-ai.com/ep005.mp3",
+    "article": "episodes/ep005.html",
+    "language": "ja"
+  },
+  {
     "id": 4,
     "title": "時代の変化 — 知識労働者の今と未来",
     "description": "AI時代の到来で知識労働者の役割はどう変わるのか。スキルの半減期、リスキリング、そして人間にしかできない仕事の本質について考えます。",
     "date": "2026.03.19",
     "category": "business",
-    "tags": ["知識労働", "AI時代", "キャリア", "リスキリング"],
+    "tags": [
+      "知識労働",
+      "AI時代",
+      "キャリア",
+      "リスキリング"
+    ],
     "duration": "5:00",
     "audio": "https://audio.deepcast-ai.com/ep004.mp3",
     "article": "episodes/ep004.html",
@@ -17,7 +50,12 @@
     "description": "AIが私たちの生活を便利にする一方で、消費者の権利や社会全体の福祉に関わる課題も浮上しています。AI倫理の最前線を解説します。",
     "date": "2026.03.19",
     "category": "tech",
-    "tags": ["AI", "倫理", "消費者保護", "社会的責任"],
+    "tags": [
+      "AI",
+      "倫理",
+      "消費者保護",
+      "社会的責任"
+    ],
     "duration": "6:00",
     "audio": "https://audio.deepcast-ai.com/ep003.mp3",
     "article": "episodes/ep003.html",
@@ -29,7 +67,11 @@
     "description": "会社のお金の使い方が変わりつつあることをご存じですか？サステナブルファイナンスとESG投資が私たちの暮らしにどう関わるのか、分かりやすく解説します。",
     "date": "2026.03.19",
     "category": "business",
-    "tags": ["サステナブルファイナンス", "ESG投資", "企業の社会的責任"],
+    "tags": [
+      "サステナブルファイナンス",
+      "ESG投資",
+      "企業の社会的責任"
+    ],
     "duration": "7:00",
     "audio": "https://audio.deepcast-ai.com/ep002.mp3",
     "article": "episodes/ep002.html",
@@ -41,7 +83,11 @@
     "description": "AIと倫理について深く掘り下げます。人工知能が私たちの生活に大きな影響を与えている今、倫理的な課題とどう向き合うべきか。偏見・プライバシー・責任あるAI開発について考えます。",
     "date": "2026.03.19",
     "category": "tech",
-    "tags": ["AI", "倫理", "未来社会"],
+    "tags": [
+      "AI",
+      "倫理",
+      "未来社会"
+    ],
     "duration": "6:00",
     "audio": "https://audio.deepcast-ai.com/ep001.mp3",
     "article": "episodes/ep001.html",
