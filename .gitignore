@@ -33,6 +33,9 @@ engine/data/audio/
 # Node
 node_modules/
 
+# Wrangler
+.wrangler/
+
 # Audio test files
 engine/data/audio/test_*
 
