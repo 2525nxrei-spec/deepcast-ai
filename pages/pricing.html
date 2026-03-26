@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NRM2K26K7J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NRM2K26K7J');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>料金プラン - DeepCast AI</title>
+  <meta name="description" content="DeepCast AIの料金プラン。無料プランとPro（月額150円）の比較。全エピソード聴き放題、文字起こし、優先リクエストなど。">
+  <meta property="og:title" content="料金プラン - DeepCast AI">
+  <meta property="og:description" content="DeepCast AIの料金プラン。無料プランとPro（月額150円）の比較。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://deepcast-ai.com/pages/pricing.html">
+  <meta property="og:image" content="https://deepcast-ai.com/assets/og-image.png">
+  <meta property="og:site_name" content="DeepCast AI">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="料金プラン - DeepCast AI">
+  <meta name="twitter:description" content="DeepCast AIの料金プラン。無料プランとPro（月額150円）の比較。">
+  <meta name="twitter:image" content="https://deepcast-ai.com/assets/og-image.png">
+  <link rel="canonical" href="https://deepcast-ai.com/pages/pricing.html">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/icon.svg">
+  <link rel="stylesheet" href="../css/style.css?v=20260326">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* 料金ページ固有スタイル */
+    .pricing-page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+    }
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .pricing-title {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .pricing-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* プランカード */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    .plan-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 32px 28px;
+      position: relative;
+    }
+    .plan-card--pro {
+      border-color: var(--green);
+      border-width: 2px;
+    }
+    .plan-badge {
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 14px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .plan-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .plan-price {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .plan-price small {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .plan-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 8px 0 20px;
+    }
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+    .plan-features li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 5px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .plan-features li svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .plan-features li svg.check { color: var(--green); }
+    .plan-features li svg.cross { color: #ccc; }
+    .plan-features li.disabled { color: #bbb; }
+
+    .plan-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 12px 24px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .plan-btn:hover { opacity: 0.85; }
+    .plan-btn--free {
+      background: var(--bg-card);
+      color: var(--text);
+    }
+    .plan-btn--pro {
+      background: var(--green);
+      color: #fff;
+    }
+
+    /* 認証セクション */
+    .auth-section {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 32px 28px;
+      display: none;
+    }
+    .auth-section.is-visible { display: block; }
+    .auth-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .auth-section-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 9px 0;
+      cursor: pointer;
+      background: #fff;
+      color: var(--text-muted);
+      border: none;
+      font-family: var(--sans);
+      transition: background 0.15s, color 0.15s;
+    }
+    .auth-tab.is-active {
+      background: var(--green);
+      color: #fff;
+    }
+    .auth-field {
+      margin-bottom: 14px;
+    }
+    .auth-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+    .auth-field input {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 14px;
+      padding: 10px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      outline: none;
+      background: var(--bg-alt);
+      transition: border-color 0.2s;
+    }
+    .auth-field input:focus {
+      border-color: var(--green);
+    }
+    .auth-submit {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 12px 0;
+      border: none;
+      border-radius: 4px;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .auth-submit:hover { opacity: 0.85; }
+    .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-error {
+      font-size: 12px;
+      color: #dc2626;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+    .auth-toggle {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 14px;
+    }
+    .auth-toggle a {
+      color: var(--green);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    @media (max-width: 640px) {
+      .plan-grid {
+        grid-template-columns: 1fr;
+        max-width: 380px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .plan-card { padding: 24px 20px; }
+      .pricing-title { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container nav-container">
+      <a href="../" class="logo">
+        <span class="logo-icon">&#9678;</span>
+        <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../#episodes">エピソード</a></li>
+        <li><a href="../#request">リクエスト</a></li>
+        <li><a href="pricing.html">料金</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="../#episodes" class="btn btn-primary btn-sm">エピソードを聴く</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="pricing-page">
+    <div class="pricing-header">
+      <h1 class="pricing-title">料金プラン</h1>
+      <p class="pricing-sub">無料で始めて、もっと聴きたくなったらProへ。</p>
+    </div>
+
+    <div class="plan-grid" id="plan-grid">
+      <!-- Free -->
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">0<small>円</small></div>
+        <div class="plan-desc">登録不要。最新エピソードをすぐ再生。</div>
+        <ul class="plan-features">
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>
+            最新3本のエピソード再生
+          </li>
+          <li class="disabled">
+            <svg class="cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            文字起こし
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>
+            トピックリクエスト（月1回）
+          </li>
+          <li class="disabled">
+            <svg class="cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            広告なし
+          </li>
+        </ul>
+        <a href="../" class="plan-btn plan-btn--free">無料で聴く</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="plan-card plan-card--pro">
+        <div class="plan-badge">おすすめ</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">150<small>円/月</small></div>
+        <div class="plan-desc">全エピソード聴き放題。広告なし。</div>
+        <ul class="plan-features">
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>
+            全エピソード聴き放題
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>
+            文字起こし閲覧
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>
+            トピックリクエスト無制限・優先対応
+          </li>
+          <li>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>
+            広告なし
+          </li>
+        </ul>
+        <button class="plan-btn plan-btn--pro" id="btn-pro-upgrade">Proプランを始める — 月額150円</button>
+      </div>
+    </div>
+
+    <!-- 認証フォーム（未ログイン時に表示） -->
+    <div class="auth-section" id="auth-section">
+      <div class="auth-section-title" id="auth-title">アカウント登録</div>
+      <div class="auth-section-sub" id="auth-sub">Pro契約にはアカウントが必要です</div>
+      <div class="auth-tabs">
+        <button class="auth-tab is-active" id="tab-register">新規登録</button>
+        <button class="auth-tab" id="tab-login">ログイン</button>
+      </div>
+      <form id="auth-form">
+        <div class="auth-field">
+          <label for="input-email">メールアドレス</label>
+          <input type="email" id="input-email" placeholder="you@example.com" required>
+        </div>
+        <div class="auth-field">
+          <label for="input-password">パスワード（8文字以上）</label>
+          <input type="password" id="input-password" placeholder="8文字以上" minlength="8" required>
+        </div>
+        <button type="submit" class="auth-submit" id="auth-submit-btn">登録してProを始める</button>
+        <div class="auth-error" id="auth-error"></div>
+      </form>
+      <div class="auth-toggle" id="auth-toggle">
+        既にアカウントをお持ちの方は<a id="toggle-link">ログイン</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../" class="logo">
+            <span class="logo-icon">&#9678;</span>
+            <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+          </a>
+          <p class="footer-desc">AIが生み出す、2分半の深い洞察。<br>あなたの知識を毎日アップデート。</p>
+        </div>
+        <div class="footer-links-group">
+          <h4>サービス</h4>
+          <ul>
+            <li><a href="../#episodes">エピソード一覧</a></li>
+            <li><a href="../#request">トピックリクエスト</a></li>
+            <li><a href="pricing.html">料金プラン</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>サポート</h4>
+          <ul>
+            <li><a href="../#faq">よくある質問</a></li>
+            <li><a href="../contact.html">お問い合わせ</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>法的情報</h4>
+          <ul>
+            <li><a href="../terms.html">利用規約</a></li>
+            <li><a href="../privacy.html">プライバシーポリシー</a></li>
+            <li><a href="../tokushoho.html">特定商取引法に基づく表示</a></li>
+            <li><a href="../copyright.html">著作権について</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var authSection = document.getElementById('auth-section');
+      var authForm = document.getElementById('auth-form');
+      var authError = document.getElementById('auth-error');
+      var authTitle = document.getElementById('auth-title');
+      var authSub = document.getElementById('auth-sub');
+      var authSubmitBtn = document.getElementById('auth-submit-btn');
+      var tabRegister = document.getElementById('tab-register');
+      var tabLogin = document.getElementById('tab-login');
+      var toggleLink = document.getElementById('toggle-link');
+      var authToggle = document.getElementById('auth-toggle');
+      var btnProUpgrade = document.getElementById('btn-pro-upgrade');
+
+      var mode = 'register';
+
+      // 認証状態チェック（DEEPCAST_AUTHが読み込まれている前提）
+      if (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isLoggedIn()) {
+        if (DEEPCAST_AUTH.isPro()) {
+          // Proユーザーはアカウントページへリダイレクト
+          window.location.href = 'account.html';
+          return;
+        }
+        // Freeユーザー → アップグレードボタン直行
+        btnProUpgrade.textContent = 'Proにアップグレード — 月額150円';
+        btnProUpgrade.addEventListener('click', async function() {
+          btnProUpgrade.disabled = true;
+          btnProUpgrade.textContent = '処理中...';
+          try {
+            await DEEPCAST_AUTH.startCheckout();
+          } catch (err) {
+            alert(err.message);
+            btnProUpgrade.disabled = false;
+            btnProUpgrade.textContent = 'Proにアップグレード — 月額150円';
+          }
+        });
+        return;
+      }
+
+      // 未ログイン時: ボタンクリックで認証フォーム表示
+      btnProUpgrade.addEventListener('click', function() {
+        authSection.classList.add('is-visible');
+        authSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+
+      function setMode(m) {
+        mode = m;
+        if (mode === 'register') {
+          tabRegister.classList.add('is-active');
+          tabLogin.classList.remove('is-active');
+          authTitle.textContent = 'アカウント登録';
+          authSub.textContent = 'Pro契約にはアカウントが必要です';
+          authSubmitBtn.textContent = '登録してProを始める';
+          authToggle.innerHTML = '既にアカウントをお持ちの方は<a id="toggle-link">ログイン</a>';
+        } else {
+          tabLogin.classList.add('is-active');
+          tabRegister.classList.remove('is-active');
+          authTitle.textContent = 'ログイン';
+          authSub.textContent = 'メールアドレスとパスワードを入力';
+          authSubmitBtn.textContent = 'ログインしてProを始める';
+          authToggle.innerHTML = 'アカウントをお持ちでない方は<a id="toggle-link">新規登録</a>';
+        }
+        document.getElementById('toggle-link').addEventListener('click', function() {
+          setMode(mode === 'register' ? 'login' : 'register');
+        });
+        authError.style.display = 'none';
+      }
+
+      tabRegister.addEventListener('click', function() { setMode('register'); });
+      tabLogin.addEventListener('click', function() { setMode('login'); });
+      toggleLink.addEventListener('click', function() { setMode('login'); });
+
+      authForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        authError.style.display = 'none';
+        authSubmitBtn.disabled = true;
+        var origText = authSubmitBtn.textContent;
+        authSubmitBtn.textContent = '処理中...';
+
+        try {
+          var email = document.getElementById('input-email').value;
+          var password = document.getElementById('input-password').value;
+
+          if (typeof DEEPCAST_AUTH === 'undefined') {
+            throw new Error('認証システムの読み込みに失敗しました。ページを再読み込みしてください。');
+          }
+
+          if (mode === 'register') {
+            await DEEPCAST_AUTH.register(email, password);
+          } else {
+            await DEEPCAST_AUTH.login(email, password);
+          }
+          // 登録/ログイン成功 → Checkout開始
+          await DEEPCAST_AUTH.startCheckout();
+        } catch (err) {
+          authError.textContent = err.message;
+          authError.style.display = 'block';
+          authSubmitBtn.disabled = false;
+          authSubmitBtn.textContent = origText;
+        }
+      });
+
+      // ハンバーガーメニュー（nav共通処理）
+      var hamburger = document.getElementById('hamburger');
+      var navLinks = document.getElementById('navLinks');
+      if (hamburger && navLinks) {
+        hamburger.addEventListener('click', function() {
+          navLinks.classList.toggle('open');
+          hamburger.classList.toggle('open');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

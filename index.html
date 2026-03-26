@@ -12,19 +12,19 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DeepCast AI｜無料AIポッドキャスト - 5分で深い洞察を毎日配信</title>
-  <meta name="description" content="【完全無料・登録不要】記事を読む時間がないビジネスパーソンへ。AIが最新のAI・テック・ビジネスニュースを毎日5分のポッドキャストに変換。通勤中に耳だけでインプット完了。">
-  <meta name="keywords" content="AIポッドキャスト,AI音声,ポッドキャスト,深い洞察,5分,無料,AI生成,ながら聴き,通勤,スキマ時間,深掘り解説,AI解説,無料ポッドキャスト">
-  <meta property="og:title" content="DeepCast AI｜無料AIポッドキャスト - 5分で深い洞察を毎日配信">
-  <meta property="og:description" content="【完全無料・登録不要】AIが生成する高品質ポッドキャスト。毎日5分で最新トピックを深掘り分析。リクエストも無料。">
+  <title>DeepCast AI｜AIポッドキャスト - 2分半で深い洞察を毎日配信</title>
+  <meta name="description" content="AIが最新のAI・テック・ビジネスニュースを毎日2分半のポッドキャストに変換。通勤中に耳だけでインプット完了。無料プランあり。">
+  <meta name="keywords" content="AIポッドキャスト,AI音声,ポッドキャスト,深い洞察,2分半,AI生成,ながら聴き,通勤,スキマ時間,深掘り解説,AI解説">
+  <meta property="og:title" content="DeepCast AI｜AIポッドキャスト - 2分半で深い洞察を毎日配信">
+  <meta property="og:description" content="AIが生成する高品質ポッドキャスト。毎日2分半で最新トピックを深掘り分析。無料プランあり。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://deepcast-ai.com/">
   <meta property="og:image" content="https://deepcast-ai.com/assets/og-image.png">
   <meta property="og:site_name" content="DeepCast AI">
   <meta property="og:locale" content="ja_JP">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="DeepCast AI｜無料AIポッドキャスト - 5分で深い洞察を毎日配信">
-  <meta name="twitter:description" content="【完全無料・登録不要】AIが生成する高品質ポッドキャスト。毎日5分で最新トピックを深掘り分析。リクエストも無料。">
+  <meta name="twitter:title" content="DeepCast AI｜AIポッドキャスト - 2分半で深い洞察を毎日配信">
+  <meta name="twitter:description" content="AIが生成する高品質ポッドキャスト。毎日2分半で最新トピックを深掘り分析。無料プランあり。">
   <meta name="twitter:image" content="https://deepcast-ai.com/assets/og-image.png">
   <link rel="canonical" href="https://deepcast-ai.com/">
   <meta name="theme-color" content="#ffffff">
@@ -43,7 +43,7 @@
       "@type": "PodcastSeries",
       "name": "DeepCast AI",
       "url": "https://deepcast-ai.com/",
-      "description": "【完全無料】AIが生み出す5分間の深い洞察。AIの高度な推論で制作した高品質ポッドキャスト。毎日更新・登録不要。テクノロジー・ビジネス・サイエンス・社会の4カテゴリで配信。",
+      "description": "AIが生み出す2分半の深い洞察。AIの高度な推論で制作した高品質ポッドキャスト。毎日更新。テクノロジー・ビジネスの2カテゴリで配信。無料プランあり。",
       "webFeed": "https://deepcast-ai.com/feed.xml",
       "image": "https://deepcast-ai.com/assets/og-image.png",
       "author": {
@@ -55,12 +55,22 @@
       "inLanguage": "ja",
       "genre": ["Technology", "Business"],
       "accessMode": "auditory",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "JPY",
-        "availability": "https://schema.org/InStock"
-      }
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free",
+          "price": "0",
+          "priceCurrency": "JPY",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro",
+          "price": "150",
+          "priceCurrency": "JPY",
+          "availability": "https://schema.org/InStock"
+        }
+      ]
     },
     {
       "@context": "https://schema.org",
@@ -68,7 +78,7 @@
       "name": "DeepCast AI",
       "alternateName": "ディープキャストAI",
       "url": "https://deepcast-ai.com/",
-      "description": "AIが生み出す5分間の深い洞察ポッドキャスト",
+      "description": "AIが生み出す2分半の深い洞察ポッドキャスト",
       "inLanguage": "ja",
       "potentialAction": {
         "@type": "SearchAction",
@@ -116,7 +126,7 @@
             "description": ep.description || ep.summary || "",
             "url": "https://deepcast-ai.com/all-episodes.html#" + (ep.id || ""),
             "datePublished": (ep.date || ep.pubDate || "").replace(/\./g, "-"),
-            "timeRequired": (function(d) { d = d || "5:00"; if (d.indexOf(":") !== -1) { var p = d.split(":"); return "PT" + p[0] + "M" + p[1] + "S"; } return "PT" + d + (/\d$/.test(d) ? "M" : ""); })(ep.duration),
+            "timeRequired": (function(d) { d = d || "2:30"; if (d.indexOf(":") !== -1) { var p = d.split(":"); return "PT" + p[0] + "M" + p[1] + "S"; } return "PT" + d + (/\d$/.test(d) ? "M" : ""); })(ep.duration),
             "associatedMedia": {
               "@type": "MediaObject",
               "contentUrl": ep.audioUrl || ep.audio || ""
@@ -162,6 +172,7 @@
           <button class="lang-btn active" data-lang="ja">日本語</button>
           <button class="lang-btn" data-lang="en">EN</button>
         </div>
+        <a href="pages/pricing.html" class="btn btn-ghost btn-sm" id="navLoginBtn">ログイン</a>
         <a href="all-episodes.html" class="btn btn-primary btn-sm">エピソードを聴く</a>
       </div>
       <button class="hamburger" id="hamburger" aria-label="メニュー">
@@ -197,19 +208,19 @@
       <div class="hero-content">
         <div class="hero-badge">
           <span class="badge-dot"></span>
-          毎日更新中 &mdash; 無料・登録不要
+          毎日更新中 &mdash; 無料プランあり
         </div>
         <h1 class="hero-title">
-          <span class="hero-title-sub">忙しいあなたの通勤5分で</span>
+          <span class="hero-title-sub">忙しいあなたの通勤2分半で</span>
           <span class="hero-title-main">AI・テック動向を<br>耳だけでキャッチアップ</span>
         </h1>
         <p class="hero-desc">
-          記事を読む時間がないビジネスパーソンへ。AIが最新ニュースを毎日5分のポッドキャストに変換。無料・登録不要・ブラウザで今すぐ再生。
+          記事を読む時間がないビジネスパーソンへ。AIが最新ニュースを毎日2分半のポッドキャストに変換。ブラウザで今すぐ再生。
         </p>
         <div class="hero-actions">
           <a href="#episodes" class="btn btn-primary btn-lg">
             <span class="btn-icon">&#9654;</span>
-            今すぐ無料で聴く
+            今すぐ聴く
           </a>
           <a href="#request" class="btn btn-ghost btn-lg">聴きたいテーマをリクエスト</a>
         </div>
@@ -219,7 +230,7 @@
             <span class="stat-label">配信エピソード</span>
           </div>
           <div class="stat">
-            <span class="stat-number">5分</span>
+            <span class="stat-number">2:30</span>
             <span class="stat-label">1エピソード</span>
           </div>
           <div class="stat">
@@ -255,12 +266,12 @@
           <div class="player-info">
             <span class="player-tag">NOW PLAYING</span>
             <span class="player-title">2025年AI業界の転換点を読む</span>
-            <span class="player-duration">5:12</span>
+            <span class="player-duration">2:30</span>
           </div>
         </div>
         <div class="floating-card fc-1">
           <span class="fc-icon">&#127911;</span>
-          <span>毎日5分</span>
+          <span>毎日2:30</span>
         </div>
         <div class="floating-card fc-2">
           <span class="fc-icon">&#129504;</span>
@@ -284,7 +295,7 @@
       <div class="section-header">
         <span class="section-tag">EPISODES</span>
         <h2 class="section-title">最新エピソード</h2>
-        <p class="section-desc">AIの高度な推論で制作した5分間のポッドキャスト。</p>
+        <p class="section-desc">AIの高度な推論で制作した2分半のポッドキャスト。</p>
       </div>
 
       <div class="episode-filters">
@@ -321,18 +332,18 @@
           </div>
           <h3 class="service-name">ポッドキャスト配信</h3>
           <p class="service-desc">
-            最新のAI・テック・ビジネストピックをAIで深掘りした5分間のポッドキャストを毎日配信。
-            忙しいビジネスパーソンの情報収集を5分で完結させます。
+            最新のAI・テック・ビジネストピックをAIで深掘りした2分半のポッドキャストを毎日配信。
+            忙しいビジネスパーソンの情報収集を2分半で完結させます。
           </p>
           <ul class="service-features">
-            <li>無料エピソードを定期配信</li>
-            <li>全エピソード無料で聴き放題</li>
-            <li>文字起こし・要約テキスト付き</li>
-            <li>オフラインダウンロード対応</li>
+            <li>最新3本を無料で視聴</li>
+            <li>Proで全エピソード聴き放題</li>
+            <li>Proで文字起こしテキスト付き</li>
+            <li>連続再生で快適視聴</li>
           </ul>
           <div class="service-price">
             <span class="price-label">個人向け</span>
-            <span class="price-value">完全無料</span>
+            <span class="price-value">無料〜月額150円</span>
           </div>
         </div>
 
@@ -350,12 +361,12 @@
           <ul class="service-features">
             <li>自由なテーマでリクエスト可能</li>
             <li>AIによる深い分析</li>
-            <li>5分・10分・15分の3段階</li>
+            <li>2分半のコンパクトな解説</li>
             <li>通常48時間以内に納品</li>
           </ul>
           <div class="service-price">
-            <span class="price-label">個人・法人</span>
-            <span class="price-value">完全無料</span>
+            <span class="price-label">Free: 月1回 / Pro: 無制限</span>
+            <span class="price-value">無料〜</span>
           </div>
         </div>
 
@@ -364,20 +375,19 @@
           <div class="service-icon-wrap">
             <div class="service-icon">&#127970;</div>
           </div>
-          <h3 class="service-name">法人・大量制作</h3>
+          <h3 class="service-name">Proプラン</h3>
           <p class="service-desc">
-            社内教育、マーケティング、顧客向けコンテンツなど、
-            企業のニーズに合わせたポッドキャストを継続的に制作。ブランドに合わせたトーン設計も対応。
+            月額150円で全エピソード聴き放題。文字起こし、優先リクエスト、広告なしの快適な視聴体験。
           </p>
           <ul class="service-features">
-            <li>月10本〜の継続制作</li>
-            <li>ブランドトーン・構成カスタマイズ</li>
-            <li>専任担当者によるサポート</li>
-            <li>チーム共有・分析ダッシュボード</li>
+            <li>全エピソード聴き放題</li>
+            <li>文字起こしテキスト付き</li>
+            <li>リクエスト無制限・優先対応</li>
+            <li>広告なし</li>
           </ul>
           <div class="service-price">
-            <span class="price-label">法人向け</span>
-            <span class="price-value">完全無料</span>
+            <span class="price-label">個人向け</span>
+            <span class="price-value">月額150円</span>
           </div>
         </div>
       </div>
@@ -390,7 +400,7 @@
       <div class="section-header">
         <span class="section-tag">REQUEST</span>
         <h2 class="section-title">聴きたいテーマをリクエスト</h2>
-        <p class="section-desc">「これが知りたい」を送るだけ。AIで徹底分析し、あなた専用の5分間ポッドキャストを制作してお届けします。</p>
+        <p class="section-desc">「これが知りたい」を送るだけ。AIで徹底分析し、あなた専用の2分半ポッドキャストを制作してお届けします。</p>
       </div>
 
       <div class="request-layout">
@@ -412,9 +422,7 @@
               <div class="form-group">
                 <label for="requestDepth">深掘り度</label>
                 <select id="requestDepth" name="depth">
-                  <option value="standard">スタンダード（5分）</option>
-                  <option value="deep">ディープ（10分）</option>
-                  <option value="expert">エキスパート（15分）</option>
+                  <option value="standard">スタンダード（2分半）</option>
                 </select>
               </div>
             </div>
@@ -429,7 +437,7 @@
             <button type="submit" class="btn btn-primary btn-block btn-lg">
               リクエストを送信
             </button>
-            <p class="form-note">リクエストは完全無料です。お気軽にどうぞ。</p>
+            <p class="form-note">Freeプランは月1回、Proプランは無制限でリクエスト可能です。</p>
           </form>
         </div>
 
@@ -457,7 +465,7 @@
                 <span class="rs-num">3</span>
                 <div>
                   <strong>ポッドキャスト制作</strong>
-                  <p>分析結果を聴きやすい5分間のポッドキャストに仕上げます</p>
+                  <p>分析結果を聴きやすい2分半のポッドキャストに仕上げます</p>
                 </div>
               </li>
               <li>
@@ -512,7 +520,7 @@
         <div class="step-card">
           <div class="step-number">03</div>
           <h3 class="step-title">音声制作</h3>
-          <p class="step-desc">分析結果を5分間のポッドキャストに。聴きやすい構成と適切な緩急で丁寧に仕上げます。</p>
+          <p class="step-desc">分析結果を2分半のポッドキャストに。聴きやすい構成と適切な緩急で丁寧に仕上げます。</p>
         </div>
         <div class="step-connector"></div>
         <div class="step-card">
@@ -530,29 +538,44 @@
       <div class="section-header">
         <span class="section-tag">PRICING</span>
         <h2 class="section-title">料金プラン</h2>
-        <p class="section-desc">DeepCast AIはすべて完全無料。会員登録もクレジットカードも不要。<br>全エピソード聴き放題＆リクエストも0円でご利用いただけます。</p>
+        <p class="section-desc">無料プランで最新エピソードを体験。Proプランで全機能を解放。</p>
       </div>
 
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-popular">完全無料</div>
+      <div class="pricing-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:720px;margin:0 auto;">
+        <div class="pricing-card">
           <div class="pricing-header">
-            <h3 class="plan-name">完全無料プラン</h3>
-            <p class="plan-desc">料金は一切かかりません。今すぐ、制限なしでご利用ください。</p>
+            <h3 class="plan-name">Free</h3>
+            <p class="plan-desc">まずは無料で体験</p>
           </div>
           <div class="pricing-price">
             <span class="price-amount">¥0</span>
-            <span class="price-period">永久無料・課金なし</span>
+            <span class="price-period">登録不要</span>
           </div>
           <ul class="plan-features">
-            <li class="included">全エピソード聴き放題（制限なし）</li>
-            <li class="included">文字起こし＆要約テキスト無料</li>
-            <li class="included">トピックリクエスト無料</li>
-            <li class="included">会員登録・ログイン不要</li>
-            <li class="included">連続再生で快適視聴</li>
-            <li class="included">クレジットカード登録不要</li>
+            <li class="included">最新3エピソード再生</li>
+            <li class="included">リクエスト月1回</li>
+            <li class="excluded">文字起こし</li>
+            <li class="excluded">広告あり</li>
           </ul>
-          <a href="all-episodes.html" class="btn btn-primary btn-block">エピソードを聴く</a>
+          <a href="all-episodes.html" class="btn btn-ghost btn-block">エピソードを聴く</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-popular">おすすめ</div>
+          <div class="pricing-header">
+            <h3 class="plan-name">Pro</h3>
+            <p class="plan-desc">全機能を解放</p>
+          </div>
+          <div class="pricing-price">
+            <span class="price-amount">¥150</span>
+            <span class="price-period">/ 月</span>
+          </div>
+          <ul class="plan-features">
+            <li class="included">全エピソード聴き放題</li>
+            <li class="included">リクエスト無制限・優先</li>
+            <li class="included">文字起こしテキスト付き</li>
+            <li class="included">広告なし</li>
+          </ul>
+          <a href="pages/pricing.html" class="btn btn-primary btn-block">Proを始める</a>
         </div>
       </div>
     </div>
@@ -568,7 +591,7 @@
       <div class="testimonial-grid">
         <div class="testimonial-card">
           <div class="testimonial-stars">&#128218;</div>
-          <p class="testimonial-text">「最近話題のニュースをサクッと理解したい」 &mdash; 通勤中の5分で、今知るべきトピックの本質がわかる。</p>
+          <p class="testimonial-text">「最近話題のニュースをサクッと理解したい」 &mdash; 通勤中の2分半で、今知るべきトピックの本質がわかる。</p>
           <div class="testimonial-author">
             <div class="author-avatar">&#127911;</div>
             <div class="author-info">
@@ -644,7 +667,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>はい、リクエストも完全無料です。回数制限なく、どなたでもお気軽にご利用いただけます。会員登録も不要です。</p>
+            <p>Freeプランでは月1回、Proプラン（月額150円）では無制限・優先対応でリクエスト可能です。</p>
           </div>
         </div>
         <div class="faq-item">
@@ -662,7 +685,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>DeepCast AIはすべて完全無料のサービスです。有料プランや課金はありませんので、解約の必要もありません。安心してご利用ください。</p>
+            <p>はい、いつでも解約できます。アカウントページの「お支払い管理」から手続きできます。解約後も請求期間の終了までProプランをご利用いただけます。</p>
           </div>
         </div>
       </div>
@@ -673,17 +696,20 @@
   <section class="section cta-section">
     <div class="container">
       <div class="cta-card">
-        <h2 class="cta-title">あなたの「知りたい」を<br>5分間のポッドキャストに</h2>
-        <p class="cta-desc">すべて完全無料。会員登録もクレジットカードも不要。<br>今すぐ試してみてください。品質に驚くはずです。</p>
+        <h2 class="cta-title">あなたの「知りたい」を<br>2分半のポッドキャストに</h2>
+        <p class="cta-desc">無料プランで最新エピソードを体験。<br>Proプラン（月額150円）で全機能を解放。</p>
         <div class="cta-actions">
-          <a href="#request" class="btn btn-white btn-lg">
-            無料でリクエストする
+          <a href="pages/pricing.html" class="btn btn-white btn-lg">
+            Proプランを見る
+          </a>
+          <a href="#request" class="btn btn-ghost btn-lg" style="border-color:rgba(255,255,255,0.4);color:#fff;">
+            リクエストする
           </a>
         </div>
         <div class="cta-trust">
-          <span>&#10003; 完全無料</span>
-          <span>&#10003; 会員登録不要</span>
-          <span>&#10003; クレジットカード不要</span>
+          <span>&#10003; 無料プランあり</span>
+          <span>&#10003; いつでも解約OK</span>
+          <span>&#10003; 月額150円から</span>
         </div>
       </div>
     </div>
@@ -698,7 +724,7 @@
             <span class="logo-icon">&#9678;</span>
             <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
           </a>
-          <p class="footer-desc">AIが生み出す、5分間の深い洞察。<br>あなたの知識を毎日アップデート。</p>
+          <p class="footer-desc">AIが生み出す、2分半の深い洞察。<br>あなたの知識を毎日アップデート。</p>
           <div class="footer-social">
             <a href="#" class="social-link sns-coming-soon" aria-label="X (Twitter)" id="sns-x">&#120143;</a>
             <a href="#" class="social-link sns-coming-soon" aria-label="YouTube" id="sns-yt">&#9654;</a>
@@ -711,14 +737,15 @@
             <li><a href="#episodes">エピソード一覧</a></li>
             <li><a href="#request">トピックリクエスト</a></li>
             <li><a href="#services">サービス紹介</a></li>
-            <li><a href="#pricing">料金プラン</a></li>
+            <li><a href="pages/pricing.html">料金プラン</a></li>
+            <li><a href="pages/account.html">アカウント</a></li>
           </ul>
         </div>
         <div class="footer-links-group">
           <h4>サポート</h4>
           <ul>
             <li><a href="#faq">よくある質問</a></li>
-            <li><a href="#request">お問い合わせ</a></li>
+            <li><a href="contact.html">お問い合わせ</a></li>
           </ul>
         </div>
         <div class="footer-links-group">
@@ -776,9 +803,10 @@
     </div>
   </div>
 
-  <script src="js/audio-player.js?v=20260323"></script>
-  <script src="js/page-init.js?v=20260323"></script>
-  <script src="js/spa-router.js?v=20260323"></script>
-  <script src="js/main.js?v=20260323"></script>
+  <script src="assets/js/auth.js?v=20260326"></script>
+  <script src="js/audio-player.js?v=20260326"></script>
+  <script src="js/page-init.js?v=20260326"></script>
+  <script src="js/spa-router.js?v=20260326"></script>
+  <script src="js/main.js?v=20260326"></script>
 </body>
 </html>

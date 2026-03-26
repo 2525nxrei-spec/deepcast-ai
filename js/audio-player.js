@@ -8,6 +8,8 @@
 
   const audioEl = new Audio();
   audioEl.preload = 'metadata';
+  // エピソード再生時間の上限（2分30秒 = 150秒）
+  const MAX_DURATION_SEC = 150;
 
   let currentPlayBtn = null;
   let currentAudioSrc = '';
@@ -182,9 +184,16 @@
     });
   }
 
-  // --- timeupdate イベント ---
+  // --- timeupdate イベント（2:30で強制終了） ---
   audioEl.addEventListener('timeupdate', function() {
     if (!audioEl.duration) return;
+    // 2:30制限: 上限に達したら再生終了イベントを発火
+    if (audioEl.currentTime >= MAX_DURATION_SEC) {
+      audioEl.pause();
+      audioEl.currentTime = 0;
+      audioEl.dispatchEvent(new Event('ended'));
+      return;
+    }
     const pct = (audioEl.currentTime / audioEl.duration * 100) + '%';
     const timeStr = formatTime(audioEl.currentTime) + ' / ' + formatTime(audioEl.duration);
     // ミニプレイヤー

@@ -4,13 +4,13 @@
      xmlns:atom="http://www.w3.org/2005/Atom"
      xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>DeepCast AI - AIが生み出す5分間の深い洞察</title>
+    <title>DeepCast AI - AIが生み出す2分半の深い洞察</title>
     <link>https://deepcast-ai.com/</link>
     <language>ja</language>
-    <description>AIが生成する高品質ポッドキャスト。毎日更新、5分で最新トピックの深い洞察を。登録不要。</description>
+    <description>AIが生成する高品質ポッドキャスト。毎日更新、2分半で最新トピックの深い洞察を。登録不要。</description>
     <atom:link href="https://deepcast-ai.com/feed.xml" rel="self" type="application/rss+xml"/>
     <itunes:author>DeepCast AI</itunes:author>
-    <itunes:summary>AIが生成する高品質ポッドキャスト。毎日更新、5分で最新トピックの深い洞察を。</itunes:summary>
+    <itunes:summary>AIが生成する高品質ポッドキャスト。毎日更新、2分半で最新トピックの深い洞察を。</itunes:summary>
     <itunes:owner>
       <itunes:name>DeepCast AI</itunes:name>
       <itunes:email>2525nxrei@gmail.com</itunes:email>
@@ -21,7 +21,29 @@
     <itunes:category text="Business"/>
     <itunes:explicit>false</itunes:explicit>
     <itunes:type>episodic</itunes:type>
-    <itunes:keywords>AIポッドキャスト,AI生成,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,5分</itunes:keywords>
+    <itunes:keywords>AIポッドキャスト,AI生成,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,2分半</itunes:keywords>
+
+<item>
+  <title>#6 スマホを見た瞬間に集中力が死ぬ科学的メカニズム — そして"回復"に23分かかる理由</title>
+  <description>皆さん、こんにちは！「ブレイン・ハック・ラボ」へようこそ。突然ですが、あなたは今、集中して何かをしている最中に、ふとスマホが視界に入っただけで、思考が途切れた経験はありませんか？</description>
+  <enclosure url="https://audio.deepcast-ai.com/ep006.mp3" type="audio/mpeg" length="0"/>
+  <pubDate>Mon, 23 Mar 2026 00:00:00 +0900</pubDate>
+  <itunes:duration>10:51</itunes:duration>
+  <itunes:episode>6</itunes:episode>
+  <itunes:keywords>スマホ,集中力,科学的メカニズム,回復時間</itunes:keywords>
+  <guid isPermaLink="false">deepcast-ep006</guid>
+</item>
+
+<item>
+  <title>#5 なぜ独裁国家ほどAI開発に積極的なのか</title>
+  <description>皆さん、こんにちは！「テクノロジーの深層」へようこそ。AI、人工知能。この言葉を聞くと、私たちは便利さや効率化、あるいはSF映画のような未来を想像するかもしれません。</description>
+  <enclosure url="https://audio.deepcast-ai.com/ep005.mp3" type="audio/mpeg" length="0"/>
+  <pubDate>Mon, 23 Mar 2026 00:00:00 +0900</pubDate>
+  <itunes:duration>11:07</itunes:duration>
+  <itunes:episode>5</itunes:episode>
+  <itunes:keywords>独裁国家,AI開発,テクノロジー,政治</itunes:keywords>
+  <guid isPermaLink="false">deepcast-ep005</guid>
+</item>
 
 <item>
   <title>#4 時代の変化 — 知識労働者の今と未来</title>

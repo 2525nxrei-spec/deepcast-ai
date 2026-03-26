@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NRM2K26K7J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NRM2K26K7J');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アカウント - DeepCast AI</title>
+  <meta name="description" content="DeepCast AI アカウント管理ページ。プラン確認、お支払い管理、ログアウト。">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/icon.svg">
+  <link rel="stylesheet" href="../css/style.css?v=20260326">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .account-page {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+    }
+    .account-title {
+      font-family: var(--serif);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+    .account-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 24px 20px;
+      margin-bottom: 14px;
+    }
+    .account-card-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .account-card-value {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .account-card-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 4px;
+    }
+    .badge--pro {
+      background: var(--green);
+      color: #fff;
+    }
+    .badge--free {
+      background: var(--bg-card);
+      color: var(--text-muted);
+    }
+    .account-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .account-btn {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-align: center;
+    }
+    .account-btn:hover { opacity: 0.85; }
+    .account-btn--primary {
+      background: var(--green);
+      color: #fff;
+    }
+    .account-btn--outline {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid #e0e0e0;
+    }
+    .account-btn--danger {
+      background: #fff;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container nav-container">
+      <a href="../" class="logo">
+        <span class="logo-icon">&#9678;</span>
+        <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../#episodes">エピソード</a></li>
+        <li><a href="pricing.html">料金</a></li>
+        <li><a href="#" id="nav-logout" style="color:#dc2626">ログアウト</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="../#episodes" class="btn btn-primary btn-sm">エピソードを聴く</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="account-page">
+    <h1 class="account-title">アカウント</h1>
+
+    <div class="account-card">
+      <div class="account-card-label">メールアドレス</div>
+      <div class="account-card-value" id="account-email">--</div>
+    </div>
+
+    <div class="account-card">
+      <div class="account-card-label">現在のプラン</div>
+      <div class="account-card-value" id="account-plan">
+        <span class="badge badge--free">Free</span>
+      </div>
+      <div class="account-card-sub" id="account-plan-detail"></div>
+      <div class="account-actions" id="account-actions"></div>
+    </div>
+
+    <div class="account-card" id="subscription-card" style="display:none">
+      <div class="account-card-label">サブスクリプション</div>
+      <div class="account-card-value" id="sub-status">--</div>
+      <div class="account-card-sub" id="sub-next-billing"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../" class="logo">
+            <span class="logo-icon">&#9678;</span>
+            <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+          </a>
+          <p class="footer-desc">AIが生み出す、2分半の深い洞察。<br>あなたの知識を毎日アップデート。</p>
+        </div>
+        <div class="footer-links-group">
+          <h4>サービス</h4>
+          <ul>
+            <li><a href="../#episodes">エピソード一覧</a></li>
+            <li><a href="../#request">トピックリクエスト</a></li>
+            <li><a href="pricing.html">料金プラン</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>サポート</h4>
+          <ul>
+            <li><a href="../#faq">よくある質問</a></li>
+            <li><a href="../contact.html">お問い合わせ</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>法的情報</h4>
+          <ul>
+            <li><a href="../terms.html">利用規約</a></li>
+            <li><a href="../privacy.html">プライバシーポリシー</a></li>
+            <li><a href="../tokushoho.html">特定商取引法に基づく表示</a></li>
+            <li><a href="../copyright.html">著作権について</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // 未ログインならリダイレクト
+      if (typeof DEEPCAST_AUTH === 'undefined' || !DEEPCAST_AUTH.isLoggedIn()) {
+        window.location.href = 'pricing.html';
+        return;
+      }
+
+      // ログアウト
+      document.getElementById('nav-logout').addEventListener('click', function(e) {
+        e.preventDefault();
+        DEEPCAST_AUTH.logout();
+      });
+
+      // ハンバーガーメニュー
+      var hamburger = document.getElementById('hamburger');
+      var navLinks = document.getElementById('navLinks');
+      if (hamburger && navLinks) {
+        hamburger.addEventListener('click', function() {
+          navLinks.classList.toggle('open');
+          hamburger.classList.toggle('open');
+        });
+      }
+
+      // ユーザー情報取得
+      var user;
+      try {
+        user = await DEEPCAST_AUTH.fetchMe();
+      } catch (err) {
+        window.location.href = 'pricing.html';
+        return;
+      }
+      if (!user) {
+        window.location.href = 'pricing.html';
+        return;
+      }
+
+      // メールアドレス表示
+      document.getElementById('account-email').textContent = user.email;
+
+      var planEl = document.getElementById('account-plan');
+      var planDetail = document.getElementById('account-plan-detail');
+      var actions = document.getElementById('account-actions');
+
+      if (user.plan === 'pro') {
+        planEl.innerHTML = '<span class="badge badge--pro">Pro</span>';
+        planDetail.textContent = '月額150円 - 全エピソード聴き放題';
+
+        // サブスク情報取得
+        try {
+          var billing = await DEEPCAST_AUTH.getBillingStatus();
+          if (billing && billing.subscription) {
+            var subCard = document.getElementById('subscription-card');
+            subCard.style.display = '';
+
+            var statusText = '有効';
+            if (billing.subscription.cancel_at_period_end) {
+              statusText = '解約予定';
+            } else if (billing.subscription.status !== 'active') {
+              statusText = billing.subscription.status;
+            }
+            document.getElementById('sub-status').textContent = statusText;
+
+            if (billing.subscription.next_billing_date) {
+              var date = new Date(billing.subscription.next_billing_date);
+              document.getElementById('sub-next-billing').textContent =
+                '次回請求日: ' + date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日';
+            }
+          }
+        } catch (err) {
+          console.error('課金情報取得エラー:', err);
+        }
+
+        // お支払い管理ボタン
+        var portalBtn = document.createElement('button');
+        portalBtn.className = 'account-btn account-btn--outline';
+        portalBtn.textContent = 'お支払い管理';
+        portalBtn.addEventListener('click', async function() {
+          portalBtn.disabled = true;
+          portalBtn.textContent = '処理中...';
+          try {
+            await DEEPCAST_AUTH.openPortal();
+          } catch (err) {
+            alert(err.message);
+            portalBtn.disabled = false;
+            portalBtn.textContent = 'お支払い管理';
+          }
+        });
+        actions.appendChild(portalBtn);
+      } else {
+        planEl.innerHTML = '<span class="badge badge--free">Free</span>';
+        planDetail.textContent = '最新3本のエピソードのみ再生可能';
+
+        // アップグレードボタン
+        var upgradeBtn = document.createElement('button');
+        upgradeBtn.className = 'account-btn account-btn--primary';
+        upgradeBtn.textContent = 'Proにアップグレード（150円/月）';
+        upgradeBtn.addEventListener('click', async function() {
+          upgradeBtn.disabled = true;
+          upgradeBtn.textContent = '処理中...';
+          try {
+            await DEEPCAST_AUTH.startCheckout();
+          } catch (err) {
+            alert(err.message);
+            upgradeBtn.disabled = false;
+            upgradeBtn.textContent = 'Proにアップグレード（150円/月）';
+          }
+        });
+        actions.appendChild(upgradeBtn);
+      }
+
+      // ログアウトボタン（カード下部）
+      var logoutBtn = document.createElement('button');
+      logoutBtn.className = 'account-btn account-btn--danger';
+      logoutBtn.textContent = 'ログアウト';
+      logoutBtn.addEventListener('click', function() {
+        DEEPCAST_AUTH.logout();
+      });
+      actions.appendChild(logoutBtn);
+    });
+  </script>
+</body>
+</html>

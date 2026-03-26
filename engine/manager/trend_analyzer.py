@@ -251,10 +251,14 @@ Each object must have these fields:
 - urgency (string): "high", "medium", or "low"
 
 Prioritize:
-1. Topics that fill content gaps
-2. Seasonally relevant topics for {month_name}
-3. Categories with proven high quality scores
-4. Diversity across categories"""
+1. 今この時期に検索されやすい旬のトピック（季節・時事・イベント連動）
+2. 検索ボリュームが見込めるテーマ（多くの人が「知りたい」と思う話題）
+3. SNSでシェアされやすい意外性・驚きのある切り口
+4. コンテンツギャップがあるカテゴリ
+5. カテゴリの多様性（同じジャンルに偏らない）
+
+重要: 一般的・抽象的なテーマではなく、「今この時期だからこそ聴きたい」と思える具体的で旬なテーマを選ぶこと。
+例: 3月なら「新生活×AI活用」「花粉症の科学」「年度末の節税テクニック」など、時期と結びついたテーマ。"""
 
         system_prompt = (
             "You are a content strategy analyst. "

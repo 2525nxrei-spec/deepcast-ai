@@ -1,0 +1,39 @@
+# ============================================================
+# DeepCast AI API — Cloudflare Workers 設定
+# ============================================================
+
+name = "deepcast-api"
+main = "workers/index.js"
+compatibility_date = "2024-12-01"
+
+# ============================================================
+# D1 データベースバインディング
+# ============================================================
+[[d1_databases]]
+binding = "DB"
+database_name = "deepcast-db"
+database_id = ""  # 後でwrangler d1 createで生成して設定
+
+# ============================================================
+# 環境変数
+# ============================================================
+[vars]
+FRONTEND_URL = "https://deepcast-ai.com"
+STRIPE_PRICE_PRO = ""  # 後でStripeで作成して設定（150円/月）
+
+# 以下はシークレットとして設定（wrangler secret put コマンド使用）
+# wrangler secret put STRIPE_SECRET_KEY
+# wrangler secret put STRIPE_WEBHOOK_SECRET
+# wrangler secret put JWT_SECRET
+
+# ============================================================
+# 開発環境
+# ============================================================
+[dev]
+port = 8791
+
+[env.dev]
+name = "deepcast-api-dev"
+
+[env.dev.vars]
+FRONTEND_URL = "http://localhost:8791"

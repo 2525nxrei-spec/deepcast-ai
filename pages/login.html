@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NRM2K26K7J"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NRM2K26K7J');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン - DeepCast AI</title>
+  <meta name="description" content="DeepCast AI ログイン・新規登録ページ。">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/icon.svg">
+  <link rel="stylesheet" href="../css/style.css?v=20260326">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .login-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .login-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 400px;
+      padding: 36px 28px;
+    }
+    .login-logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .login-logo a {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .login-logo .logo-ai {
+      font-family: var(--sans);
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 16px;
+      margin-left: 3px;
+    }
+    .login-title {
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .login-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .login-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .login-tab {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 9px 0;
+      cursor: pointer;
+      background: #fff;
+      color: var(--text-muted);
+      border: none;
+      font-family: var(--sans);
+      transition: background 0.15s, color 0.15s;
+    }
+    .login-tab.is-active {
+      background: var(--green);
+      color: #fff;
+    }
+    .login-field {
+      margin-bottom: 14px;
+    }
+    .login-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+    .login-field input {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 14px;
+      padding: 10px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      outline: none;
+      background: var(--bg-alt);
+      transition: border-color 0.2s;
+    }
+    .login-field input:focus {
+      border-color: var(--green);
+    }
+    .login-submit {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 12px 0;
+      border: none;
+      border-radius: 4px;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .login-submit:hover { opacity: 0.85; }
+    .login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-error {
+      font-size: 12px;
+      color: #dc2626;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+    .login-toggle {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 14px;
+    }
+    .login-toggle a {
+      color: var(--green);
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .login-back {
+      display: block;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+    .login-back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <a href="../">DeepCast<span class="logo-ai">AI</span></a>
+      </div>
+      <div class="login-title" id="login-title">ログイン</div>
+      <div class="login-sub" id="login-sub">メールアドレスとパスワードを入力</div>
+      <div class="login-tabs">
+        <button class="login-tab" id="tab-login">ログイン</button>
+        <button class="login-tab" id="tab-register">新規登録</button>
+      </div>
+      <form id="login-form">
+        <div class="login-field">
+          <label for="input-email">メールアドレス</label>
+          <input type="email" id="input-email" placeholder="you@example.com" required>
+        </div>
+        <div class="login-field">
+          <label for="input-password">パスワード（8文字以上）</label>
+          <input type="password" id="input-password" placeholder="8文字以上" minlength="8" required>
+        </div>
+        <button type="submit" class="login-submit" id="login-submit-btn">ログイン</button>
+        <div class="login-error" id="login-error"></div>
+      </form>
+      <div class="login-toggle" id="login-toggle">
+        アカウントをお持ちでない方は<a id="toggle-link">新規登録</a>
+      </div>
+      <a href="../" class="login-back">&larr; トップに戻る</a>
+    </div>
+  </div>
+
+  <script src="../assets/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 既にログイン済みならリダイレクト
+      if (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isLoggedIn()) {
+        var returnUrl = new URLSearchParams(window.location.search).get('return');
+        window.location.href = returnUrl || '../';
+        return;
+      }
+
+      var loginForm = document.getElementById('login-form');
+      var loginError = document.getElementById('login-error');
+      var loginTitle = document.getElementById('login-title');
+      var loginSub = document.getElementById('login-sub');
+      var loginSubmitBtn = document.getElementById('login-submit-btn');
+      var tabLogin = document.getElementById('tab-login');
+      var tabRegister = document.getElementById('tab-register');
+      var toggleLink = document.getElementById('toggle-link');
+      var loginToggle = document.getElementById('login-toggle');
+
+      var mode = 'login';
+
+      // 初期状態: ログインタブをアクティブ
+      tabLogin.classList.add('is-active');
+
+      function setMode(m) {
+        mode = m;
+        if (mode === 'login') {
+          tabLogin.classList.add('is-active');
+          tabRegister.classList.remove('is-active');
+          loginTitle.textContent = 'ログイン';
+          loginSub.textContent = 'メールアドレスとパスワードを入力';
+          loginSubmitBtn.textContent = 'ログイン';
+          loginToggle.innerHTML = 'アカウントをお持ちでない方は<a id="toggle-link">新規登録</a>';
+        } else {
+          tabRegister.classList.add('is-active');
+          tabLogin.classList.remove('is-active');
+          loginTitle.textContent = '新規登録';
+          loginSub.textContent = 'メールアドレスとパスワードで登録';
+          loginSubmitBtn.textContent = '新規登録';
+          loginToggle.innerHTML = '既にアカウントをお持ちの方は<a id="toggle-link">ログイン</a>';
+        }
+        document.getElementById('toggle-link').addEventListener('click', function() {
+          setMode(mode === 'login' ? 'register' : 'login');
+        });
+        loginError.style.display = 'none';
+      }
+
+      tabLogin.addEventListener('click', function() { setMode('login'); });
+      tabRegister.addEventListener('click', function() { setMode('register'); });
+      toggleLink.addEventListener('click', function() { setMode('register'); });
+
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        loginError.style.display = 'none';
+        loginSubmitBtn.disabled = true;
+        var origText = loginSubmitBtn.textContent;
+        loginSubmitBtn.textContent = '処理中...';
+
+        try {
+          var email = document.getElementById('input-email').value;
+          var password = document.getElementById('input-password').value;
+
+          if (typeof DEEPCAST_AUTH === 'undefined') {
+            throw new Error('認証システムの読み込みに失敗しました。ページを再読み込みしてください。');
+          }
+
+          if (mode === 'register') {
+            await DEEPCAST_AUTH.register(email, password);
+          } else {
+            await DEEPCAST_AUTH.login(email, password);
+          }
+
+          // 成功 → 元のページまたはトップへ
+          var returnUrl = new URLSearchParams(window.location.search).get('return');
+          window.location.href = returnUrl || '../';
+        } catch (err) {
+          loginError.textContent = err.message;
+          loginError.style.display = 'block';
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.textContent = origText;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
