@@ -1,340 +1,64 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NRM2K26K7J"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-NRM2K26K7J');
-  </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>#1 AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃｜DeepCast AI</title>
-  <meta name="description" content="## AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃  皆さん、こんにちは！「知の最前線」へようこそ。今回のテーマは、学術界に激震をもたらしている生成AI、特にその論文作成能力についてです。もはやAIが書いた文章を見抜くことは困難になりつつあり、学術界はかつてない危機に直面していま...">
-  <meta name="keywords" content="AI,倫理,未来社会,道徳">
-  <link rel="canonical" href="https://deepcast-ai.com/episodes/ep001.html">
-  <meta property="og:title" content="#1 AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃｜DeepCast AI">
-  <meta property="og:description" content="## AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃  皆さん、こんにちは！「知の最前線」へようこそ。今回のテーマは、学術界に激震をもたらしている生成AI、特にその論文作成能力についてです。もはやAIが書いた文章を見抜くことは困難になりつつあり、学術界はかつてない危機に直面していま...">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://deepcast-ai.com/episodes/ep001.html">
-  <meta property="og:image" content="https://deepcast-ai.com/assets/og-image.png">
-  <meta property="og:site_name" content="DeepCast AI">
-  <meta property="og:locale" content="ja_JP">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="#1 AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃｜DeepCast AI">
-  <meta name="twitter:description" content="## AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃  皆さん、こんにちは！「知の最前線」へようこそ。今回のテーマは、学術界に激震をもたらしている生成AI、特にその論文作成能力についてです。もはやAIが書いた文章を見抜くことは困難になりつつあり、学術界はかつてない危機に直面していま...">
-  <meta name="twitter:image" content="https://deepcast-ai.com/assets/og-image.png">
-  <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="../assets/icon.svg">
-  <link rel="stylesheet" href="../css/style.css?v=20260321">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
-  <script type="application/ld+json">
-  [
-    {
-        "@context": "https://schema.org",
-        "@type": "PodcastEpisode",
-        "name": "AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃",
-        "description": "皆さん、こんにちは！「テクノロジーの波紋」へようこそ。 テクノロジーの進化が止まらない現代、私たちが当たり前だと思っていたことが、根底から揺らぎ始めています。特に、学術界で今、大きな衝撃が走っているのをご存知でしょうか？それが、「AIが書いた論文を見抜けない」という、まさにSFのような現実です。今日...",
-        "datePublished": "2026-03-27",
-        "duration": "PT2M30S",
-        "episodeNumber": 1,
-        "url": "https://deepcast-ai.com/episodes/ep001.html",
-        "associatedMedia": {
-            "@type": "MediaObject",
-            "contentUrl": "https://audio.deepcast-ai.com/ep001.mp3"
-        },
-        "partOfSeries": {
-            "@type": "PodcastSeries",
-            "name": "DeepCast AI",
-            "url": "https://deepcast-ai.com/"
-        }
-    },
-    {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "DeepCast AI",
-                "item": "https://deepcast-ai.com/"
-            },
-            {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "エピソード一覧",
-                "item": "https://deepcast-ai.com/all-episodes.html"
-            },
-            {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "#1 AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃"
-            }
-        ]
-    }
-]
-  </script>
-  <style>
-    .article-hero {
-      padding: 100px 24px 40px;
-      background: var(--bg);
-    }
-    .article-hero .container { max-width: 760px; margin: 0 auto; }
-    .article-meta {
-      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-      margin-bottom: 16px; font-size: 12px; color: var(--text-muted);
-    }
-    .article-meta .episode-badge { padding: 2px 9px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; background: rgba(94, 194, 105, 0.1); color: var(--green); }
-    .article-hero h1 {
-      font-family: var(--serif);
-      font-size: clamp(24px, 4vw, 36px);
-      font-weight: 700; line-height: 1.4;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-    }
-    .article-hero .lead {
-      font-size: 15px; color: var(--text-secondary); line-height: 1.8;
-    }
-    .article-player-bar {
-      max-width: 760px; margin: 0 auto 32px;
-      padding: 16px 24px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      display: flex; align-items: center; gap: 12px;
-    }
-    .article-body {
-      max-width: 760px; margin: 0 auto;
-      padding: 0 24px 72px;
-    }
-    .article-body h2 {
-      font-family: var(--serif);
-      font-size: 22px; font-weight: 700;
-      margin: 48px 0 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .article-body h3 {
-      font-size: 17px; font-weight: 600;
-      margin: 32px 0 12px;
-    }
-    .article-body p {
-      font-size: 15px; line-height: 1.9;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-    }
-    .article-body strong { color: var(--text); }
-    .article-body .highlight-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin: 24px 0;
-    }
-    .article-body .highlight-box h4 {
-      font-size: 14px; font-weight: 600;
-      margin-bottom: 8px; color: var(--text);
-    }
-    .article-body .highlight-box ul {
-      list-style: none; padding: 0; margin: 0;
-    }
-    .article-body .highlight-box li {
-      font-size: 14px; line-height: 1.7;
-      color: var(--text-secondary);
-      padding: 4px 0 4px 16px;
-      position: relative;
-    }
-    .article-body .highlight-box li::before {
-      content: "—"; position: absolute; left: 0; color: var(--text-muted);
-    }
-    .article-back {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 13px; color: var(--text-muted);
-      margin-bottom: 24px;
-      transition: color 0.2s;
-    }
-    .article-back:hover { color: var(--text); }
-    .article-tags { display: flex; gap: 6px; margin-top: 8px; }
-    .article-share {
-      margin-top: 48px; padding-top: 24px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-    .article-share p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#1 AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃｜DeepCast AI</title>
+<meta name="description" content="皆さん、こんにちは、[ポッドキャスト名]です。今日のテーマは、学術界の根幹を揺るがす新たな衝撃、「AIが書いた論文を見抜けない」という現実です。AIの進化は、私たちの生活のあらゆる側面に変革をもたらしていますが、その波はついに、知識の最前線である学術の世界にも押し寄せています。  ## 論文審査の最前線で起きていること">
+<link rel="canonical" href="https://deepcast-ai.com/episodes/ep001.html">
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <!-- NAVIGATION -->
-  <nav class="navbar scrolled" id="navbar">
-    <div class="container nav-container">
-      <a href="../" class="logo">
-        <span class="logo-icon">&#9678;</span>
-        <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
-      </a>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="../#episodes">エピソード</a></li>
-        <li><a href="../#request">リクエスト</a></li>
-        <li><a href="../#services">サービス</a></li>
-        <li><a href="../#faq">FAQ</a></li>
-      </ul>
-      <div class="nav-actions">
-        <a href="../all-episodes.html" class="btn btn-primary btn-sm">エピソードを聴く</a>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="メニュー">
-        <span></span><span></span><span></span>
-      </button>
+<header class="site-header">
+  <nav class="nav">
+    <a href="/" class="nav__logo">DeepCast AI</a>
+    <div class="nav__links">
+      <a href="/all-episodes.html" class="nav__link">全エピソード</a>
+      <a href="/pages/pricing.html" class="nav__link">料金</a>
     </div>
   </nav>
-
-  <!-- ARTICLE HERO -->
-  <div class="article-hero">
-    <div class="container">
-      <a href="../all-episodes.html" class="article-back">&larr; エピソード一覧に戻る</a>
-      <div class="article-meta">
-        <span class="episode-badge">PRO</span>
-        <span>#1</span>
-        <span>2026.03.27</span>
-        <span>テクノロジー</span>
-        <span>5:00</span>
-      </div>
-      <h1>AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃</h1>
-      <p class="lead">皆さん、こんにちは！「テクノロジーの波紋」へようこそ。 テクノロジーの進化が止まらない現代、私たちが当たり前だと思っていたことが、根底から揺らぎ始めています。特に、学術界で今、大きな衝撃が走っているのをご存知でしょうか？それが、「AIが書いた論文を見抜けない」という、まさにSFのような現実です。今日...</p>
-      <div class="article-tags">
-        <span class="tag">AIが書いた論文を見抜けない</span>
-        <span class="tag">学術界を揺るがす生成AIの衝撃</span>
-      </div>
+</header>
+<main class="episode-page">
+  <article class="episode-detail">
+    <div class="episode-detail__header">
+      <span class="episode-detail__number">#1</span>
+      <h1 class="episode-detail__title">AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃</h1>
+      <time class="episode-detail__date">2026-03-27</time>
     </div>
-  </div>
-
-  <!-- INLINE PLAYER -->
-  <div class="article-player-bar">
-    <button class="play-btn" id="articlePlayBtn" data-audio="https://audio.deepcast-ai.com/ep001.mp3" data-title="AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃" aria-label="再生">
-      <span class="play-icon">&#9654;</span>
-    </button>
-    <div class="episode-progress" style="flex:1">
-      <div class="progress-bar"><div class="progress-fill" id="articleProgressFill" style="width:0%"></div></div>
-      <span class="progress-time" id="articleProgressTime">0:00 / 5:00</span>
+    <div class="episode-detail__player">
+      <audio controls preload="metadata" style="width:100%;">
+        <source src="https://audio.deepcast-ai.com/ep001.mp3" type="audio/mpeg">
+      </audio>
     </div>
-    <span style="font-size:12px;color:var(--text-muted)">音声で聴く</span>
-  </div>
+    <div class="article-body">
+        <p>皆さん、こんにちは、[ポッドキャスト名]です。今日のテーマは、学術界の根幹を揺るがす新たな衝撃、「AIが書いた論文を見抜けない」という現実です。AIの進化は、私たちの生活のあらゆる側面に変革をもたらしていますが、その波はついに、知識の最前線である学術の世界にも押し寄せています。</p>
+        <h2>論文審査の最前線で起きていること</h2>
+        <p>学術論文の執筆に生成AIが活用されるケースが急増しています。昨年、世界的科学誌『Science』を擁するAAASは、査読においてAIが生成したテキストを識別することが困難になっていると警鐘を鳴らしました。実際、一部の学術誌では、AIによる不正な論文投稿が原因で、年間数百件もの論文が撤回される事態に発展しています。例えば、Nature姉妹誌の一つでは、不自然な言い回しや矛盾したデータを含むAI生成論文が発覚し、撤回が相次いだ事例が報告されています。</p>
+        <p>AIが書いた論文を見抜くことがなぜこれほど難しいのでしょうか。それは、ChatGPTのような大規模言語モデルが、膨大な量の学術文献データを学習しているため、専門用語を適切に使いこなし、自然な論理展開で文章を生成する能力が非常に高いからです。さらに、AI検出ツールも万能ではありません。2023年の研究では、主要なAIテキスト検出ツールの多くが、人間が書いた文章をAI生成と誤判定したり、逆にAIが書いた文章を見抜けなかったりする精度上の課題が指摘されています。特に、AIが生成した文章に人間が少し手を加えるだけで、検出ツールを容易にすり抜けることが可能になります。</p>
+        <p>この問題は、査読者にも大きな負担をかけています。査読者は限られた時間の中で、論文の内容の真偽だけでなく、それがAIによって書かれたものではないかという追加のチェックまで求められるようになり、質の高い査読を維持することが一層困難になっているのです。プレプリントサーバーであるarXivでも、AIが生成したとみられる論文が増加傾向にあり、中には全く意味をなさない架空の論文まで投稿される事態も報告されています。</p>
+        <h2>学術の信頼性を揺るがす本質的な問い</h2>
+        <p>AIが書いた論文を見抜けないという問題は、単に不正行為への対処にとどまらず、学術界が長年培ってきた「信頼性」という本質的な価値に深く関わってきます。学術論文は、研究者自身の独創的な思考、実験、分析に基づき、その成果を公開し、他の研究者からの批判的吟味を経て、新たな知識として確立されるものです。しかし、もしAIが論文の大部分、あるいは全てを執筆しているとしたら、その「オリジナリティ」や「オーサーシップ（著者性）」の定義は一体どうなるのでしょうか。</p>
+        <p>一部の研究者からは、「AIを共著者とすべきか」といった議論も提起されていますが、現在の学術倫理ガイドラインでは、知的貢献が人間であるという前提が強くあります。例えば、国際医学雑誌編集者委員会（ICMJE）は、AIツールは著者として認められないと明記しています。しかし、AIが先行研究のレビューを効率化し、仮説構築の助けとなり、さらには論文草稿の生成まで行う現状を考えると、AIが「知的貢献」をしていると解釈することもできます。このジレンマは、学術論文の根幹にある「誰が、いかにしてこの知識を生み出したのか」という問いを曖昧にさせ、ひいては学術研究全体の透明性と信頼性を損なう可能性をはらんでいます。</p>
+        <p>また、AI生成論文の増加は、研究の質そのものにも影響を与えかねません。表面的には完璧に見えるAI生成論文でも、その中身が深い洞察や創造的な発想を欠いている場合、学術の発展を停滞させてしまうリスクがあります。人間が思考し、試行錯誤するプロセスこそが、真のイノベーションを生み出す源泉であるという視点からすると、AIが「書く」ことの比重が増すことは、非常に大きな懸念事項です。</p>
+        <h2>新たな共存の道を模索する学術界</h2>
+        <p>この大きな変革期において、学術界はAIを単なる脅威として排除するだけでなく、いかに共存していくかを模索する必要があります。一つの方向性としては、AIを研究者の「強力なアシスタント」として活用しつつ、その使用ルールを明確化することが挙げられます。例えば、AIによる情報収集や文章校正は認めつつも、研究の核心部分である仮説設定、実験設計、結果の解釈、そして結論の導出は、あくまで人間が行うというガイドラインの策定です。</p>
+        <p>また、査読システム自体も進化を遂げる必要があるでしょう。AI検出ツールの精度向上はもちろんのこと、査読者がより本質的な内容の吟味に集中できるよう、AIが生成した文章の可能性が高い箇所を自動でハイライトするような補助ツールの導入も考えられます。さらに、ブロックチェーン技術を活用し、論文の執筆過程やデータ生成の透明性を確保することで、不正を困難にする試みも始まっています。</p>
+        <p>結論として、AIが書いた論文を見抜けないという課題は、学術界にこれまでの常識を問い直し、新たな倫理観とシステムを構築することを迫っています。しかし、これは単なる危機ではなく、人間とAIがそれぞれの強みを活かし、より効率的かつ創造的な知識生成プロセスを築くための機会と捉えることもできます。AIの知的なアシスタンスを受けながらも、人間ならではの深い洞察力、批判的思考、そして倫理観を研ぎ澄ますことで、学術の未来はさらに豊かなものになるはずです。私たちは今、知のフロンティアを再定義する岐路に立たされていると言えるでしょう。</p>
+        <p>今日の[ポッドキャスト名]はここまで。AIと学術界の未来について、皆さんもぜひ考えてみてください。それではまた次回。</p>
 
-  <!-- ARTICLE BODY -->
-  <div class="article-body">
-
-    <p>皆さん、こんにちは！「テクノロジーの波紋」へようこそ。
-テクノロジーの進化が止まらない現代、私たちが当たり前だと思っていたことが、根底から揺らぎ始めています。特に、学術界で今、大きな衝撃が走っているのをご存知でしょうか？それが、「AIが書いた論文を見抜けない」という、まさにSFのような現実です。今日のテーマは、この学術界を揺るがす生成AIの衝撃について、深く掘り下げていきたいと思います。</p>
-
-    <h2>AI論文検出の最前線と現状の限界</h2>
-
-    <p>「AIが書いた論文なんて、すぐにバレるだろう？」そう思われる方も多いかもしれません。しかし、現実はずっと複雑です。OpenAIのGPTシリーズを筆頭とする大規模言語モデルは、驚くほど自然で論理的な文章を生成する能力を持っています。その文章は、人間の書いたものと区別がつかないレベルにまで達しています。</p>
-
-    <p>実際、AIが生成したテキストを検出するツールは、すでにいくつか存在します。例えば、GPTZeroやTurnitinのようなサービスは、AIが書いた可能性のある文章を特定しようと試みています。しかし、その精度には限界があり、AIが書いたものを人間が書いたと誤検出したり、逆にAIが書いたものをすり抜けさせてしまったりするケースが頻繁に報告されています。ニューヨーク大学の研究では、GPT-4によって生成された論文の半数以上が、AI検出ツールをすり抜けたという報告もあります。これは、検出ツール自体もAIの技術を応用しているため、互いに進化を競う「いたちごっこ」の状態にあるからです。AIは、検出を回避するために表現を微妙に変えるといった、より巧妙な手法を学習していくのです。この現状は、学術界における不正行為の温床となりかねないという、深刻な懸念を引き起こしています。</p>
-
-    <h2>学術界の「信頼性」が問われる時代</h2>
-
-    <p>この状況は、学術界の根幹である「信頼性」に大きな影を落としています。毎年発表される学術論文は数百万本に上りますが、その全てをこれまでと同じ厳密さで査読し続けることは、もはや現実的ではありません。査読者がAI生成論文を見抜けないとなれば、虚偽の情報やハルシネーション（AIが事実に基づかない情報を生成すること）が含まれた論文が公表され、それが科学的進歩を誤った方向へ導く可能性も出てきます。</p>
-
-    <p>NatureやScienceといった主要な学術ジャーナルは、すでにAIツールの利用に関するガイドラインを更新し始めています。例えば、AIを論文の共著者とすることを禁じたり、AIツールの利用箇所を明記するよう義務付けたりする動きが見られます。しかし、これらのガイドラインが実効性を持つかどうかは、依然として疑問符が付きます。研究者は、論文執筆やデータ分析における効率化の誘惑にかられるでしょう。その結果、学術論文の生産量は増える一方で、その質や信頼性が低下するというパラドックスに直面するかもしれません。学術界は今、AIの力をどう活用し、どう規制するかという、かつてない倫理的・技術的課題に直面しているのです。</p>
-
-    <p>この問題は、単にAI論文を検出できるか否かという技術的な問題にとどまりません。私たちが長年培ってきた、論文の信頼性、査読の厳密さ、そして科学的探求における人間の役割そのものに、根本的な問いを投げかけています。AIとの共存が避けられない未来において、私たちはAIを単なる「脅威」としてではなく、新たな知の探求を促す「道具」として捉え、その可能性を最大限に引き出しつつ、同時にその限界とリスクを深く理解し、倫理的な枠組みを構築していく必要があります。</p>
-
-    <p>私たち人類が今こそ向き合うべきは、AIとどう向き合い、人間の独創性、問いを立てる力、そして批判的思考力をどう進化させていくかという、根源的な問いなのではないでしょうか。未来の学術界は、AIとの対話の中から、新たな知のフロンティアを切り開いていくことになるのかもしれません。</p>
-
-    <p>それでは、また次回の配信でお会いしましょう。</p>
-
-
-    <div class="article-share">
-      <p>このエピソードをシェアする</p>
-      <a href="../all-episodes.html" class="btn btn-primary">他のエピソードも聴く</a>
     </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <a href="../" class="logo">
-            <span class="logo-icon">&#9678;</span>
-            <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
-          </a>
-          <p class="footer-desc">AIが生み出す、2分半の深い洞察。<br>あなたの知識を毎日アップデート。</p>
-        </div>
-        <div class="footer-links-group">
-          <h4>サービス</h4>
-          <ul>
-            <li><a href="../#episodes">エピソード一覧</a></li>
-            <li><a href="../#request">トピックリクエスト</a></li>
-          </ul>
-        </div>
-        <div class="footer-links-group">
-          <h4>法的情報</h4>
-          <ul>
-            <li><a href="../terms.html">利用規約</a></li>
-            <li><a href="../privacy.html">プライバシーポリシー</a></li>
-            <li><a href="../about.html">運営者情報</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- MINI PLAYER -->
-  <div class="mini-player" id="miniPlayer">
-    <div class="mini-player-inner">
-      <button class="mini-play-btn" id="miniPlayBtn" aria-label="再生/一時停止">
-        <span class="play-icon">&#9654;</span>
-      </button>
-      <div class="mini-info">
-        <span class="mini-title" id="miniTitle">-</span>
-        <div class="mini-progress-wrap">
-          <div class="mini-progress-bar" id="miniProgressBar">
-            <div class="mini-progress-fill" id="miniProgressFill" style="width:0%"></div>
-          </div>
-          <span class="mini-time" id="miniTime">0:00 / 0:00</span>
-        </div>
-      </div>
-      <button class="mini-close-btn" id="miniCloseBtn" aria-label="閉じる">&times;</button>
-    </div>
-  </div>
-
-  <script src="../assets/js/auth.js?v=20260327"></script>
-  <script src="../js/audio-player.js?v=20260327"></script>
-  <script src="../js/page-init.js?v=20260327"></script>
-  <script src="../js/spa-router.js?v=20260327"></script>
-  <script src="../js/main.js?v=20260327"></script>
-  <script>
-  // エピソードゲーティング: Freeユーザーは最新3エピソード以外再生不可
-  (function() {
-    var playBtn = document.getElementById('articlePlayBtn');
-    if (!playBtn) return;
-    fetch('/episodes/episodes.json')
-      .then(function(r) { return r.json(); })
-      .then(function(episodes) {
-        var audioSrc = playBtn.dataset.audio || '';
-        var fileName = audioSrc.split('/').pop().split('?')[0];
-        var idx = -1;
-        for (var i = 0; i < episodes.length; i++) {
-          var epFile = (episodes[i].audio || '').split('/').pop().split('?')[0];
-          if (epFile === fileName) { idx = i; break; }
-        }
-        if (idx >= 3 && !(typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isPro())) {
-          playBtn.dataset.locked = 'true';
-          playBtn.innerHTML = '<span class="play-icon">&#9654;</span><span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>';
-          playBtn.addEventListener('click', function(e) {
-            e.preventDefault(); e.stopPropagation();
-            if (typeof DEEPCAST_AUTH !== 'undefined') DEEPCAST_AUTH.showUpgradeGate();
-          });
-        }
-      }).catch(function() {});
-  })();
-  </script>
+  </article>
+</main>
+<footer class="site-footer">
+  <p>&copy; 2026 DeepCast AI — 濱田礼</p>
+  <nav>
+    <a href="/pages/terms.html">利用規約</a>
+    <a href="/pages/privacy.html">プライバシーポリシー</a>
+    <a href="/pages/tokushoho.html">特商法</a>
+    <a href="/pages/contact.html">お問い合わせ</a>
+  </nav>
+</footer>
+<script src="/assets/js/auth.js?v=20260327"></script>
 </body>
 </html>
