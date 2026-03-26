@@ -36,6 +36,9 @@ node_modules/
 # Wrangler
 .wrangler/
 
+# Setup scripts (contain secret handling)
+setup-stripe.sh
+
 # Audio test files
 engine/data/audio/test_*
 
