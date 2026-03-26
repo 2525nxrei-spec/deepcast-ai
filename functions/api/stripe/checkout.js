@@ -33,22 +33,22 @@ export async function onRequestPost(context) {
         .run();
     }
 
-    // Checkout Session作成
+    // Embedded Checkout: ページ内埋め込み決済（リダイレクトなし）
     const frontendUrl = env.FRONTEND_URL || 'https://deepcast-ai.com';
     const session = await stripeRequest('checkout/sessions', 'POST', {
       mode: 'subscription',
+      ui_mode: 'embedded',
       customer: stripeCustomerId,
       locale: 'ja',
       'line_items[0][price]': priceId,
       'line_items[0][quantity]': '1',
-      success_url: `${frontendUrl}/pages/account.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontendUrl}/pages/pricing.html`,
+      return_url: `${frontendUrl}/pages/account.html?session_id={CHECKOUT_SESSION_ID}`,
       metadata: { user_id: user.id },
       subscription_data: { metadata: { user_id: user.id } },
     }, env.STRIPE_SECRET_KEY);
 
     console.log(`Checkout作成: session=${session.id}, user=${user.id}`);
-    return jsonResponse({ checkout_url: session.url });
+    return jsonResponse({ clientSecret: session.client_secret });
   } catch (err) {
     console.error('Checkoutエラー:', err.message);
     return errorResponse('決済セッションの作成に失敗しました', 500);

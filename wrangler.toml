@@ -19,6 +19,8 @@ database_id = "a932458d-de69-4dad-a777-e1a2ceeee840"
 # ============================================================
 [vars]
 FRONTEND_URL = "https://deepcast-ai.com"
+# Stripe公開鍵（Embedded Checkout用）— Cloudflareダッシュボードで本番値を設定
+STRIPE_PUBLISHABLE_KEY = ""
 # STRIPE_PRICE_PRO は Cloudflare ダッシュボードまたは wrangler pages secret put で設定
 
 # 以下はシークレットとして設定（wrangler pages secret put コマンド使用）

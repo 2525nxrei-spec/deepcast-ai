@@ -133,8 +133,45 @@ const DEEPCAST_AUTH = (() => {
 
   async function startCheckout() {
     const data = await apiRequest('/api/stripe/checkout', 'POST');
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
+    if (data.clientSecret) {
+      // Stripe公開鍵を取得
+      const keyRes = await fetch('/api/stripe/stripe-key');
+      const keyData = await keyRes.json();
+      if (!keyData.publishableKey) throw new Error('Stripe公開鍵が取得できませんでした');
+
+      // Stripe.js読み込み確認
+      if (typeof Stripe === 'undefined') throw new Error('Stripe.jsが読み込まれていません');
+      const stripe = Stripe(keyData.publishableKey);
+
+      // 既存モーダルがあれば削除
+      const existing = document.getElementById('deepcast-checkout-modal');
+      if (existing) existing.remove();
+
+      // モーダルを作成
+      const modal = document.createElement('div');
+      modal.id = 'deepcast-checkout-modal';
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;';
+      modal.innerHTML = '<div style="background:#fff;border-radius:8px;width:100%;max-width:500px;max-height:90vh;overflow:auto;position:relative;">' +
+        '<button id="deepcast-checkout-close" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;z-index:1;">&times;</button>' +
+        '<div id="deepcast-checkout-container" style="padding:16px;"></div>' +
+      '</div>';
+      document.body.appendChild(modal);
+
+      // 閉じるイベント
+      const closeModal = () => {
+        if (window._deepcast_embedded_checkout) {
+          window._deepcast_embedded_checkout.destroy();
+          window._deepcast_embedded_checkout = null;
+        }
+        modal.remove();
+      };
+      document.getElementById('deepcast-checkout-close').addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+      // Embedded Checkoutをマウント
+      const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+      window._deepcast_embedded_checkout = checkout;
+      checkout.mount('#deepcast-checkout-container');
     }
   }
 
