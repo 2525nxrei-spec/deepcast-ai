@@ -298,6 +298,15 @@ input, textarea, select { font: inherit; }
 .episode-badge.category-business { background: rgba(234, 179, 8, 0.12); color: #ca8a04; }
 .episode-badge.category-science { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
 .episode-badge.category-society { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.episode-badge.pro-badge { background: rgba(107, 33, 168, 0.12); color: #6b21a8; font-weight: 700; }
+.episode-card.locked { opacity: 0.75; }
+.episode-card.locked .play-btn { position: relative; }
+.episode-card.locked .play-btn .lock-icon {
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; inset: 0; background: rgba(0,0,0,0.35); border-radius: 50%;
+}
+.episode-card.locked .play-btn .lock-icon svg { width: 18px; height: 18px; }
+.episode-card.locked .episode-title::after { content: ''; }
 .episode-number, .episode-date, .episode-duration { font-size: 11px; color: var(--text-muted); }
 .episode-title {
   font-family: var(--serif);

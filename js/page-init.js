@@ -165,14 +165,29 @@
   }
 
   // エピソードカードのHTML生成
-  function renderEpisode(ep) {
+  // episodeIndex: episodes配列内のインデックス（0が最新）
+  function renderEpisode(ep, episodeIndex) {
     var tags = ep.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('');
     // タイトルのエスケープ（aria-label用）
     var safeTitle = (ep.title || '').replace(/"/g, '&quot;');
-    return '<article class="episode-card" data-category="' + ep.category + '" aria-label="エピソード: ' + safeTitle + '">' +
+
+    // Pro判定: DEEPCAST_AUTHが読み込まれていればisPro()を使い、なければfalse
+    var userIsPro = (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isPro());
+    var isLocked = !userIsPro && (typeof episodeIndex === 'number') && episodeIndex >= 3;
+    var lockedClass = isLocked ? ' locked' : '';
+    var lockedAttr = isLocked ? ' data-locked="true"' : '';
+    var proBadge = isLocked ? '<span class="episode-badge pro-badge">Pro</span>' : '';
+
+    // ロックアイコン（再生ボタン上に重ねる）
+    var lockIconHtml = isLocked
+      ? '<span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>'
+      : '';
+
+    return '<article class="episode-card' + lockedClass + '" data-category="' + ep.category + '" aria-label="エピソード: ' + safeTitle + '">' +
       '<div class="episode-header">' +
         '<div class="episode-info">' +
           '<span class="episode-badge category-' + ep.category + '">' + (CATEGORY_LABELS[ep.category] || '') + '</span>' +
+          proBadge +
           '<span class="episode-number">#' + ep.id + '</span>' +
           '<span class="episode-date">' + ep.date + '</span>' +
           '<span class="episode-duration" aria-label="再生時間 ' + ep.duration + '">' + ep.duration + '</span>' +
@@ -183,8 +198,9 @@
       '</div>' +
       '<div class="episode-embed">' +
         '<div class="episode-player" role="group" aria-label="オーディオプレイヤー: ' + safeTitle + '">' +
-          '<button class="play-btn" data-audio="' + (ep.audio || '') + '" data-title="' + safeTitle + '" role="button" aria-label="再生: ' + safeTitle + '" tabindex="0">' +
+          '<button class="play-btn" data-audio="' + (ep.audio || '') + '" data-title="' + safeTitle + '"' + lockedAttr + ' role="button" aria-label="' + (isLocked ? 'Proプラン限定: ' : '再生: ') + safeTitle + '" tabindex="0">' +
             '<span class="play-icon">&#9654;</span>' +
+            lockIconHtml +
           '</button>' +
           '<div class="episode-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="再生進捗">' +
             '<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>' +
@@ -396,13 +412,23 @@
         var filterContainer = document.querySelector('.episode-filters');
         if (filterContainer) buildFilterButtons(filterContainer, episodes);
 
-        episodeList.innerHTML = episodes.map(renderEpisode).join('');
+        episodeList.innerHTML = episodes.map(function(ep, idx) { return renderEpisode(ep, idx); }).join('');
         document.querySelectorAll('.stat-number[data-count]').forEach(function(el) {
           el.dataset.count = episodes.length;
           animateCounter(el);
         });
         episodeList.querySelectorAll('.play-btn').forEach(function(btn) {
-          DA.bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
+          if (btn.dataset.locked === 'true') {
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (typeof DEEPCAST_AUTH !== 'undefined') {
+                DEEPCAST_AUTH.showUpgradeGate();
+              }
+            });
+          } else {
+            DA.bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
+          }
         });
         var btns = document.querySelectorAll('.filter-btn');
         var cards = document.querySelectorAll('.episode-card');
@@ -426,9 +452,19 @@
           { id: 2, title: "スタートアップ資金調達の新常識 2026", description: "VC市場の変化、AIスタートアップへの投資トレンド。", date: "2026.03.01", category: "business", tags: ["ビジネス"], duration: "4:58", free: true, audio: "" },
           { id: 1, title: "量子コンピュータの実用化が見えてきた", description: "IBMとGoogleの量子超越性競争。実用化のユースケース。", date: "2026.02.28", category: "science", tags: ["サイエンス"], duration: "5:31", free: false, audio: "" }
         ];
-        episodeList.innerHTML = fallback.map(renderEpisode).join('');
+        episodeList.innerHTML = fallback.map(function(ep, idx) { return renderEpisode(ep, idx); }).join('');
         episodeList.querySelectorAll('.play-btn').forEach(function(btn) {
-          DA.bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
+          if (btn.dataset.locked === 'true') {
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (typeof DEEPCAST_AUTH !== 'undefined') {
+                DEEPCAST_AUTH.showUpgradeGate();
+              }
+            });
+          } else {
+            DA.bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
+          }
         });
         DA.buildPlaylist();
         initReveal();
@@ -454,10 +490,20 @@
         return;
       }
       if (noResults) noResults.style.display = 'none';
-      episodeList.innerHTML = episodes.map(renderEpisode).join('');
+      episodeList.innerHTML = episodes.map(function(ep) { return renderEpisode(ep, ep._originalIndex); }).join('');
       if (episodeCount) episodeCount.textContent = episodes.length + '件のエピソード';
       episodeList.querySelectorAll('.play-btn').forEach(function(btn) {
-        DA.bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
+        if (btn.dataset.locked === 'true') {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof DEEPCAST_AUTH !== 'undefined') {
+              DEEPCAST_AUTH.showUpgradeGate();
+            }
+          });
+        } else {
+          DA.bindPlayer(btn, btn.dataset.audio, btn.dataset.title);
+        }
       });
       DA.buildPlaylist();
       DA.reassociatePlayingButton();
@@ -482,6 +528,8 @@
         autoAssignCategories(rawEpisodes);
         buildArticleMap(rawEpisodes);
         var episodes = filterByLang(rawEpisodes);
+        // 各エピソードに元のインデックスを付与（Free/Pro判定用）
+        episodes.forEach(function(ep, idx) { ep._originalIndex = idx; });
         var filterContainer = document.querySelector('.episode-filters');
         if (filterContainer) {
           buildFilterButtons(filterContainer, episodes);
@@ -508,10 +556,42 @@
   function initArticlePlayer() {
     var btn = document.getElementById('articlePlayBtn');
     if (!btn) return;
+    // ロック済みの場合はbindしない（ゲーティングスクリプトが処理済み）
+    if (btn.dataset.locked === 'true') return;
     var audioSrc = btn.dataset.audio;
     var title = btn.dataset.title;
     if (!audioSrc) return;
-    DA.bindPlayer(btn, audioSrc, title);
+
+    // SPA遷移時のゲーティング: episodes.jsonからインデックスを確認
+    var userIsPro = (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isPro());
+    if (!userIsPro) {
+      fetch('/episodes/episodes.json')
+        .then(function(r) { return r.json(); })
+        .then(function(episodes) {
+          var fileName = audioSrc.split('/').pop().split('?')[0];
+          var idx = -1;
+          for (var i = 0; i < episodes.length; i++) {
+            var epFile = (episodes[i].audio || '').split('/').pop().split('?')[0];
+            if (epFile === fileName) { idx = i; break; }
+          }
+          if (idx >= 3) {
+            btn.dataset.locked = 'true';
+            btn.innerHTML = '<span class="play-icon">&#9654;</span><span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>';
+            btn.addEventListener('click', function(e) {
+              e.preventDefault(); e.stopPropagation();
+              if (typeof DEEPCAST_AUTH !== 'undefined') DEEPCAST_AUTH.showUpgradeGate();
+            });
+          } else {
+            DA.bindPlayer(btn, audioSrc, title);
+          }
+        })
+        .catch(function() {
+          // fallback: bindする
+          DA.bindPlayer(btn, audioSrc, title);
+        });
+    } else {
+      DA.bindPlayer(btn, audioSrc, title);
+    }
   }
 
   function initContactForm() {
