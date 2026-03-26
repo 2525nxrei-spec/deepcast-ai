@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepcast-v18';
+const CACHE_NAME = 'deepcast-v19';
 const ASSETS = [
   '/',
   '/css/style.css',

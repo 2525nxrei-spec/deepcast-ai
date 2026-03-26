@@ -60,7 +60,7 @@ const DEEPCAST_AUTH = (() => {
       response = await fetch(`${API_BASE}${endpoint}`, options);
     } catch (err) {
       console.error('[DEEPCAST_AUTH] ネットワークエラー:', err);
-      throw new Error('ネットワーク接続を確認してください');
+      throw new Error('インターネット接続を確認してください。接続に問題がない場合は、しばらく時間をおいて再度お試しください。');
     }
 
     let data;
@@ -68,7 +68,7 @@ const DEEPCAST_AUTH = (() => {
       data = await response.json();
     } catch {
       console.error('[DEEPCAST_AUTH] レスポンスのJSON解析に失敗');
-      throw new Error('サーバーからの応答が不正です');
+      throw new Error('サーバーからの応答が不正です。しばらく時間をおいて再度お試しください。');
     }
 
     // トークン期限切れ（401）→ 自動ログアウト
@@ -76,11 +76,19 @@ const DEEPCAST_AUTH = (() => {
       console.error('[DEEPCAST_AUTH] トークン期限切れ');
       removeToken();
       updateNavUI();
-      throw new Error('セッションが切れました。再ログインしてください');
+      throw new Error('セッションの有効期限が切れました。お手数ですが、再度ログインしてください。');
+    }
+
+    if (response.status === 429) {
+      throw new Error('リクエストが多すぎます。しばらく時間をおいてから再度お試しください。');
+    }
+
+    if (response.status >= 500) {
+      throw new Error('サーバーに一時的な問題が発生しています。しばらく時間をおいて再度お試しください。');
     }
 
     if (!response.ok || data.ok === false) {
-      throw new Error(data.error || 'リクエストに失敗しました');
+      throw new Error(data.error || 'リクエストに失敗しました。もう一度お試しください。');
     }
     return data;
   }

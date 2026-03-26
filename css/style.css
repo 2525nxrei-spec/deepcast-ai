@@ -669,6 +669,162 @@ input, textarea, select { font: inherit; }
 /* push footer up so mini player doesn't overlap */
 body.player-active .footer { padding-bottom: 56px; }
 
+/* ===== UX FEEDBACK: active states, spinners, focus-visible ===== */
+
+/* 全CTA・ボタンの:activeフィードバック */
+.btn:active,
+.plan-btn:active,
+.login-submit:active,
+.auth-submit:active,
+.account-btn:active,
+.filter-btn:active,
+.popular-tag:active,
+.play-btn:active,
+.mini-play-btn:active {
+  transform: scale(0.96);
+  opacity: 0.8;
+  transition: transform 0.05s, opacity 0.05s;
+}
+
+/* :focus-visible - キーボードフォーカスのみ表示 */
+.btn:focus-visible,
+.plan-btn:focus-visible,
+.login-submit:focus-visible,
+.auth-submit:focus-visible,
+.account-btn:focus-visible,
+.filter-btn:focus-visible,
+.popular-tag:focus-visible,
+.play-btn:focus-visible,
+.mini-play-btn:focus-visible,
+.mini-close-btn:focus-visible,
+.faq-question:focus-visible,
+.hamburger:focus-visible,
+.login-tab:focus-visible,
+.auth-tab:focus-visible,
+.lang-btn:focus-visible,
+.login-field input:focus-visible,
+.auth-field input:focus-visible,
+.request-form textarea:focus-visible,
+.request-form input:focus-visible,
+.request-form select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* スピナーアニメーション */
+@keyframes btnSpinner {
+  to { transform: rotate(360deg); }
+}
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 18px; height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btnSpinner 0.6s linear infinite;
+}
+/* ダーク背景でないボタンのスピナー */
+.btn-ghost.btn-loading::after,
+.plan-btn--free.btn-loading::after,
+.account-btn--outline.btn-loading::after,
+.account-btn--danger.btn-loading::after {
+  border-color: rgba(0,0,0,0.15);
+  border-top-color: var(--text);
+}
+
+/* オーディオプレイヤー: ローディング状態 */
+.play-btn.loading {
+  position: relative;
+  color: transparent !important;
+}
+.play-btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 18px; height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btnSpinner 0.6s linear infinite;
+}
+.mini-play-btn.loading {
+  position: relative;
+  color: transparent !important;
+}
+.mini-play-btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 16px; height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btnSpinner 0.6s linear infinite;
+}
+
+/* バッファリング状態（プログレスバーのストライプアニメーション） */
+@keyframes bufferStripe {
+  0% { background-position: 0 0; }
+  100% { background-position: 20px 0; }
+}
+.progress-fill.buffering,
+.mini-progress-fill.buffering {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--text),
+    var(--text) 4px,
+    var(--text-muted) 4px,
+    var(--text-muted) 8px
+  );
+  background-size: 20px 20px;
+  animation: bufferStripe 0.8s linear infinite;
+}
+
+/* エラーメッセージのスタイル改善 */
+.player-error-msg {
+  font-size: 12px;
+  color: #dc2626;
+  padding: 4px 0;
+  line-height: 1.4;
+}
+
+/* オフライン案内バナー */
+.offline-banner {
+  position: fixed;
+  top: 48px; left: 0; right: 0;
+  z-index: 999;
+  background: #fef3c7;
+  border-bottom: 1px solid #fbbf24;
+  padding: 8px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #92400e;
+  transform: translateY(-100%);
+  transition: transform 0.3s var(--ease);
+}
+.offline-banner.visible {
+  transform: translateY(0);
+}
+
+/* 二重クリック防止: disabled状態の視覚フィードバック */
+button:disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
   .services-grid {

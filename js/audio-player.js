@@ -47,9 +47,41 @@
 
   function updatePlayIcons(playing) {
     const icon = playing ? '&#10074;&#10074;' : '&#9654;';
-    if (currentPlayBtn) currentPlayBtn.innerHTML = '<span class="play-icon">' + icon + '</span>';
+    if (currentPlayBtn) {
+      currentPlayBtn.classList.remove('loading');
+      currentPlayBtn.innerHTML = '<span class="play-icon">' + icon + '</span>';
+    }
     const mpb = getMiniEl('miniPlayBtn');
-    if (mpb) mpb.innerHTML = '<span class="play-icon">' + icon + '</span>';
+    if (mpb) {
+      mpb.classList.remove('loading');
+      mpb.innerHTML = '<span class="play-icon">' + icon + '</span>';
+    }
+  }
+
+  // ローディング状態の表示
+  function showLoading(btn) {
+    if (btn) {
+      btn.classList.add('loading');
+      btn.innerHTML = '';
+    }
+    const mpb = getMiniEl('miniPlayBtn');
+    if (mpb) {
+      mpb.classList.add('loading');
+      mpb.innerHTML = '';
+    }
+  }
+
+  // バッファリング状態の表示
+  function setBuffering(buffering) {
+    if (currentPlayBtn) {
+      const card = currentPlayBtn.closest('.episode-card');
+      if (card) {
+        const fill = card.querySelector('.progress-fill');
+        if (fill) fill.classList.toggle('buffering', buffering);
+      }
+    }
+    const mpf = getMiniEl('miniProgressFill');
+    if (mpf) mpf.classList.toggle('buffering', buffering);
   }
 
   function resetCardUI(btn) {
@@ -118,17 +150,21 @@
     playlistIndex = idx;
     var src = item.audio;
     if (src && !src.startsWith('http') && !src.startsWith('/')) src = '/' + src;
+    // 即時フィードバック: ローディング状態を表示
+    item.btn.classList.add('playing');
+    showLoading(item.btn);
     audioEl.src = src;
     audioEl.play().catch(function() {
       var card = item.btn.closest('.episode-card');
       if (card) {
         var timeEl = card.querySelector('.progress-time');
-        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+        if (timeEl) {
+          timeEl.innerHTML = '<span class="player-error-msg">エピソードの読み込みに失敗しました。ページを再読み込みしてください。</span>';
+        }
       }
+      item.btn.classList.remove('loading');
       currentPlayBtn = null;
     });
-    item.btn.classList.add('playing');
-    updatePlayIcons(true);
     setMediaSession(item.title);
     const mt = getMiniEl('miniTitle');
     if (mt) mt.textContent = item.title;
@@ -136,12 +172,35 @@
   }
 
   function bindPlayer(btn, audioSrc, title) {
+    // ARIA属性の設定
+    btn.setAttribute('role', 'button');
+    btn.setAttribute('aria-label', '再生: ' + title);
+    btn.setAttribute('tabindex', '0');
+
+    // キーボード操作対応（スペースキー/Enterで再生/停止）
+    btn.addEventListener('keydown', function(e) {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+
     btn.addEventListener('click', function() {
+      // 二重クリック防止
+      if (btn.classList.contains('loading')) return;
+
       const card = btn.closest('.episode-card');
       const timeEl = card ? card.querySelector('.progress-time') : null;
       if (currentPlayBtn === btn) {
-        if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
-        else { audioEl.pause(); updatePlayIcons(false); }
+        if (audioEl.paused) {
+          audioEl.play();
+          updatePlayIcons(true);
+          btn.setAttribute('aria-label', '一時停止: ' + title);
+        } else {
+          audioEl.pause();
+          updatePlayIcons(false);
+          btn.setAttribute('aria-label', '再生: ' + title);
+        }
         return;
       }
       resetCardUI(currentPlayBtn);
@@ -158,14 +217,20 @@
       if (audioSrc && !audioSrc.startsWith('http') && !audioSrc.startsWith('/')) {
         resolvedSrc = '/' + audioSrc;
       }
+      // 即時フィードバック: ボタンアイコンを即座に変更しローディング表示
+      btn.classList.add('playing');
+      showLoading(btn);
+      btn.setAttribute('aria-label', '読み込み中: ' + title);
       audioEl.src = resolvedSrc;
       // play()をクリック直後に呼ぶ（ユーザージェスチャーコンテキスト内で実行）
       audioEl.play().catch(function(err) {
-        if (timeEl) timeEl.textContent = '音声ファイルを読み込めません';
+        if (timeEl) {
+          timeEl.innerHTML = '<span class="player-error-msg">エピソードの読み込みに失敗しました。ページを再読み込みしてください。</span>';
+        }
+        btn.classList.remove('loading', 'playing');
+        btn.setAttribute('aria-label', '再生: ' + title);
         currentPlayBtn = null;
       });
-      btn.classList.add('playing');
-      updatePlayIcons(true);
       setMediaSession(title);
       const mt = getMiniEl('miniTitle');
       if (mt) mt.textContent = title;
@@ -183,6 +248,44 @@
       }
     });
   }
+
+  // --- canplay: ローディング完了 → アイコンを再生中に切り替え ---
+  audioEl.addEventListener('canplay', function() {
+    updatePlayIcons(!audioEl.paused);
+    setBuffering(false);
+  });
+
+  // --- playing: 再生開始（バッファリング解除） ---
+  audioEl.addEventListener('playing', function() {
+    updatePlayIcons(true);
+    setBuffering(false);
+    if (currentPlayBtn) {
+      currentPlayBtn.setAttribute('aria-label', '一時停止: ' + currentTitleText);
+    }
+  });
+
+  // --- waiting: バッファリング中 ---
+  audioEl.addEventListener('waiting', function() {
+    setBuffering(true);
+  });
+
+  // --- error: 再生エラーの親切なメッセージ ---
+  audioEl.addEventListener('error', function() {
+    if (currentPlayBtn) {
+      currentPlayBtn.classList.remove('loading', 'playing');
+      currentPlayBtn.innerHTML = '<span class="play-icon">&#9654;</span>';
+      var card = currentPlayBtn.closest('.episode-card');
+      if (card) {
+        var timeEl = card.querySelector('.progress-time');
+        if (timeEl) {
+          timeEl.innerHTML = '<span class="player-error-msg">エピソードの読み込みに失敗しました。ページを再読み込みしてください。</span>';
+        }
+      }
+    }
+    setBuffering(false);
+    hideMiniPlayer();
+    currentPlayBtn = null;
+  });
 
   // --- timeupdate イベント（2:30で強制終了） ---
   audioEl.addEventListener('timeupdate', function() {
@@ -300,6 +403,28 @@
           audioEl.currentTime = ((e.clientX - rect.left) / rect.width) * audioEl.duration;
         }
       });
+
+      // ミニプレイヤーのキーボード操作
+      mp.addEventListener('keydown', function(e) {
+        var target = e.target.closest('#miniPlayBtn, #miniProgressBar');
+        if (!target) return;
+
+        if (target.id === 'miniPlayBtn' && (e.key === ' ' || e.key === 'Enter')) {
+          e.preventDefault();
+          if (!audioEl.src) return;
+          if (audioEl.paused) { audioEl.play(); updatePlayIcons(true); }
+          else { audioEl.pause(); updatePlayIcons(false); }
+        } else if (target.id === 'miniProgressBar') {
+          if (!audioEl.duration) return;
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            audioEl.currentTime = Math.min(audioEl.duration, audioEl.currentTime + 5);
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            audioEl.currentTime = Math.max(0, audioEl.currentTime - 5);
+          }
+        }
+      });
       miniPlayerDelegated = true;
     }
 
@@ -357,6 +482,37 @@
       const idx = playlist.findIndex(function(p) { return p.btn === currentPlayBtn; });
       playlistIndex = idx >= 0 ? idx : -1;
     }
+  }
+
+  // --- オフライン検出・案内 ---
+  function createOfflineBanner() {
+    if (document.getElementById('offlineBanner')) return;
+    var banner = document.createElement('div');
+    banner.id = 'offlineBanner';
+    banner.className = 'offline-banner';
+    banner.setAttribute('role', 'alert');
+    banner.textContent = 'インターネットに接続されていません。接続を確認してください。';
+    document.body.appendChild(banner);
+  }
+
+  function showOfflineBanner() {
+    createOfflineBanner();
+    var banner = document.getElementById('offlineBanner');
+    if (banner) {
+      requestAnimationFrame(function() { banner.classList.add('visible'); });
+    }
+  }
+
+  function hideOfflineBanner() {
+    var banner = document.getElementById('offlineBanner');
+    if (banner) banner.classList.remove('visible');
+  }
+
+  window.addEventListener('offline', showOfflineBanner);
+  window.addEventListener('online', hideOfflineBanner);
+  // 初期チェック
+  if (!navigator.onLine) {
+    document.addEventListener('DOMContentLoaded', showOfflineBanner);
   }
 
   // --- グローバルオブジェクトとして公開 ---

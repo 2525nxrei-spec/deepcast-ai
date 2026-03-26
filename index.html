@@ -35,7 +35,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon.svg">
-  <link rel="stylesheet" href="css/style.css?v=20260323">
+  <link rel="stylesheet" href="css/style.css?v=20260327">
   <script type="application/ld+json">
   [
     {
@@ -785,28 +785,28 @@
   </div>
 
   <!-- MINI PLAYER -->
-  <div class="mini-player" id="miniPlayer">
+  <div class="mini-player" id="miniPlayer" role="region" aria-label="オーディオミニプレイヤー">
     <div class="mini-player-inner">
-      <button class="mini-play-btn" id="miniPlayBtn" aria-label="再生/一時停止">
+      <button class="mini-play-btn" id="miniPlayBtn" aria-label="再生/一時停止" tabindex="0">
         <span class="play-icon">&#9654;</span>
       </button>
       <div class="mini-info">
-        <span class="mini-title" id="miniTitle">-</span>
+        <span class="mini-title" id="miniTitle" aria-live="polite">-</span>
         <div class="mini-progress-wrap">
-          <div class="mini-progress-bar" id="miniProgressBar">
+          <div class="mini-progress-bar" id="miniProgressBar" role="slider" aria-label="再生位置" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
             <div class="mini-progress-fill" id="miniProgressFill" style="width:0%"></div>
           </div>
-          <span class="mini-time" id="miniTime">0:00 / 0:00</span>
+          <span class="mini-time" id="miniTime" aria-live="off">0:00 / 0:00</span>
         </div>
       </div>
       <button class="mini-close-btn" id="miniCloseBtn" aria-label="閉じる">&times;</button>
     </div>
   </div>
 
-  <script src="assets/js/auth.js?v=20260326"></script>
-  <script src="js/audio-player.js?v=20260326"></script>
-  <script src="js/page-init.js?v=20260326"></script>
-  <script src="js/spa-router.js?v=20260326"></script>
-  <script src="js/main.js?v=20260326"></script>
+  <script src="assets/js/auth.js?v=20260327"></script>
+  <script src="js/audio-player.js?v=20260327"></script>
+  <script src="js/page-init.js?v=20260327"></script>
+  <script src="js/spa-router.js?v=20260327"></script>
+  <script src="js/main.js?v=20260327"></script>
 </body>
 </html>

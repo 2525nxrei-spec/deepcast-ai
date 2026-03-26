@@ -167,29 +167,31 @@
   // エピソードカードのHTML生成
   function renderEpisode(ep) {
     var tags = ep.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('');
-    return '<article class="episode-card" data-category="' + ep.category + '">' +
+    // タイトルのエスケープ（aria-label用）
+    var safeTitle = (ep.title || '').replace(/"/g, '&quot;');
+    return '<article class="episode-card" data-category="' + ep.category + '" aria-label="エピソード: ' + safeTitle + '">' +
       '<div class="episode-header">' +
         '<div class="episode-info">' +
           '<span class="episode-badge category-' + ep.category + '">' + (CATEGORY_LABELS[ep.category] || '') + '</span>' +
           '<span class="episode-number">#' + ep.id + '</span>' +
           '<span class="episode-date">' + ep.date + '</span>' +
-          '<span class="episode-duration">' + ep.duration + '</span>' +
+          '<span class="episode-duration" aria-label="再生時間 ' + ep.duration + '">' + ep.duration + '</span>' +
         '</div>' +
         '<h3 class="episode-title">' + ep.title + '</h3>' +
         '<p class="episode-desc">' + ep.description + '</p>' +
-        '<div class="episode-tags">' + tags + '</div>' +
+        '<div class="episode-tags" role="list" aria-label="タグ">' + tags + '</div>' +
       '</div>' +
       '<div class="episode-embed">' +
-        '<div class="episode-player">' +
-          '<button class="play-btn" data-audio="' + (ep.audio || '') + '" data-title="' + ep.title + '" aria-label="再生">' +
+        '<div class="episode-player" role="group" aria-label="オーディオプレイヤー: ' + safeTitle + '">' +
+          '<button class="play-btn" data-audio="' + (ep.audio || '') + '" data-title="' + safeTitle + '" role="button" aria-label="再生: ' + safeTitle + '" tabindex="0">' +
             '<span class="play-icon">&#9654;</span>' +
           '</button>' +
-          '<div class="episode-progress">' +
+          '<div class="episode-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="再生進捗">' +
             '<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>' +
-            '<span class="progress-time">0:00 / ' + ep.duration + '</span>' +
+            '<span class="progress-time" aria-live="off">0:00 / ' + ep.duration + '</span>' +
           '</div>' +
         '</div>' +
-        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn">要約を読む &rarr;</a>' : '') +
+        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn" aria-label="' + safeTitle + ' の要約を読む">要約を読む &rarr;</a>' : '') +
       '</div>' +
     '</article>';
   }
@@ -302,9 +304,11 @@
     if (signupForm) {
       signupForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        var emailVal = document.getElementById('email').value;
         var btn = e.target.querySelector('button[type="submit"]');
-        btn.textContent = '登録中...';
+        // 二重クリック防止
+        if (btn.disabled) return;
+        var emailVal = document.getElementById('email').value;
+        btn.classList.add('btn-loading');
         btn.disabled = true;
         var planName = currentPlan || 'free';
         fetch('https://formsubmit.co/ajax/2525nxrei@gmail.com', {
@@ -319,8 +323,9 @@
           setTimeout(closeModal, 3000);
         })
         .catch(function() {
-          btn.textContent = '登録に失敗しました';
-          setTimeout(function() { btn.textContent = '無料で登録する'; btn.disabled = false; }, 2000);
+          btn.classList.remove('btn-loading');
+          btn.textContent = 'ネットワークエラー。接続を確認してください。';
+          setTimeout(function() { btn.textContent = '無料で登録する'; btn.disabled = false; }, 3000);
         });
       });
     }
@@ -331,15 +336,17 @@
     if (!reqForm) return;
     reqForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      var btn = reqForm.querySelector('button[type="submit"]');
+      // 二重クリック防止
+      if (btn.disabled) return;
       var data = new FormData(reqForm);
       var body = {
         topic: data.get('topic'), category: data.get('category'), depth: data.get('depth'),
         detail: data.get('detail'), email: data.get('email'),
         _subject: 'DeepCast AI 新規リクエスト', _captcha: 'false'
       };
-      var btn = reqForm.querySelector('button[type="submit"]');
       var origText = btn.textContent;
-      btn.textContent = '送信中...';
+      btn.classList.add('btn-loading');
       btn.disabled = true;
       fetch('https://formsubmit.co/ajax/2525nxrei@gmail.com', {
         method: 'POST',
@@ -348,13 +355,15 @@
       })
       .then(function(r) { return r.json(); })
       .then(function() {
+        btn.classList.remove('btn-loading');
         btn.textContent = '受付完了!';
         btn.style.background = '#3a8a44';
         setTimeout(function() { reqForm.reset(); btn.textContent = origText; btn.style.background = ''; btn.disabled = false; }, 3000);
       })
       .catch(function() {
-        btn.textContent = '送信に失敗しました';
-        setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 2000);
+        btn.classList.remove('btn-loading');
+        btn.textContent = 'ネットワークエラー。接続を確認してください。';
+        setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 3000);
       });
     });
   }
@@ -490,7 +499,7 @@
         displayEpisodes(episodes);
       })
       .catch(function() {
-        episodeList.innerHTML = '<p class="loading-text">エピソードの読み込みに失敗しました。</p>';
+        episodeList.innerHTML = '<p class="loading-text">エピソードの読み込みに失敗しました。インターネット接続を確認の上、ページを再読み込みしてください。</p>';
       });
 
     episodeSearch.addEventListener('input', applyFilters);
@@ -511,10 +520,12 @@
     if (form.getAttribute('action') && form.getAttribute('method') === 'POST') {
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-        var data = new FormData(form);
         var btn = form.querySelector('.form-submit') || form.querySelector('button[type="submit"]');
+        // 二重クリック防止
+        if (btn && btn.disabled) return;
+        var data = new FormData(form);
         var origText = btn ? btn.textContent : '';
-        if (btn) { btn.textContent = '送信中...'; btn.disabled = true; }
+        if (btn) { btn.classList.add('btn-loading'); btn.disabled = true; }
 
         fetch(form.action, {
           method: 'POST',
@@ -530,8 +541,9 @@
         })
         .catch(function() {
           if (btn) {
-            btn.textContent = '送信に失敗しました';
-            setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 2000);
+            btn.classList.remove('btn-loading');
+            btn.textContent = 'ネットワークエラー。接続を確認してください。';
+            setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 3000);
           }
         });
       });
@@ -576,14 +588,28 @@
       });
     });
 
-    // FAQ
+    // FAQ（アクセシビリティ対応: aria-expanded切り替え）
     document.querySelectorAll('.faq-item').forEach(function(item) {
       var q = item.querySelector('.faq-question');
       if (q) {
         q.addEventListener('click', function() {
           var wasActive = item.classList.contains('active');
-          document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('active'); });
-          if (!wasActive) item.classList.add('active');
+          document.querySelectorAll('.faq-item').forEach(function(i) {
+            i.classList.remove('active');
+            var btn = i.querySelector('.faq-question');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+          });
+          if (!wasActive) {
+            item.classList.add('active');
+            q.setAttribute('aria-expanded', 'true');
+          }
+        });
+        // キーボード操作: スペース/Enterで開閉
+        q.addEventListener('keydown', function(e) {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            q.click();
+          }
         });
       }
     });

@@ -29,7 +29,7 @@
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../assets/icon.svg">
-  <link rel="stylesheet" href="../css/style.css?v=20260326">
+  <link rel="stylesheet" href="../css/style.css?v=20260327">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
@@ -258,6 +258,42 @@
       cursor: pointer;
     }
 
+    /* スピナー */
+    @keyframes btnSpinner {
+      to { transform: rotate(360deg); }
+    }
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 18px; height: 18px;
+      margin: -9px 0 0 -9px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: btnSpinner 0.6s linear infinite;
+    }
+    /* :active フィードバック */
+    .plan-btn:active,
+    .auth-submit:active,
+    .auth-tab:active {
+      transform: scale(0.97);
+      opacity: 0.8;
+    }
+    /* :focus-visible */
+    .plan-btn:focus-visible,
+    .auth-submit:focus-visible,
+    .auth-tab:focus-visible,
+    .auth-field input:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 2px;
+    }
+
     @media (max-width: 640px) {
       .plan-grid {
         grid-template-columns: 1fr;
@@ -448,13 +484,19 @@
         // Freeユーザー → アップグレードボタン直行
         btnProUpgrade.textContent = 'Proにアップグレード — 月額150円';
         btnProUpgrade.addEventListener('click', async function() {
+          if (btnProUpgrade.disabled) return;
           btnProUpgrade.disabled = true;
-          btnProUpgrade.textContent = '処理中...';
+          btnProUpgrade.classList.add('btn-loading');
           try {
             await DEEPCAST_AUTH.startCheckout();
           } catch (err) {
-            alert(err.message);
+            var msg = err.message || '';
+            if (msg.includes('network') || msg.includes('fetch') || msg.includes('Failed to fetch')) {
+              msg = 'インターネット接続を確認してください。';
+            }
+            alert(msg);
             btnProUpgrade.disabled = false;
+            btnProUpgrade.classList.remove('btn-loading');
             btnProUpgrade.textContent = 'Proにアップグレード — 月額150円';
           }
         });
@@ -496,10 +538,12 @@
 
       authForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        // 二重クリック防止
+        if (authSubmitBtn.disabled) return;
         authError.style.display = 'none';
         authSubmitBtn.disabled = true;
         var origText = authSubmitBtn.textContent;
-        authSubmitBtn.textContent = '処理中...';
+        authSubmitBtn.classList.add('btn-loading');
 
         try {
           var email = document.getElementById('input-email').value;
@@ -517,9 +561,18 @@
           // 登録/ログイン成功 → Checkout開始
           await DEEPCAST_AUTH.startCheckout();
         } catch (err) {
-          authError.textContent = err.message;
+          var msg = err.message || '';
+          if (msg.includes('network') || msg.includes('fetch') || msg.includes('Failed to fetch')) {
+            msg = 'インターネット接続を確認してください。接続に問題がない場合は、しばらく時間をおいて再度お試しください。';
+          } else if (msg.includes('Invalid') || msg.includes('invalid') || msg.includes('credentials')) {
+            msg = 'メールアドレスまたはパスワードが正しくありません。入力内容を確認してください。';
+          } else if (msg.includes('already') || msg.includes('duplicate') || msg.includes('exists')) {
+            msg = 'このメールアドレスは既に登録されています。「ログイン」タブからお試しください。';
+          }
+          authError.textContent = msg;
           authError.style.display = 'block';
           authSubmitBtn.disabled = false;
+          authSubmitBtn.classList.remove('btn-loading');
           authSubmitBtn.textContent = origText;
         }
       });

@@ -18,7 +18,7 @@
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../assets/icon.svg">
-  <link rel="stylesheet" href="../css/style.css?v=20260326">
+  <link rel="stylesheet" href="../css/style.css?v=20260327">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
@@ -156,6 +156,40 @@
       margin-top: 20px;
     }
     .login-back:hover { color: var(--text); }
+    /* スピナー */
+    @keyframes btnSpinner {
+      to { transform: rotate(360deg); }
+    }
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 18px; height: 18px;
+      margin: -9px 0 0 -9px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: btnSpinner 0.6s linear infinite;
+    }
+    /* :active フィードバック */
+    .login-submit:active,
+    .login-tab:active {
+      transform: scale(0.97);
+      opacity: 0.8;
+    }
+    /* :focus-visible */
+    .login-submit:focus-visible,
+    .login-tab:focus-visible,
+    .login-field input:focus-visible,
+    .login-back:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 2px;
+    }
   </style>
 </head>
 <body>
@@ -243,10 +277,12 @@
 
       loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        // 二重クリック防止
+        if (loginSubmitBtn.disabled) return;
         loginError.style.display = 'none';
         loginSubmitBtn.disabled = true;
         var origText = loginSubmitBtn.textContent;
-        loginSubmitBtn.textContent = '処理中...';
+        loginSubmitBtn.classList.add('btn-loading');
 
         try {
           var email = document.getElementById('input-email').value;
@@ -266,9 +302,19 @@
           var returnUrl = new URLSearchParams(window.location.search).get('return');
           window.location.href = returnUrl || '../';
         } catch (err) {
-          loginError.textContent = err.message;
+          // エラーメッセージを親切に変換
+          var msg = err.message || '';
+          if (msg.includes('network') || msg.includes('fetch') || msg.includes('Failed to fetch')) {
+            msg = 'インターネット接続を確認してください。接続に問題がない場合は、しばらく時間をおいて再度お試しください。';
+          } else if (msg.includes('Invalid') || msg.includes('invalid') || msg.includes('credentials')) {
+            msg = 'メールアドレスまたはパスワードが正しくありません。入力内容を確認してください。';
+          } else if (msg.includes('already') || msg.includes('duplicate') || msg.includes('exists')) {
+            msg = 'このメールアドレスは既に登録されています。ログインをお試しください。';
+          }
+          loginError.textContent = msg;
           loginError.style.display = 'block';
           loginSubmitBtn.disabled = false;
+          loginSubmitBtn.classList.remove('btn-loading');
           loginSubmitBtn.textContent = origText;
         }
       });
