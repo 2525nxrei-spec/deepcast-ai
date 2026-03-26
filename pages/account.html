@@ -186,6 +186,35 @@
       <div class="account-card-value" id="sub-status">--</div>
       <div class="account-card-sub" id="sub-next-billing"></div>
     </div>
+
+    <!-- パスワード変更 -->
+    <div class="account-card">
+      <div class="account-card-label">パスワード変更</div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:4px;">現在のパスワード</label>
+        <input type="password" id="current-pw" autocomplete="current-password" style="width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:4px;font-size:14px;font-family:var(--sans);outline:none;">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:4px;">新しいパスワード</label>
+        <input type="password" id="new-pw" autocomplete="new-password" minlength="8" style="width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:4px;font-size:14px;font-family:var(--sans);outline:none;">
+        <div id="pw-strength" style="font-size:11px;color:var(--text-muted);margin-top:4px;">8文字以上、英字と数字を含めてください</div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:4px;">新しいパスワード（確認）</label>
+        <input type="password" id="confirm-pw" autocomplete="new-password" style="width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:4px;font-size:14px;font-family:var(--sans);outline:none;">
+      </div>
+      <button class="account-btn account-btn--primary" id="btn-change-pw" style="width:100%;">パスワードを変更</button>
+    </div>
+
+    <!-- アカウント操作 -->
+    <div class="account-card" style="border-color:#fecaca;">
+      <div class="account-card-label" style="color:#dc2626;">アカウント操作</div>
+      <div class="account-card-sub">ログアウトするとログイン画面に戻ります。アカウント削除は取り消せません。</div>
+      <div class="account-actions" style="margin-top:12px;">
+        <button class="account-btn account-btn--outline" id="btn-logout2">ログアウト</button>
+        <button class="account-btn account-btn--danger" id="btn-delete-account">アカウントを削除</button>
+      </div>
+    </div>
   </div>
 
   <!-- FOOTER -->
@@ -355,14 +384,91 @@
         actions.appendChild(upgradeBtn);
       }
 
-      // ログアウトボタン（カード下部）
-      var logoutBtn = document.createElement('button');
-      logoutBtn.className = 'account-btn account-btn--danger';
-      logoutBtn.textContent = 'ログアウト';
-      logoutBtn.addEventListener('click', function() {
+      // パスワード強度チェック
+      document.getElementById('new-pw').addEventListener('input', function() {
+        var pw = this.value;
+        var el = document.getElementById('pw-strength');
+        if (pw.length === 0) { el.textContent = '8文字以上、英字と数字を含めてください'; el.style.color = 'var(--text-muted)'; }
+        else if (pw.length < 8) { el.textContent = 'あと' + (8 - pw.length) + '文字必要です'; el.style.color = '#dc2626'; }
+        else if (!/[a-zA-Z]/.test(pw) || !/[0-9]/.test(pw)) { el.textContent = '英字と数字の両方を含めてください'; el.style.color = '#d97706'; }
+        else { el.textContent = 'パスワード強度: OK'; el.style.color = '#16a34a'; }
+      });
+
+      // パスワード変更
+      document.getElementById('btn-change-pw').addEventListener('click', async function() {
+        var btn = this;
+        var currentPw = document.getElementById('current-pw').value;
+        var newPw = document.getElementById('new-pw').value;
+        var confirmPw = document.getElementById('confirm-pw').value;
+        if (!currentPw) { alert('現在のパスワードを入力してください'); return; }
+        if (!newPw || newPw.length < 8) { alert('新しいパスワードは8文字以上で入力してください'); return; }
+        if (!/[a-zA-Z]/.test(newPw) || !/[0-9]/.test(newPw)) { alert('パスワードは英字と数字の両方を含めてください'); return; }
+        if (newPw !== confirmPw) { alert('新しいパスワードが一致しません'); return; }
+        btn.disabled = true; btn.classList.add('btn-loading');
+        try {
+          var res = await fetch('/api/auth/password', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('deepcast_token') },
+            body: JSON.stringify({ current_password: currentPw, new_password: newPw })
+          });
+          var data = await res.json();
+          if (res.ok) {
+            alert('パスワードを変更しました');
+            document.getElementById('current-pw').value = '';
+            document.getElementById('new-pw').value = '';
+            document.getElementById('confirm-pw').value = '';
+            document.getElementById('pw-strength').textContent = '8文字以上、英字と数字を含めてください';
+          } else { alert(data.error || 'パスワード変更に失敗しました'); }
+        } catch(e) { alert('通信エラーが発生しました'); }
+        finally { btn.disabled = false; btn.classList.remove('btn-loading'); btn.textContent = 'パスワードを変更'; }
+      });
+
+      // ログアウト（カード下部の新ボタン）
+      document.getElementById('btn-logout2').addEventListener('click', function() {
+        if (!confirm('ログアウトしますか？')) return;
         DEEPCAST_AUTH.logout();
       });
-      actions.appendChild(logoutBtn);
+
+      // アカウント削除
+      document.getElementById('btn-delete-account').addEventListener('click', async function() {
+        var pw = prompt('アカウントを削除するには、パスワードを入力してください。\nこの操作は取り消せません。');
+        if (!pw) return;
+        if (!confirm('本当にアカウントを削除しますか？\nすべてのデータが完全に削除されます。')) return;
+        var btn = this;
+        btn.disabled = true; btn.classList.add('btn-loading');
+        try {
+          var res = await fetch('/api/auth/account', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('deepcast_token') },
+            body: JSON.stringify({ password: pw })
+          });
+          var data = await res.json();
+          if (res.ok) {
+            localStorage.removeItem('deepcast_token');
+            localStorage.removeItem('deepcast_user');
+            alert('アカウントを削除しました。ご利用ありがとうございました。');
+            window.location.href = '/';
+          } else { alert(data.error || 'アカウント削除に失敗しました'); }
+        } catch(e) { alert('通信エラーが発生しました'); }
+        finally { btn.disabled = false; btn.classList.remove('btn-loading'); btn.textContent = 'アカウントを削除'; }
+      });
+
+      // セッションタイムアウト（24時間操作なしでログアウト）
+      (function() {
+        var TIMEOUT = 24 * 60 * 60 * 1000;
+        function resetTimer() { localStorage.setItem('deepcast_last_activity', Date.now()); }
+        function checkTimeout() {
+          var last = parseInt(localStorage.getItem('deepcast_last_activity') || '0', 10);
+          if (last && Date.now() - last > TIMEOUT && localStorage.getItem('deepcast_token')) {
+            localStorage.removeItem('deepcast_token');
+            localStorage.removeItem('deepcast_user');
+            alert('長時間操作がなかったため、セキュリティのためログアウトしました。');
+            window.location.href = '/pages/pricing.html';
+          }
+        }
+        checkTimeout(); resetTimer();
+        ['click', 'keydown', 'scroll', 'touchstart'].forEach(function(e) { document.addEventListener(e, resetTimer, { passive: true }); });
+      })();
     });
   </script>
 </body>

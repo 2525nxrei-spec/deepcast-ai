@@ -213,6 +213,13 @@
           <label for="input-password">パスワード（8文字以上）</label>
           <input type="password" id="input-password" placeholder="8文字以上" minlength="8" required>
         </div>
+        <div class="login-field" id="field-terms" style="display:none;">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;cursor:pointer;">
+            <input type="checkbox" id="input-terms" style="margin-top:3px;flex-shrink:0;">
+            <span><a href="../terms.html" target="_blank" style="color:var(--green);text-decoration:underline;">利用規約</a>と<a href="../privacy.html" target="_blank" style="color:var(--green);text-decoration:underline;">プライバシーポリシー</a>に同意する</span>
+          </label>
+        </div>
+        <div id="pw-strength-reg" style="font-size:11px;color:var(--text-muted);margin-bottom:8px;display:none;"></div>
         <button type="submit" class="login-submit" id="login-submit-btn">ログイン</button>
         <div class="login-error" id="login-error"></div>
         <p style="text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted);">パスワードをお忘れの方は <a href="../contact.html" style="color:var(--green);text-decoration:underline;">こちら</a></p>
@@ -245,6 +252,19 @@
       var loginToggle = document.getElementById('login-toggle');
 
       var mode = 'login';
+      var fieldTerms = document.getElementById('field-terms');
+      var pwStrengthReg = document.getElementById('pw-strength-reg');
+
+      // パスワード強度チェック（リアルタイム）
+      document.getElementById('input-password').addEventListener('input', function() {
+        if (mode !== 'register') return;
+        var pw = this.value;
+        var el = pwStrengthReg;
+        if (pw.length === 0) { el.textContent = ''; }
+        else if (pw.length < 8) { el.textContent = 'あと' + (8 - pw.length) + '文字必要です'; el.style.color = '#dc2626'; }
+        else if (!/[a-zA-Z]/.test(pw) || !/[0-9]/.test(pw)) { el.textContent = '英字と数字の両方を含めてください'; el.style.color = '#d97706'; }
+        else { el.textContent = 'OK'; el.style.color = '#16a34a'; }
+      });
 
       // 初期状態: ログインタブをアクティブ
       tabLogin.classList.add('is-active');
@@ -258,6 +278,8 @@
           loginSub.textContent = 'メールアドレスとパスワードを入力';
           loginSubmitBtn.textContent = 'ログイン';
           loginToggle.innerHTML = 'アカウントをお持ちでない方は<a id="toggle-link">新規登録</a>';
+          if (fieldTerms) fieldTerms.style.display = 'none';
+          if (pwStrengthReg) pwStrengthReg.style.display = 'none';
         } else {
           tabRegister.classList.add('is-active');
           tabLogin.classList.remove('is-active');
@@ -265,6 +287,8 @@
           loginSub.textContent = 'メールアドレスとパスワードで登録';
           loginSubmitBtn.textContent = '新規登録';
           loginToggle.innerHTML = '既にアカウントをお持ちの方は<a id="toggle-link">ログイン</a>';
+          if (fieldTerms) fieldTerms.style.display = 'block';
+          if (pwStrengthReg) pwStrengthReg.style.display = 'block';
         }
         document.getElementById('toggle-link').addEventListener('click', function() {
           setMode(mode === 'login' ? 'register' : 'login');
@@ -294,6 +318,10 @@
           }
 
           if (mode === 'register') {
+            if (password.length < 8) { throw new Error('パスワードは8文字以上で入力してください'); }
+            if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) { throw new Error('パスワードは英字と数字の両方を含めてください'); }
+            var termsCheck = document.getElementById('input-terms');
+            if (termsCheck && !termsCheck.checked) { throw new Error('利用規約への同意が必要です'); }
             await DEEPCAST_AUTH.register(email, password);
           } else {
             await DEEPCAST_AUTH.login(email, password);
