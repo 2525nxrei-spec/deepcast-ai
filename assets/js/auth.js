@@ -114,7 +114,9 @@ const DEEPCAST_AUTH = (() => {
   }
 
   function logout() {
+    if (!confirm('ログアウトしますか？')) return;
     removeToken();
+    localStorage.removeItem('deepcast_last_activity');
     window.location.href = '/';
   }
 
@@ -167,6 +169,9 @@ const DEEPCAST_AUTH = (() => {
       };
       document.getElementById('deepcast-checkout-close').addEventListener('click', closeModal);
       modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function checkoutEsc(e) {
+        if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', checkoutEsc); }
+      });
 
       // Embedded Checkoutをマウント
       const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
@@ -227,39 +232,36 @@ const DEEPCAST_AUTH = (() => {
     gate.firstElementChild.addEventListener('click', (e) => {
       if (e.target === gate.firstElementChild) gate.remove();
     });
+
+    // Escキーで閉じる
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        gate.remove();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
   }
 
   // --- ナビバーUI更新 ---
 
   function updateNavUI() {
     const user = getUser();
-    const navLinks = document.querySelector('.nav__links');
-    if (!navLinks) return;
 
-    // 既存の認証リンクがあれば削除
-    const existingLink = navLinks.querySelector('.nav__auth-link');
-    if (existingLink) existingLink.remove();
-
-    const link = document.createElement('a');
-    link.className = 'nav__link nav__auth-link';
-
-    if (user) {
-      link.href = '/pages/account.html';
-      link.textContent = user.plan === 'pro' ? 'Pro' : 'アカウント';
-      if (user.plan === 'pro') {
-        link.style.cssText = 'color:#6b21a8;font-weight:700';
+    // index.html の navLoginBtn を更新
+    const navLoginBtn = document.getElementById('navLoginBtn');
+    if (navLoginBtn) {
+      if (user) {
+        navLoginBtn.href = '/pages/account.html';
+        navLoginBtn.textContent = user.plan === 'pro' ? 'Pro' : 'アカウント';
+        if (user.plan === 'pro') {
+          navLoginBtn.style.cssText = 'color:#6b21a8;font-weight:700';
+        }
+      } else {
+        navLoginBtn.href = '/pages/login.html';
+        navLoginBtn.textContent = 'ログイン';
+        navLoginBtn.style.cssText = '';
       }
-    } else {
-      link.href = '/pages/pricing.html';
-      link.textContent = 'ログイン';
-    }
-
-    // ドロップダウンの前に挿入
-    const dropdown = navLinks.querySelector('.nav__dropdown');
-    if (dropdown) {
-      navLinks.insertBefore(link, dropdown);
-    } else {
-      navLinks.appendChild(link);
     }
   }
 
@@ -292,4 +294,29 @@ const DEEPCAST_AUTH = (() => {
 // ページロード時に自動初期化
 document.addEventListener('DOMContentLoaded', () => {
   DEEPCAST_AUTH.init();
+
+  // セッションタイムアウト（24時間操作なしでログアウト）
+  // 全ページで動作するようauth.jsに配置
+  (function() {
+    var TIMEOUT = 24 * 60 * 60 * 1000; // 24時間
+    var LAST_KEY = 'deepcast_last_activity';
+    function resetTimer() { localStorage.setItem(LAST_KEY, Date.now()); }
+    function checkTimeout() {
+      var last = parseInt(localStorage.getItem(LAST_KEY) || '0', 10);
+      if (last && Date.now() - last > TIMEOUT && localStorage.getItem('deepcast_token')) {
+        localStorage.removeItem('deepcast_token');
+        localStorage.removeItem('deepcast_user');
+        localStorage.removeItem(LAST_KEY);
+        alert('長時間操作がなかったため、セキュリティのためログアウトしました。');
+        window.location.href = '/pages/login.html';
+      }
+    }
+    if (DEEPCAST_AUTH.isLoggedIn()) {
+      checkTimeout();
+      resetTimer();
+      ['click', 'keydown', 'scroll', 'touchstart'].forEach(function(e) {
+        document.addEventListener(e, resetTimer, { passive: true });
+      });
+    }
+  })();
 });

@@ -14,7 +14,9 @@ export async function onRequestPost(context) {
     const { email, password, display_name } = body;
 
     if (!email || !password) return errorResponse('メールアドレスとパスワードは必須です');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errorResponse('メールアドレスの形式が正しくありません');
     if (password.length < 8) return errorResponse('パスワードは8文字以上で設定してください');
+    if (display_name && display_name.length > 50) return errorResponse('表示名は50文字以内にしてください');
 
     const emailLower = email.toLowerCase().trim();
 
@@ -32,7 +34,7 @@ export async function onRequestPost(context) {
     ).bind(id, emailLower, hash, salt, display_name || null).run();
 
     const token = await createJWT(
-      { sub: id, email: emailLower, plan: 'free', exp: Math.floor(Date.now() / 1000) + 30 * 86400 },
+      { sub: id, email: emailLower, plan: 'free', exp: Math.floor(Date.now() / 1000) + 86400 },
       env.JWT_SECRET
     );
 

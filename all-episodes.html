@@ -145,7 +145,7 @@
     <div class="container">
       <div class="search-bar">
         <span class="search-icon">&#128269;</span>
-        <input type="text" id="episodeSearch" placeholder="エピソードを検索...">
+        <input type="text" id="episodeSearch" placeholder="エピソードを検索..." aria-label="エピソードを検索">
       </div>
 
       <div class="episode-filters" style="margin-bottom:24px">
@@ -223,6 +223,10 @@
           </div>
           <span class="mini-time" id="miniTime">0:00 / 0:00</span>
         </div>
+      </div>
+      <div class="mini-volume" aria-label="音量調整">
+        <button class="mini-mute-btn" id="miniMuteBtn" aria-label="ミュート" tabindex="0">&#128266;</button>
+        <input type="range" id="miniVolumeSlider" class="mini-volume-slider" min="0" max="100" value="100" aria-label="音量" tabindex="0">
       </div>
       <button class="mini-close-btn" id="miniCloseBtn" aria-label="閉じる">&times;</button>
     </div>

@@ -299,7 +299,7 @@ class VoiceEngine:
                 f"Body:\n{body}"
             )
 
-        # Gemini Flash で台本生成（ローカルLLMより圧倒的に高速）
+        # Gemini Flash で台本生成（60秒タイムアウト付き）
         try:
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
@@ -310,7 +310,7 @@ class VoiceEngine:
                 )
                 return response.text
 
-            script = await asyncio.to_thread(_generate_script)
+            script = await asyncio.wait_for(asyncio.to_thread(_generate_script), timeout=60)
             logger.info("voice_engine.script.gemini_ok", script_length=len(script))
         except Exception as exc:
             # Gemini失敗時はローカルLLMにフォールバック
@@ -365,8 +365,13 @@ class VoiceEngine:
         backend = TTSBackend(settings.TTS_BACKEND)
 
         # Gemini TTS: 台本分割方式で合成（長尺の品質劣化を防止）
+        # Gemini TTSが失敗/タイムアウトした場合はEdge TTSにフォールバック
         if backend == TTSBackend.GEMINI and "山口:" in full_script:
-            return await self._synthesize_gemini_chunked(full_script, language, title=title)
+            try:
+                return await self._synthesize_gemini_chunked(full_script, language, title=title)
+            except (asyncio.TimeoutError, Exception) as e:
+                logger.warning("voice_engine.gemini_fallback_to_edge", error=str(e))
+                return await self._synthesize_edge_dialogue(full_script, language, title=title)
 
         # Edge-TTS対話モード: 山口/田中を別ボイスで合成
         if backend == TTSBackend.EDGE and "山口:" in full_script:
@@ -802,7 +807,8 @@ class VoiceEngine:
                 )
                 wav_path.write_bytes(header + audio_data)
 
-            await asyncio.to_thread(_tts_full)
+            # 180秒タイムアウト付きで実行
+            await asyncio.wait_for(asyncio.to_thread(_tts_full), timeout=180)
 
             # --- ffmpeg: WAV → MP3 (loudnorm + highpass + lowpass + atempo) ---
             result = await asyncio.to_thread(

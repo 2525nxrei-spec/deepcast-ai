@@ -675,6 +675,40 @@ input, textarea, select { font: inherit; }
 }
 .mini-close-btn:hover { color: var(--text); }
 
+/* --- 音量コントロール --- */
+.mini-volume {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.mini-mute-btn {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text-muted);
+  background: none; border: none; cursor: pointer;
+  transition: color 0.2s;
+}
+.mini-mute-btn:hover { color: var(--text); }
+.mini-volume-slider {
+  width: 60px; height: 3px;
+  -webkit-appearance: none; appearance: none;
+  background: var(--surface); border-radius: 2px;
+  outline: none; cursor: pointer;
+}
+.mini-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--text); cursor: pointer;
+}
+.mini-volume-slider::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--text); border: none; cursor: pointer;
+}
+.mini-volume-slider:focus-visible {
+  outline: 2px solid var(--green); outline-offset: 2px;
+}
+.mini-mute-btn:focus-visible {
+  outline: 2px solid var(--green); outline-offset: 2px;
+}
+
 /* push footer up so mini player doesn't overlap */
 body.player-active .footer { padding-bottom: 56px; }
 
@@ -716,7 +750,11 @@ body.player-active .footer { padding-bottom: 56px; }
 .request-form textarea:focus-visible,
 .request-form input:focus-visible,
 .request-form select:focus-visible,
-a:focus-visible {
+a:focus-visible,
+.search-bar input:focus-visible,
+.form-group input:focus-visible,
+.form-group textarea:focus-visible,
+.form-group select:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 2px;
 }
@@ -931,6 +969,8 @@ button:disabled,
   .cta-card { padding: 48px 22px; }
   .cta-trust { flex-direction: column; gap: 4px; }
   .form-row { grid-template-columns: 1fr; }
+  /* 音量コントロール: モバイルでは非表示（物理ボリュームを使用） */
+  .mini-volume { display: none; }
   /* Mini player mobile */
   .mini-player { padding: 0 12px; }
   .mini-player-inner { gap: 8px; height: 60px; }

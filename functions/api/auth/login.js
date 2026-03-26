@@ -25,7 +25,7 @@ export async function onRequestPost(context) {
     if (hash !== user.password_hash) return errorResponse('メールアドレスまたはパスワードが正しくありません', 401);
 
     const token = await createJWT(
-      { sub: user.id, email: user.email, plan: user.plan, exp: Math.floor(Date.now() / 1000) + 30 * 86400 },
+      { sub: user.id, email: user.email, plan: user.plan, exp: Math.floor(Date.now() / 1000) + 86400 },
       env.JWT_SECRET
     );
 

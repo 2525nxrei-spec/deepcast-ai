@@ -428,6 +428,14 @@
       miniPlayerDelegated = true;
     }
 
+    // 音量コントロールの初期化
+    initVolumeControl();
+    var muteBtn = document.getElementById('miniMuteBtn');
+    if (muteBtn && !muteBtn._bound) {
+      muteBtn.addEventListener('click', toggleMute);
+      muteBtn._bound = true;
+    }
+
     // 再生中ならミニプレイヤーの状態を復元
     if (currentAudioSrc && audioEl.src) {
       const mt = getMiniEl('miniTitle');
@@ -515,6 +523,29 @@
     document.addEventListener('DOMContentLoaded', showOfflineBanner);
   }
 
+  // --- 音量調整 ---
+  // ミニプレイヤーの音量スライダーを初期化
+  function initVolumeControl() {
+    var slider = document.getElementById('miniVolumeSlider');
+    if (!slider) return;
+    slider.value = audioEl.volume * 100;
+    // input と change の両方で即時反映
+    slider.addEventListener('input', function() {
+      audioEl.volume = this.value / 100;
+      audioEl.muted = false;
+    });
+  }
+
+  // 音量ミュートトグル
+  function toggleMute() {
+    audioEl.muted = !audioEl.muted;
+    var btn = document.getElementById('miniMuteBtn');
+    if (btn) {
+      btn.innerHTML = audioEl.muted ? '&#128263;' : '&#128266;';
+      btn.setAttribute('aria-label', audioEl.muted ? 'ミュート解除' : 'ミュート');
+    }
+  }
+
   // --- グローバルオブジェクトとして公開 ---
   window.DeepCastAudio = {
     audioEl: audioEl,
@@ -537,7 +568,9 @@
     setMediaSession: setMediaSession,
     bindMiniPlayer: bindMiniPlayer,
     reassociatePlayingButton: reassociatePlayingButton,
-    audioFileName: audioFileName
+    audioFileName: audioFileName,
+    initVolumeControl: initVolumeControl,
+    toggleMute: toggleMute
   };
 
 })();

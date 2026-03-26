@@ -77,6 +77,15 @@
     }
     .form-group textarea { resize: vertical; min-height: 160px; }
     .form-group select { cursor: pointer; }
+    .form-group input:focus-visible,
+    .form-group select:focus-visible,
+    .form-group textarea:focus-visible,
+    .form-submit:focus-visible,
+    .btn:focus-visible,
+    a:focus-visible {
+      outline: 2px solid #3a8a44;
+      outline-offset: 2px;
+    }
     .form-submit {
       display: inline-flex;
       align-items: center;
@@ -194,13 +203,18 @@
           <span class="mini-time" id="miniTime">0:00 / 0:00</span>
         </div>
       </div>
+      <div class="mini-volume" aria-label="音量調整">
+        <button class="mini-mute-btn" id="miniMuteBtn" aria-label="ミュート" tabindex="0">&#128266;</button>
+        <input type="range" id="miniVolumeSlider" class="mini-volume-slider" min="0" max="100" value="100" aria-label="音量" tabindex="0">
+      </div>
       <button class="mini-close-btn" id="miniCloseBtn" aria-label="閉じる">&times;</button>
     </div>
   </div>
 
-  <script src="js/audio-player.js?v=20260323"></script>
-  <script src="js/page-init.js?v=20260323"></script>
-  <script src="js/spa-router.js?v=20260323"></script>
-  <script src="js/main.js?v=20260323"></script>
+  <script src="assets/js/auth.js?v=20260327"></script>
+  <script src="js/audio-player.js?v=20260327"></script>
+  <script src="js/page-init.js?v=20260327"></script>
+  <script src="js/spa-router.js?v=20260327"></script>
+  <script src="js/main.js?v=20260327"></script>
 </body>
 </html>

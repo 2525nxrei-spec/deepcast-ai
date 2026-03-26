@@ -136,7 +136,8 @@
       opacity: 0.8;
     }
     /* :focus-visible */
-    .account-btn:focus-visible {
+    .account-btn:focus-visible,
+    .account-page input:focus-visible {
       outline: 2px solid var(--green);
       outline-offset: 2px;
     }
@@ -423,9 +424,8 @@
         finally { btn.disabled = false; btn.classList.remove('btn-loading'); btn.textContent = 'パスワードを変更'; }
       });
 
-      // ログアウト（カード下部の新ボタン）
+      // ログアウト（カード下部のボタン）— auth.jsのlogout()内で確認ダイアログ表示
       document.getElementById('btn-logout2').addEventListener('click', function() {
-        if (!confirm('ログアウトしますか？')) return;
         DEEPCAST_AUTH.logout();
       });
 
@@ -453,22 +453,7 @@
         finally { btn.disabled = false; btn.classList.remove('btn-loading'); btn.textContent = 'アカウントを削除'; }
       });
 
-      // セッションタイムアウト（24時間操作なしでログアウト）
-      (function() {
-        var TIMEOUT = 24 * 60 * 60 * 1000;
-        function resetTimer() { localStorage.setItem('deepcast_last_activity', Date.now()); }
-        function checkTimeout() {
-          var last = parseInt(localStorage.getItem('deepcast_last_activity') || '0', 10);
-          if (last && Date.now() - last > TIMEOUT && localStorage.getItem('deepcast_token')) {
-            localStorage.removeItem('deepcast_token');
-            localStorage.removeItem('deepcast_user');
-            alert('長時間操作がなかったため、セキュリティのためログアウトしました。');
-            window.location.href = '/pages/pricing.html';
-          }
-        }
-        checkTimeout(); resetTimer();
-        ['click', 'keydown', 'scroll', 'touchstart'].forEach(function(e) { document.addEventListener(e, resetTimer, { passive: true }); });
-      })();
+      // セッションタイムアウトはauth.jsで全ページ共通処理
     });
   </script>
 </body>

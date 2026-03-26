@@ -200,9 +200,9 @@
       </div>
       <div class="login-title" id="login-title">ログイン</div>
       <div class="login-sub" id="login-sub">メールアドレスとパスワードを入力</div>
-      <div class="login-tabs">
-        <button class="login-tab" id="tab-login">ログイン</button>
-        <button class="login-tab" id="tab-register">新規登録</button>
+      <div class="login-tabs" role="tablist">
+        <button class="login-tab" id="tab-login" role="tab" aria-selected="true">ログイン</button>
+        <button class="login-tab" id="tab-register" role="tab" aria-selected="false">新規登録</button>
       </div>
       <form id="login-form">
         <div class="login-field">
@@ -327,7 +327,11 @@
             await DEEPCAST_AUTH.login(email, password);
           }
 
-          // 成功 → 元のページまたはトップへ
+          // 成功 → チェックマーク表示 → 元のページまたはトップへ
+          loginSubmitBtn.classList.remove('btn-loading');
+          loginSubmitBtn.innerHTML = '&#10003;';
+          loginSubmitBtn.style.background = '#16a34a';
+          await new Promise(function(r) { setTimeout(r, 600); });
           var returnUrl = new URLSearchParams(window.location.search).get('return');
           window.location.href = returnUrl || '../';
         } catch (err) {
