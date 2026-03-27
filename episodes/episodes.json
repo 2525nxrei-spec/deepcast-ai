@@ -2,15 +2,15 @@
   {
     "id": 10,
     "title": "ゲーム理論で読み解く日常の駆け引き — 囚人のジレンマは毎日起きている",
-    "description": "ジョン・ナッシュが提唱したナッシュ均衡は、各プレイヤーが相手の戦略を前提に最適な戦略を取っている状態。値引き交渉、職場の会議、渋滞の車線変更——日常のあらゆる場",
+    "description": "ナッシュ均衡が職場の会議、値引き交渉、SNSの炎上に潜んでいる。ゲーム理論の基本を日常に応用する方法。",
     "date": "2026.03.27",
     "category": "business",
     "tags": [
       "ゲーム理論",
       "意思決定"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep010.mp3",
+    "duration": "2:47",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep010.mp3",
     "article": "episodes/ep010.html",
     "language": "ja",
     "tier": "pro"
@@ -18,15 +18,15 @@
   {
     "id": 9,
     "title": "孤独は1日15本の喫煙に匹敵する — 社会的つながりの生物学",
-    "description": "2015年のブリガムヤング大学のメタ分析（308万人対象）によれば、社会的孤立は死亡リスクを29%上昇させ、これは1日15本の喫煙に匹敵する。孤独はストレスホル",
+    "description": "2015年のメタ分析が示した衝撃データ。孤独が免疫系に与える影響と、テクノロジー時代の新しいつながり方。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "孤独",
       "健康科学"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep009.mp3",
+    "duration": "3:18",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep009.mp3",
     "article": "episodes/ep009.html",
     "language": "ja",
     "tier": "pro"
@@ -34,15 +34,15 @@
   {
     "id": 8,
     "title": "なぜ日本語には「もったいない」しかないのか — 言語が思考を制限する",
-    "description": "サピア=ウォーフ仮説は「言語が思考を形作る」と主張する。ロシア語話者は青の微妙な違いを英語話者より速く見分ける。アマゾンのピラハ族は数詞を持たず、正確な数の概念",
+    "description": "サピア=ウォーフ仮説の最新研究。言語が色の認識、時間感覚、道徳判断にまで影響を与えるメカニズム。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "言語学",
       "認知科学"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep008.mp3",
+    "duration": "2:29",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep008.mp3",
     "article": "episodes/ep008.html",
     "language": "ja",
     "tier": "pro"
@@ -50,15 +50,15 @@
   {
     "id": 7,
     "title": "音楽が脳を書き換える — モーツァルト効果の真実と嘘",
-    "description": "1993年のRauscherらの論文が「モーツァルトを聴くとIQが上がる」という都市伝説を生んだ。しかし実際の効果は空間推論能力の一時的向上のみで、15分で消え",
+    "description": "1993年の論文から始まった都市伝説の真相。音楽が認知機能に与える本当の影響と、科学的に効果がある聴き方。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "音楽",
       "脳科学"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep007.mp3",
+    "duration": "2:14",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep007.mp3",
     "article": "episodes/ep007.html",
     "language": "ja",
     "tier": "pro"
@@ -66,15 +66,15 @@
   {
     "id": 6,
     "title": "あなたの直感はなぜ当たるのか — 無意識の情報処理の秘密",
-    "description": "ドイツの心理学者ゲルト・ギーゲレンツァーの研究によれば、情報が少なく不確実性が高い状況では、直感（シンプルなヒューリスティクス）が複雑な統計モデルを上回ることが",
+    "description": "ゲルト・ギーゲレンツァーの研究が示す、直感が論理分析を上回る条件とは。シンプルなヒューリスティクスの力。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "直感",
       "意思決定"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep006.mp3",
+    "duration": "3:09",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep006.mp3",
     "article": "episodes/ep006.html",
     "language": "ja",
     "tier": "pro"
@@ -82,15 +82,15 @@
   {
     "id": 5,
     "title": "江戸時代のリサイクル経済は現代より優れていた",
-    "description": "人口100万人の江戸は、ほぼゼロウェイストを実現していた。灰を買い取る「灰買い」、鍋を修理する「鋳掛屋」、古紙を漉き直す「紙漉き」。現代のサーキュラーエコノミー",
+    "description": "灰買い、紙漉き直し、鋳掛屋。江戸のゼロウェイスト社会は現代のサーキュラーエコノミーの理想形だった。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "江戸時代",
       "サーキュラーエコノミー"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep005.mp3",
+    "duration": "2:39",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep005.mp3",
     "article": "episodes/ep005.html",
     "language": "ja",
     "tier": "pro"
@@ -98,15 +98,15 @@
   {
     "id": 4,
     "title": "なぜ人は損切りができないのか — 脳に刻まれたサバイバル本能",
-    "description": "ダニエル・カーネマンとエイモス・トヴェルスキーのプロスペクト理論によれば、人は同じ金額でも「得る喜び」より「失う苦痛」を約2.5倍強く感じる。この損失回避バイア",
+    "description": "行動経済学のプロスペクト理論と、進化心理学から見た損失回避。投資だけでなく日常の意思決定にも効く対処法。",
     "date": "2026.03.27",
     "category": "business",
     "tags": [
       "行動経済学",
       "損失回避"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep004.mp3",
+    "duration": "2:08",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep004.mp3",
     "article": "episodes/ep004.html",
     "language": "ja",
     "tier": "pro"
@@ -114,15 +114,15 @@
   {
     "id": 3,
     "title": "睡眠を制する者が創造性を制する — NASAの戦略的仮眠の科学",
-    "description": "NASAの研究で、26分の仮眠がパイロットの注意力を54%向上させることが判明。レム睡眠中に脳は一見無関係な記憶同士を結びつけ、創造的な解決策を生み出す。Goo",
+    "description": "NASAが発見した26分仮眠の効果。レム睡眠と創造性の関係、そしてGoogleやNikeが導入した睡眠戦略を紹介。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "睡眠科学",
       "創造性"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep003.mp3",
+    "duration": "1:59",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep003.mp3",
     "article": "episodes/ep003.html",
     "language": "ja",
     "tier": "free"
@@ -130,15 +130,15 @@
   {
     "id": 2,
     "title": "コーヒーが世界史を動かした3つの瞬間",
-    "description": "17世紀のロンドン、コーヒーハウスは「1ペニー大学」と呼ばれ、身分を超えた議論の場となり啓蒙思想を加速させた。フランス革命の密議もカフェで行われ、シリコンバレー",
+    "description": "啓蒙思想の誕生、フランス革命の導火線、シリコンバレーの文化。コーヒーハウスが歴史の転換点で果たした意外な役割。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "コーヒー",
       "世界史"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep002.mp3",
+    "duration": "2:44",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep002.mp3",
     "article": "episodes/ep002.html",
     "language": "ja",
     "tier": "free"
@@ -146,15 +146,15 @@
   {
     "id": 1,
     "title": "なぜ第一印象は7秒で決まるのに覆すには200時間かかるのか",
-    "description": "プリンストン大学の研究によると、人は相手の顔を見てわずか0.1秒で信頼性を判断する。この判断は脳の扁桃体が自動的に行い、意識的なコントロールがほぼ効かない。一度",
+    "description": "認知心理学が明らかにした第一印象のメカニズム。脳の扁桃体が瞬時に判断を下す仕組みと、それを意識的に覆す方法を解説。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "認知心理学",
       "第一印象"
     ],
-    "duration": "2:30",
-    "audio": "episodes/ep001.mp3",
+    "duration": "2:39",
+    "audio": "https://audio.deepcast-ai.com/episodes/ep001.mp3",
     "article": "episodes/ep001.html",
     "language": "ja",
     "tier": "free"
