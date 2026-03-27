@@ -59,7 +59,7 @@
 <item>
   <title>#3 AI倫理の現在 — 消費者保護と社会的責任</title>
   <description>AIが私たちの生活を便利にする一方で、消費者の権利や社会全体の福祉に関わる課題も浮上しています。AI倫理の最前線を解説します。</description>
-  <enclosure url="https://audio.deepcast-ai.com/ep003.mp3" type="audio/mpeg" length="8676875"/>
+  <!-- Pro音声: API経由でのみ配信 -->
   <pubDate>Wed, 19 Mar 2026 18:32:31 +0900</pubDate>
   <itunes:duration>6:00</itunes:duration>
   <itunes:episode>3</itunes:episode>
@@ -70,7 +70,7 @@
 <item>
   <title>#2 知っておきたいサステナブルファイナンスとESG投資の真実</title>
   <description>会社のお金の使い方が変わりつつあることをご存じですか？サステナブルファイナンスとESG投資が私たちの暮らしにどう関わるのか、分かりやすく解説します。</description>
-  <enclosure url="https://audio.deepcast-ai.com/ep002.mp3" type="audio/mpeg" length="10883073"/>
+  <!-- Pro音声: API経由でのみ配信 -->
   <pubDate>Wed, 18 Mar 2026 22:27:54 +0900</pubDate>
   <itunes:duration>7:00</itunes:duration>
   <itunes:episode>2</itunes:episode>
@@ -81,7 +81,7 @@
 <item>
   <title>#1 AIと倫理 — 人工知能の進化とともに考える未来社会</title>
   <description>AIと倫理について深く掘り下げます。人工知能が私たちの生活に大きな影響を与えている今、倫理的な課題とどう向き合うべきか。偏見・プライバシー・責任あるAI開発について考えます。</description>
-  <enclosure url="https://audio.deepcast-ai.com/ep001.mp3" type="audio/mpeg" length="9157737"/>
+  <!-- Pro音声: API経由でのみ配信 -->
   <pubDate>Wed, 18 Mar 2026 22:27:32 +0900</pubDate>
   <itunes:duration>6:00</itunes:duration>
   <itunes:episode>1</itunes:episode>
