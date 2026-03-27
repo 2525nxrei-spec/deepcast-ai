@@ -215,7 +215,7 @@ const DEEPCAST_AUTH = (() => {
           </div>
           <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:8px;color:#1d1d1f">このエピソードはProプラン限定です</h2>
           <p style="font-size:0.88rem;color:#636366;line-height:1.7;margin-bottom:24px">月額150円で全エピソード聴き放題。<br>最新のAIニュースを深掘りで、いつでもどこでも。</p>
-          <a href="/pages/pricing.html" style="display:inline-block;background:#6b21a8;color:#fff;font-size:0.88rem;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;margin-bottom:12px">Proプランを見る</a>
+          <a href="/pages/pricing.html#plan-pro" style="display:inline-block;background:#6b21a8;color:#fff;font-size:0.88rem;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;margin-bottom:12px">Proプランを見る</a>
           <br>
           <button id="deepcast-gate-close" style="font-size:0.8rem;color:#8e8e93;background:none;border:none;cursor:pointer;padding:8px;margin-top:4px">閉じる</button>
         </div>

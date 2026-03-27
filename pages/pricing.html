@@ -362,7 +362,7 @@
       </div>
 
       <!-- Pro -->
-      <div class="plan-card plan-card--pro">
+      <div class="plan-card plan-card--pro" id="plan-pro">
         <div class="plan-badge">おすすめ</div>
         <div class="plan-name">Pro</div>
         <div class="plan-price">150<small>円/月</small></div>
@@ -385,7 +385,7 @@
             広告なし
           </li>
         </ul>
-        <button class="plan-btn plan-btn--pro" id="btn-pro-upgrade">Proプランを始める — 月額150円</button>
+        <button class="plan-btn plan-btn--pro" id="btn-pro-upgrade" onclick="(function(){var s=document.getElementById('auth-section');if(s){s.classList.add('is-visible');s.scrollIntoView({behavior:'smooth',block:'center'})}})()">Proプランを始める — 月額150円</button>
       </div>
     </div>
 
@@ -474,6 +474,16 @@
       var btnProUpgrade = document.getElementById('btn-pro-upgrade');
 
       var mode = 'register';
+
+      // #plan-pro ハッシュがある場合、Proカードまでスクロール
+      if (window.location.hash === '#plan-pro') {
+        var proPlan = document.getElementById('plan-pro');
+        if (proPlan) {
+          setTimeout(function() {
+            proPlan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        }
+      }
 
       // 認証状態チェック（DEEPCAST_AUTHが読み込まれている前提）
       if (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isLoggedIn()) {
