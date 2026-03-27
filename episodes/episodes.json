@@ -1,15 +1,15 @@
 [
   {
     "id": 10,
-    "title": "ゲーム理論で読み解く日常の駆け引き — 囚人のジレンマは毎日起きている",
-    "description": "ナッシュ均衡が職場の会議、値引き交渉、SNSの炎上に潜んでいる。ゲーム理論の基本を日常に応用する方法。",
+    "title": "囚人のジレンマは毎日起きている",
+    "description": "ナッシュ均衡が渋滞、職場、交渉に潜んでいる。最強戦略しっぺ返しの教訓。",
     "date": "2026.03.27",
     "category": "business",
     "tags": [
       "ゲーム理論",
       "意思決定"
     ],
-    "duration": "2:47",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep010.mp3",
     "article": "episodes/ep010.html",
     "language": "ja",
@@ -17,15 +17,15 @@
   },
   {
     "id": 9,
-    "title": "孤独は1日15本の喫煙に匹敵する — 社会的つながりの生物学",
-    "description": "2015年のメタ分析が示した衝撃データ。孤独が免疫系に与える影響と、テクノロジー時代の新しいつながり方。",
+    "title": "孤独は1日15本の喫煙に匹敵する",
+    "description": "308万人のメタ分析。社会的孤立が免疫系に与える分子レベルの影響。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "孤独",
       "健康科学"
     ],
-    "duration": "3:18",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep009.mp3",
     "article": "episodes/ep009.html",
     "language": "ja",
@@ -33,15 +33,15 @@
   },
   {
     "id": 8,
-    "title": "なぜ日本語には「もったいない」しかないのか — 言語が思考を制限する",
-    "description": "サピア=ウォーフ仮説の最新研究。言語が色の認識、時間感覚、道徳判断にまで影響を与えるメカニズム。",
+    "title": "言語が思考を制限する",
+    "description": "サピア=ウォーフ仮説の最新研究。言語が色の認識や道徳判断にまで影響を与える。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "言語学",
       "認知科学"
     ],
-    "duration": "2:29",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep008.mp3",
     "article": "episodes/ep008.html",
     "language": "ja",
@@ -49,15 +49,15 @@
   },
   {
     "id": 7,
-    "title": "音楽が脳を書き換える — モーツァルト効果の真実と嘘",
-    "description": "1993年の論文から始まった都市伝説の真相。音楽が認知機能に与える本当の影響と、科学的に効果がある聴き方。",
+    "title": "音楽が脳を書き換える",
+    "description": "モーツァルト効果の真実と嘘。楽器演奏が脳構造を変えるメカニズム。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "音楽",
       "脳科学"
     ],
-    "duration": "2:14",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep007.mp3",
     "article": "episodes/ep007.html",
     "language": "ja",
@@ -65,15 +65,15 @@
   },
   {
     "id": 6,
-    "title": "あなたの直感はなぜ当たるのか — 無意識の情報処理の秘密",
-    "description": "ゲルト・ギーゲレンツァーの研究が示す、直感が論理分析を上回る条件とは。シンプルなヒューリスティクスの力。",
+    "title": "あなたの直感はなぜ当たるのか",
+    "description": "ギーゲレンツァーの研究。シンプルなヒューリスティクスが複雑な分析を上回る条件。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "直感",
       "意思決定"
     ],
-    "duration": "3:09",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep006.mp3",
     "article": "episodes/ep006.html",
     "language": "ja",
@@ -82,14 +82,14 @@
   {
     "id": 5,
     "title": "江戸時代のリサイクル経済は現代より優れていた",
-    "description": "灰買い、紙漉き直し、鋳掛屋。江戸のゼロウェイスト社会は現代のサーキュラーエコノミーの理想形だった。",
+    "description": "灰買い、鋳掛屋、紙漉き直し。江戸のゼロウェイスト社会。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "江戸時代",
       "サーキュラーエコノミー"
     ],
-    "duration": "2:39",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep005.mp3",
     "article": "episodes/ep005.html",
     "language": "ja",
@@ -97,15 +97,15 @@
   },
   {
     "id": 4,
-    "title": "なぜ人は損切りができないのか — 脳に刻まれたサバイバル本能",
-    "description": "行動経済学のプロスペクト理論と、進化心理学から見た損失回避。投資だけでなく日常の意思決定にも効く対処法。",
+    "title": "なぜ人は損切りができないのか",
+    "description": "プロスペクト理論と進化心理学から見た損失回避バイアス。",
     "date": "2026.03.27",
     "category": "business",
     "tags": [
       "行動経済学",
       "損失回避"
     ],
-    "duration": "2:08",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep004.mp3",
     "article": "episodes/ep004.html",
     "language": "ja",
@@ -113,15 +113,15 @@
   },
   {
     "id": 3,
-    "title": "睡眠を制する者が創造性を制する — NASAの戦略的仮眠の科学",
-    "description": "NASAが発見した26分仮眠の効果。レム睡眠と創造性の関係、そしてGoogleやNikeが導入した睡眠戦略を紹介。",
+    "title": "睡眠を制する者が創造性を制する",
+    "description": "NASAが発見した26分仮眠の効果。レム睡眠と創造性の関係。",
     "date": "2026.03.27",
     "category": "science",
     "tags": [
       "睡眠科学",
       "創造性"
     ],
-    "duration": "1:59",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep003.mp3",
     "article": "episodes/ep003.html",
     "language": "ja",
@@ -130,14 +130,14 @@
   {
     "id": 2,
     "title": "コーヒーが世界史を動かした3つの瞬間",
-    "description": "啓蒙思想の誕生、フランス革命の導火線、シリコンバレーの文化。コーヒーハウスが歴史の転換点で果たした意外な役割。",
+    "description": "啓蒙思想、フランス革命、シリコンバレー。コーヒーハウスが歴史の転換点で果たした役割。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "コーヒー",
       "世界史"
     ],
-    "duration": "2:44",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep002.mp3",
     "article": "episodes/ep002.html",
     "language": "ja",
@@ -146,14 +146,14 @@
   {
     "id": 1,
     "title": "なぜ第一印象は7秒で決まるのに覆すには200時間かかるのか",
-    "description": "認知心理学が明らかにした第一印象のメカニズム。脳の扁桃体が瞬時に判断を下す仕組みと、それを意識的に覆す方法を解説。",
+    "description": "認知心理学が明らかにした第一印象のメカニズム。脳の扁桃体が瞬時に判断を下す仕組みと、覆す方法。",
     "date": "2026.03.27",
     "category": "society",
     "tags": [
       "認知心理学",
       "第一印象"
     ],
-    "duration": "2:39",
+    "duration": "3:00",
     "audio": "https://audio.deepcast-ai.com/episodes/ep001.mp3",
     "article": "episodes/ep001.html",
     "language": "ja",
