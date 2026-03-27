@@ -26,7 +26,7 @@
 <item>
   <title>#6 スマホを見た瞬間に集中力が死ぬ科学的メカニズム — そして"回復"に23分かかる理由</title>
   <description>皆さん、こんにちは！「ブレイン・ハック・ラボ」へようこそ。突然ですが、あなたは今、集中して何かをしている最中に、ふとスマホが視界に入っただけで、思考が途切れた経験はありませんか？</description>
-  <enclosure url="https://audio.deepcast-ai.com/ep006.mp3" type="audio/mpeg" length="0"/>
+  <!-- Pro音声: API経由でのみ配信 -->
   <pubDate>Mon, 23 Mar 2026 00:00:00 +0900</pubDate>
   <itunes:duration>10:51</itunes:duration>
   <itunes:episode>6</itunes:episode>
@@ -37,7 +37,7 @@
 <item>
   <title>#5 なぜ独裁国家ほどAI開発に積極的なのか</title>
   <description>皆さん、こんにちは！「テクノロジーの深層」へようこそ。AI、人工知能。この言葉を聞くと、私たちは便利さや効率化、あるいはSF映画のような未来を想像するかもしれません。</description>
-  <enclosure url="https://audio.deepcast-ai.com/ep005.mp3" type="audio/mpeg" length="0"/>
+  <!-- Pro音声: API経由でのみ配信 -->
   <pubDate>Mon, 23 Mar 2026 00:00:00 +0900</pubDate>
   <itunes:duration>11:07</itunes:duration>
   <itunes:episode>5</itunes:episode>
@@ -48,7 +48,7 @@
 <item>
   <title>#4 時代の変化 — 知識労働者の今と未来</title>
   <description>AI時代の到来で知識労働者の役割はどう変わるのか。スキルの半減期、リスキリング、そして人間にしかできない仕事の本質について考えます。</description>
-  <enclosure url="https://audio.deepcast-ai.com/ep004.mp3" type="audio/mpeg" length="8033009"/>
+  <!-- Pro音声: API経由でのみ配信 -->
   <pubDate>Wed, 19 Mar 2026 18:32:31 +0900</pubDate>
   <itunes:duration>5:00</itunes:duration>
   <itunes:episode>4</itunes:episode>
