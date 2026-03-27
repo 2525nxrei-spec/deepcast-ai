@@ -1,3 +1,5 @@
+// ⚠️ 旧実装 — 本番はfunctions/を使用。このファイルは参考用。
+
 /**
  * DeepCast AI — Cloudflare Workers APIハンドラー
  * AIポッドキャスト配信サイトのフリーミアム決済・認証API
