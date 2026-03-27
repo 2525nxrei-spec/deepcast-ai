@@ -66,9 +66,9 @@
   <h1 class="article-title">なぜ第一印象は7秒で決まるのに覆すには200時間かかるのか</h1>
 
   <div class="article-player">
-    <audio controls preload="metadata">
-      <source src="/episodes/ep001.mp3" type="audio/mpeg">
-    </audio>
+    <!-- 音声はJS動的ロード（認証経由） -->
+    <div id="articleAudioPlayer" data-episode="ep001"></div>
+
   </div>
 
   <div class="article-summary">

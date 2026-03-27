@@ -11,7 +11,19 @@ import { stripeRequest } from '../../lib/stripe.js';
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  const user = await authenticateUser(request, env);
+  // 環境変数チェック（502 Bad Gateway防止）
+  if (!env.STRIPE_SECRET_KEY) {
+    console.error('Checkout: STRIPE_SECRET_KEYが未設定');
+    return errorResponse('決済サービスが利用できません。管理者にお問い合わせください。', 500);
+  }
+
+  let user;
+  try {
+    user = await authenticateUser(request, env);
+  } catch (err) {
+    console.error('Checkout認証エラー:', err.message);
+    return errorResponse('認証処理でエラーが発生しました', 500);
+  }
   if (!user) return errorResponse('認証が必要です', 401);
 
   try {

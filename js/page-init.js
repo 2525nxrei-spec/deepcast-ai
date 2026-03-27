@@ -129,11 +129,18 @@
   }
 
   // オーディオファイル名 → 記事URLマッピングを構築
+  // audioIdからAPI経由の音声URLを生成
+  function audioUrlFromId(audioId) {
+    if (!audioId) return '';
+    return '/api/audio/' + audioId;
+  }
+
   function buildArticleMap(episodes) {
     var audioToArticle = DA.audioToArticle;
     episodes.forEach(function(ep) {
-      if (ep.audio && ep.article) {
-        audioToArticle[DA.audioFileName(ep.audio)] = ep.article;
+      var audioUrl = audioUrlFromId(ep.audioId);
+      if (audioUrl && ep.article) {
+        audioToArticle[DA.audioFileName(audioUrl)] = ep.article;
       }
     });
   }
@@ -198,7 +205,7 @@
       '</div>' +
       '<div class="episode-embed">' +
         '<div class="episode-player" role="group" aria-label="オーディオプレイヤー: ' + safeTitle + '">' +
-          '<button class="play-btn" data-audio="' + (ep.audio || '') + '" data-title="' + safeTitle + '"' + lockedAttr + ' role="button" aria-label="' + (isLocked ? 'Proプラン限定: ' : '再生: ') + safeTitle + '" tabindex="0">' +
+          '<button class="play-btn" data-audio="' + audioUrlFromId(ep.audioId) + '" data-title="' + safeTitle + '"' + lockedAttr + ' role="button" aria-label="' + (isLocked ? 'Proプラン限定: ' : '再生: ') + safeTitle + '" tabindex="0">' +
             '<span class="play-icon">&#9654;</span>' +
             lockIconHtml +
           '</button>' +
@@ -553,7 +560,33 @@
     episodeSearch.addEventListener('input', applyFilters);
   }
 
+  // 記事ページの動的プレイヤー構築（audioタグ削除対応）
+  function initArticleDynamicPlayer() {
+    var container = document.getElementById('articleAudioPlayer');
+    if (!container) return;
+    var episodeId = container.dataset.episode;
+    if (!episodeId) return;
+    var audioSrc = '/api/audio/' + episodeId;
+    // 記事タイトルを取得
+    var titleEl = document.querySelector('.article-title');
+    var title = titleEl ? titleEl.textContent : episodeId;
+
+    // プレイヤーUIを構築
+    container.innerHTML =
+      '<div class="episode-player" role="group" aria-label="オーディオプレイヤー">' +
+        '<button class="play-btn" id="articlePlayBtn" data-audio="' + audioSrc + '" data-title="' + title.replace(/"/g, '&quot;') + '" role="button" aria-label="再生: ' + title.replace(/"/g, '&quot;') + '" tabindex="0">' +
+          '<span class="play-icon">&#9654;</span>' +
+        '</button>' +
+        '<div class="episode-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
+          '<div class="progress-bar"><div class="progress-fill" id="articleProgressFill" style="width:0%"></div></div>' +
+          '<span class="progress-time" id="articleProgressTime">0:00</span>' +
+        '</div>' +
+      '</div>';
+  }
+
   function initArticlePlayer() {
+    // まず動的プレイヤーを構築
+    initArticleDynamicPlayer();
     var btn = document.getElementById('articlePlayBtn');
     if (!btn) return;
     // ロック済みの場合はbindしない（ゲーティングスクリプトが処理済み）
@@ -568,11 +601,11 @@
       fetch('/episodes/episodes.json')
         .then(function(r) { return r.json(); })
         .then(function(episodes) {
-          var fileName = audioSrc.split('/').pop().split('?')[0];
+          var audioIdFromSrc = audioSrc.split('/').pop().split('?')[0];
           var idx = -1;
           for (var i = 0; i < episodes.length; i++) {
-            var epFile = (episodes[i].audio || '').split('/').pop().split('?')[0];
-            if (epFile === fileName) { idx = i; break; }
+            var epAudioId = (episodes[i].audioId || '');
+            if (epAudioId === audioIdFromSrc) { idx = i; break; }
           }
           if (idx >= 3) {
             btn.dataset.locked = 'true';
@@ -641,15 +674,19 @@
     var navbar = document.getElementById('navbar');
     var navLinks = document.getElementById('navLinks');
     if (navbar && navLinks && !navDelegated) {
+      var navActions = navbar.querySelector('.nav-actions');
       navbar.addEventListener('click', function(e) {
         // ハンバーガーボタンのクリック
         if (e.target.closest('#hamburger')) {
           navLinks.classList.toggle('active');
+          // モバイルメニュー展開時にログインボタン等も表示
+          if (navActions) navActions.classList.toggle('active');
           return;
         }
         // ナビリンクのクリックでメニューを閉じる
-        if (e.target.closest('#navLinks a')) {
+        if (e.target.closest('#navLinks a') || e.target.closest('.nav-actions a')) {
           navLinks.classList.remove('active');
+          if (navActions) navActions.classList.remove('active');
         }
       });
       navDelegated = true;
