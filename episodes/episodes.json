@@ -5,12 +5,9 @@
     "description": "プログラミング不要の時代 — ノーコード革命は本物か幻か",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "プログラミング不要の時代",
-      "ノーコード革命は本物か幻か"
-    ],
+    "tags": ["プログラミング不要の時代", "ノーコード革命は本物か幻か"],
     "duration": "2:30",
-    "audio": "",
+    "audio": "episodes/ep010.mp3",
     "article": "episodes/ep010.html",
     "language": "ja",
     "tier": "free"
@@ -21,12 +18,9 @@
     "description": "AIが医師を超える日 — 診断精度99%の衝撃と残る課題",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "AIが医師を超える日",
-      "診断精度99%の衝撃と残る課題"
-    ],
+    "tags": ["AIが医師を超える日", "診断精度99%の衝撃と残る課題"],
     "duration": "2:30",
-    "audio": "",
+    "audio": "episodes/ep009.mp3",
     "article": "episodes/ep009.html",
     "language": "ja",
     "tier": "free"
@@ -37,12 +31,9 @@
     "description": "電子ゴミが地球を覆う — テクノロジーの裏にある環境コスト",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "電子ゴミが地球を覆う",
-      "テクノロジーの裏にある環境コスト"
-    ],
+    "tags": ["電子ゴミが地球を覆う", "テクノロジーの裏にある環境コスト"],
     "duration": "2:30",
-    "audio": "",
+    "audio": "episodes/ep008.mp3",
     "article": "episodes/ep008.html",
     "language": "ja",
     "tier": "free"
@@ -53,12 +44,9 @@
     "description": "ディープフェイクが変える情報戦 — 真実を見極める時代の終わり",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "ディープフェイクが変える情報戦",
-      "真実を見極める時代の終わり"
-    ],
+    "tags": ["ディープフェイクが変える情報戦", "真実を見極める時代の終わり"],
     "duration": "2:30",
-    "audio": "",
+    "audio": "episodes/ep007.mp3",
     "article": "episodes/ep007.html",
     "language": "ja",
     "tier": "pro"
@@ -69,12 +57,9 @@
     "description": "自動運転車の「トロッコ問題」 — AIに命の選択を任せられるか",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "自動運転車の「トロッコ問題」",
-      "AIに命の選択を任せられるか"
-    ],
+    "tags": ["自動運転車の「トロッコ問題」", "AIに命の選択を任せられるか"],
     "duration": "2:30",
-    "audio": "",
+    "audio": "episodes/ep006.mp3",
     "article": "episodes/ep006.html",
     "language": "ja",
     "tier": "pro"
@@ -82,15 +67,12 @@
   {
     "id": 5,
     "title": "なぜGAFAMは宇宙開発に巨額投資するのか — テック企業の宇宙戦略",
-    "description": "皆さん、こんにちは！今日のテーマは「なぜGAFAMは宇宙開発に巨額投資するのか — テック企業の宇宙戦略」です。イーロン・マスク氏のSpaceXやジェフ・ベゾス氏のBlue Originなど、IT企業の創業者が宇宙開発に深く関わっているニュースを目にする機会が増えましたね。一見、...",
+    "description": "なぜGAFAMは宇宙開発に巨額投資するのか — テック企業の宇宙戦略",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "なぜGAFAMは宇宙開発に巨額投資するのか",
-      "テック企業の宇宙戦略"
-    ],
+    "tags": ["なぜGAFAMは宇宙開発に巨額投資するのか", "テック企業の宇宙戦略"],
     "duration": "2:30",
-    "audio": "",
+    "audio": "episodes/ep005.mp3",
     "article": "episodes/ep005.html",
     "language": "ja",
     "tier": "pro"
@@ -98,15 +80,12 @@
   {
     "id": 4,
     "title": "SNSアルゴリズムが選挙を動かす — デジタル民主主義の光と影",
-    "description": "皆さん、こんにちは。「デジタル民主主義の光と影」へようこそ。 現代社会において、SNSは私たちのコミュニケーション、情報収集、そして政治参加のあり方を根底から変えました。特に選挙において、SNSアルゴリズムがもたらす影響は計り知れません。今回は、この「SNSアルゴリズムが選挙を動...",
+    "description": "SNSアルゴリズムが選挙を動かす — デジタル民主主義の光と影",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "SNSアルゴリズムが選挙を動かす",
-      "デジタル民主主義の光と影"
-    ],
-    "duration": "12:22",
-    "audio": "https://audio.deepcast-ai.com/ep004.mp3",
+    "tags": ["SNSアルゴリズムが選挙を動かす", "デジタル民主主義の光と影"],
+    "duration": "2:30",
+    "audio": "episodes/ep004.mp3",
     "article": "episodes/ep004.html",
     "language": "ja",
     "tier": "pro"
@@ -114,15 +93,12 @@
   {
     "id": 3,
     "title": "脳とAIの境界線 — ニューラリンクが開く人間拡張の未来",
-    "description": "皆さん、こんにちは！「未来の扉」へようこそ。MCの[あなたの名前]です。今日のテーマは、私たちの最も複雑な臓器である「脳」と、進化を続ける「AI」が交差する、まさに未来の最前線。イーロン・マスク率いるニューラリンクが切り開こうとしている、人間拡張の未来について深く掘り下げていきま...",
+    "description": "脳とAIの境界線 — ニューラリンクが開く人間拡張の未来",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "脳とAIの境界線",
-      "ニューラリンクが開く人間拡張の未来"
-    ],
-    "duration": "4:39",
-    "audio": "https://audio.deepcast-ai.com/ep003.mp3",
+    "tags": ["脳とAIの境界線", "ニューラリンクが開く人間拡張の未来"],
+    "duration": "2:30",
+    "audio": "episodes/ep003.mp3",
     "article": "episodes/ep003.html",
     "language": "ja",
     "tier": "pro"
@@ -130,15 +106,12 @@
   {
     "id": 2,
     "title": "量子コンピュータが暗号を破る日 — いつ来るのか、どう備えるか",
-    "description": "皆さん、こんにちは！「テクノロジー最前線」へようこそ。パーソナリティの[あなたの名前/番組名]です。  今日のテーマは、私たちのデジタル生活の根幹を揺るがすかもしれない、しかし同時に新たな可能性も秘めた非常に重要な話題です。それは、「量子コンピュータが暗号を破る日 — いつ来るの...",
+    "description": "量子コンピュータが暗号を破る日 — いつ来るのか、どう備えるか",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "量子コンピュータが暗号を破る日",
-      "いつ来るのか、どう備えるか"
-    ],
-    "duration": "3:58",
-    "audio": "https://audio.deepcast-ai.com/ep002.mp3",
+    "tags": ["量子コンピュータが暗号を破る日", "いつ来るのか、どう備えるか"],
+    "duration": "2:30",
+    "audio": "episodes/ep002.mp3",
     "article": "episodes/ep002.html",
     "language": "ja",
     "tier": "pro"
@@ -146,15 +119,12 @@
   {
     "id": 1,
     "title": "AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃",
-    "description": "皆さん、こんにちは。ポッドキャスト「未来の羅針盤」へようこそ。 本日は、学術界を根底から揺るがす、まさに喫緊のテーマを取り上げます。それは、「AIが書いた論文を見抜けない」という衝撃的な現実です。  かつてはSFの世界の話だった生成AIが、今や高度な学術論文さえも執筆する時代。し...",
+    "description": "AIが書いた論文を見抜けない — 学術界を揺るがす生成AIの衝撃",
     "date": "2026.03.27",
     "category": "tech",
-    "tags": [
-      "AIが書いた論文を見抜けない",
-      "学術界を揺るがす生成AIの衝撃"
-    ],
-    "duration": "12:49",
-    "audio": "",
+    "tags": ["AIが書いた論文を見抜けない", "学術界を揺るがす生成AIの衝撃"],
+    "duration": "2:30",
+    "audio": "episodes/ep001.mp3",
     "article": "episodes/ep001.html",
     "language": "ja",
     "tier": "pro"
