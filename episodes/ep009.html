@@ -3,45 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>#9 AIが医師を超える日 — 診断精度99%の衝撃と残る課題｜DeepCast AI</title>
-<meta name="description" content="AIが医師を超える日 — 診断精度99%の衝撃と残る課題">
-<link rel="stylesheet" href="/assets/css/style.css">
-<link rel="stylesheet" href="/css/style.css">
+<title>#9 孤独は1日15本の喫煙に匹敵する — 社会的つながりの生物学｜DeepCast AI</title>
+<meta name="description" content="2015年のブリガムヤング大学のメタ分析（308万人対象）によれば、社会的孤立は死亡リスクを29%上昇させ、これは1日15本の喫煙に匹敵する。孤独はストレスホルモンのコルチゾールを慢性的に上昇させ、免疫機能を低下させることが分子レベルで確認されている。">
+<link rel="canonical" href="https://deepcast-ai.com/episodes/ep009.html">
+<link rel="stylesheet" href="/css/style.css?v=20260327">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+.article-page { max-width: 720px; margin: 0 auto; padding: 80px 24px 60px; }
+.article-back { display: inline-block; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.article-back:hover { color: var(--text); }
+.article-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); }
+.article-title { font-family: var(--serif); font-size: 24px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; letter-spacing: -0.01em; }
+.article-player { background: var(--bg-card); border-radius: 8px; padding: 16px; margin-bottom: 32px; }
+.article-player audio { width: 100%; }
+
+.article-summary { background: var(--bg-alt); border-left: 3px solid var(--text); padding: 20px 24px; margin-bottom: 32px; border-radius: 0 8px 8px 0; }
+.article-summary h2 { font-size: 14px; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.04em; color: var(--text-muted); }
+.article-summary p { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+
+.article-body h2 { font-family: var(--serif); font-size: 18px; font-weight: 600; margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.article-body p { font-size: 15px; line-height: 1.9; margin-bottom: 16px; color: var(--text); }
+
+.article-deep { background: var(--bg-card); border-radius: 8px; padding: 24px; margin-top: 40px; }
+.article-deep h2 { font-family: var(--serif); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text); border: none; padding: 0; }
+.article-deep p { font-size: 14px; line-height: 1.8; margin-bottom: 12px; color: var(--text-secondary); }
+.article-deep p strong { color: var(--text-muted); font-size: 12px; }
+
+.article-nav { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+.article-nav a { font-size: 13px; color: var(--text-muted); }
+.article-nav a:hover { color: var(--text); }
+</style>
 </head>
 <body>
-<header class="site-header">
-  <nav class="nav">
-    <a href="/" class="nav__logo">DeepCast AI</a>
-    <div class="nav__links">
-      <a href="/all-episodes.html" class="nav__link">全エピソード</a>
-      <a href="/pages/pricing.html" class="nav__link">料金</a>
+<nav class="navbar scrolled" id="navbar">
+  <div class="container nav-container">
+    <a href="/" class="logo">
+      <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/#episodes">エピソード</a></li>
+      <li><a href="/all-episodes.html">全エピソード</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/all-episodes.html" class="btn btn-primary btn-sm">エピソードを聴く</a>
     </div>
-  </nav>
-</header>
-<main class="episode-page">
-  <article class="episode-detail">
-    <div class="episode-detail__header">
-      <span class="episode-detail__number">#9</span>
-      <h1 class="episode-detail__title">AIが医師を超える日 — 診断精度99%の衝撃と残る課題</h1>
-      <time class="episode-detail__date">2026-03-27</time>
+    <button class="hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="article-page">
+  <a href="/all-episodes.html" class="article-back">&larr; 全エピソード一覧</a>
+
+  <div class="article-meta">
+    <span>#9</span>
+    <span>2026.03.27</span>
+    <span>2:30</span>
+  </div>
+  <h1 class="article-title">孤独は1日15本の喫煙に匹敵する — 社会的つながりの生物学</h1>
+
+  <div class="article-player">
+    <audio controls preload="metadata">
+      <source src="/episodes/ep009.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="article-summary">
+    <h2>SUMMARY</h2>
+    <p>2015年のブリガムヤング大学のメタ分析（308万人対象）によれば、社会的孤立は死亡リスクを29%上昇させ、これは1日15本の喫煙に匹敵する。孤独はストレスホルモンのコルチゾールを慢性的に上昇させ、免疫機能を低下させることが分子レベルで確認されている。</p>
+  </div>
+
+  <div class="article-body">
+    <h2>308万人のデータが示す衝撃の事実</h2>
+<p>2015年、ブリガムヤング大学のジュリアン・ホルト＝ランスタッド教授は、148の研究・308万人のデータを統合したメタ分析を発表しました。結論は明確でした。社会的に孤立した人の死亡リスクは29%高い。これは1日15本の喫煙、アルコール依存症、運動不足よりも大きなリスクです。</p>
+<p>孤独は「気の持ちよう」ではなく、測定可能な健康リスクなのです。</p>
+
+<h2>孤独が体を蝕むメカニズム</h2>
+<p>UCLAのスティーブ・コール教授の研究が、そのメカニズムを分子レベルで解明しました。孤独を感じている人の白血球では、炎症に関わる遺伝子が活性化し、ウイルスへの防御に関わる遺伝子が抑制されている。</p>
+<p>つまり孤独な状態では、体は「細菌との戦い」モードに入り、ウイルスへの抵抗力が下がる。進化的には、孤立した個体は肉体的な傷（＝細菌感染リスク）を受けやすいため、免疫システムがそちらにシフトすると考えられています。</p>
+<p>さらに、孤独はストレスホルモンであるコルチゾールを慢性的に上昇させます。コルチゾールの持続的な高値は、高血圧、糖尿病、認知機能の低下につながります。</p>
+
+<h2>「つながりの質」が鍵</h2>
+<p>重要なのは、友人の「数」ではなく「質」です。ダンバー数（150人）で知られるロビン・ダンバー教授の研究では、本当に困った時に頼れる「親密圏」は平均5人程度。この5人との関係の深さが、健康への影響を左右します。</p>
+<p>週に1回、誰かと「意味のある会話」を30分するだけで、孤独感が有意に低下するという研究もあります。大切なのは、SNSの「いいね」の数ではなく、目の前の人との深い対話なのです。</p>
+  </div>
+
+  <div class="article-deep">
+    <h2>さらに深く — デジタル時代の「孤独のパラドックス」</h2>
+<p>SNSで常に「つながって」いるはずの現代人が、なぜ史上最も孤独なのか。ペンシルベニア大学の2018年の実験では、SNS利用を1日30分に制限したグループは、制限なしのグループに比べて孤独感と抑うつが有意に減少しました。</p>
+<p>心理学者のシェリー・タークルは「一人でいる能力（capacity for solitude）」の重要性を指摘しています。常にスマホでつながっていると、一人の時間に耐えられなくなる。しかしパラドキシカルに、一人でいられない人は、他者との深いつながりも築けないのです。</p>
+<p>日本の厚労省は2021年に「孤独・孤立対策担当大臣」を設置しました。英国に次いで世界で2番目です。孤独は個人の問題ではなく、公衆衛生上の危機として認識され始めています。</p>
+<p><strong>参考文献:</strong> Holt-Lunstad et al. (2015) "Loneliness and Social Isolation as Risk Factors for Mortality", Perspectives on Psychological Science / Cole et al. (2007) "Social regulation of gene expression in human leukocytes", Genome Biology</p>
+  </div>
+
+  <div class="article-nav">
+    <a href="episodes/ep008.html">&larr; 前のエピソード</a>
+    <a href="episodes/ep010.html">次のエピソード &rarr;</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
     </div>
-    <div class="episode-detail__player">
-      <p>音声は準備中です。</p>
-    </div>
-    <div class="article-body">
-      <p>AIが医師を超える日 — 診断精度99%の衝撃と残る課題</p>
-    </div>
-  </article>
-</main>
-<footer class="site-footer">
-  <p>&copy; 2026 DeepCast AI</p>
-  <nav>
-    <a href="/pages/terms.html">利用規約</a>
-    <a href="/pages/privacy.html">プライバシーポリシー</a>
-    <a href="/pages/tokushoho.html">特商法</a>
-    <a href="/pages/contact.html">お問い合わせ</a>
-  </nav>
+  </div>
 </footer>
+
+<script src="/js/main.js?v=20260327"></script>
 <script src="/assets/js/auth.js?v=20260327"></script>
 </body>
 </html>

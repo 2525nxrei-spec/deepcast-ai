@@ -3,45 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>#7 ディープフェイクが変える情報戦 — 真実を見極める時代の終わり｜DeepCast AI</title>
-<meta name="description" content="ディープフェイクが変える情報戦 — 真実を見極める時代の終わり">
-<link rel="stylesheet" href="/assets/css/style.css">
-<link rel="stylesheet" href="/css/style.css">
+<title>#7 音楽が脳を書き換える — モーツァルト効果の真実と嘘｜DeepCast AI</title>
+<meta name="description" content="1993年のRauscherらの論文が「モーツァルトを聴くとIQが上がる」という都市伝説を生んだ。しかし実際の効果は空間推論能力の一時的向上のみで、15分で消える。一方、楽器演奏が脳の構造そのものを変えることは複数の研究で確認されている。">
+<link rel="canonical" href="https://deepcast-ai.com/episodes/ep007.html">
+<link rel="stylesheet" href="/css/style.css?v=20260327">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+.article-page { max-width: 720px; margin: 0 auto; padding: 80px 24px 60px; }
+.article-back { display: inline-block; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.article-back:hover { color: var(--text); }
+.article-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); }
+.article-title { font-family: var(--serif); font-size: 24px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; letter-spacing: -0.01em; }
+.article-player { background: var(--bg-card); border-radius: 8px; padding: 16px; margin-bottom: 32px; }
+.article-player audio { width: 100%; }
+
+.article-summary { background: var(--bg-alt); border-left: 3px solid var(--text); padding: 20px 24px; margin-bottom: 32px; border-radius: 0 8px 8px 0; }
+.article-summary h2 { font-size: 14px; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.04em; color: var(--text-muted); }
+.article-summary p { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+
+.article-body h2 { font-family: var(--serif); font-size: 18px; font-weight: 600; margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.article-body p { font-size: 15px; line-height: 1.9; margin-bottom: 16px; color: var(--text); }
+
+.article-deep { background: var(--bg-card); border-radius: 8px; padding: 24px; margin-top: 40px; }
+.article-deep h2 { font-family: var(--serif); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text); border: none; padding: 0; }
+.article-deep p { font-size: 14px; line-height: 1.8; margin-bottom: 12px; color: var(--text-secondary); }
+.article-deep p strong { color: var(--text-muted); font-size: 12px; }
+
+.article-nav { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+.article-nav a { font-size: 13px; color: var(--text-muted); }
+.article-nav a:hover { color: var(--text); }
+</style>
 </head>
 <body>
-<header class="site-header">
-  <nav class="nav">
-    <a href="/" class="nav__logo">DeepCast AI</a>
-    <div class="nav__links">
-      <a href="/all-episodes.html" class="nav__link">全エピソード</a>
-      <a href="/pages/pricing.html" class="nav__link">料金</a>
+<nav class="navbar scrolled" id="navbar">
+  <div class="container nav-container">
+    <a href="/" class="logo">
+      <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/#episodes">エピソード</a></li>
+      <li><a href="/all-episodes.html">全エピソード</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/all-episodes.html" class="btn btn-primary btn-sm">エピソードを聴く</a>
     </div>
-  </nav>
-</header>
-<main class="episode-page">
-  <article class="episode-detail">
-    <div class="episode-detail__header">
-      <span class="episode-detail__number">#7</span>
-      <h1 class="episode-detail__title">ディープフェイクが変える情報戦 — 真実を見極める時代の終わり</h1>
-      <time class="episode-detail__date">2026-03-27</time>
+    <button class="hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="article-page">
+  <a href="/all-episodes.html" class="article-back">&larr; 全エピソード一覧</a>
+
+  <div class="article-meta">
+    <span>#7</span>
+    <span>2026.03.27</span>
+    <span>2:30</span>
+  </div>
+  <h1 class="article-title">音楽が脳を書き換える — モーツァルト効果の真実と嘘</h1>
+
+  <div class="article-player">
+    <audio controls preload="metadata">
+      <source src="/episodes/ep007.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="article-summary">
+    <h2>SUMMARY</h2>
+    <p>1993年のRauscherらの論文が「モーツァルトを聴くとIQが上がる」という都市伝説を生んだ。しかし実際の効果は空間推論能力の一時的向上のみで、15分で消える。一方、楽器演奏が脳の構造そのものを変えることは複数の研究で確認されている。</p>
+  </div>
+
+  <div class="article-body">
+    <h2>モーツァルト効果の真相</h2>
+<p>1993年、カリフォルニア大学のフランシス・ラウシャーらが『Nature』に短い論文を発表しました。モーツァルトのソナタを10分聴いた後、空間推論テストの成績が一時的に向上したというものです。</p>
+<p>メディアはこれを「モーツァルトを聴くとIQが上がる！」と報じ、ジョージア州知事は新生児にクラシックCDを配る政策まで実施しました。しかし実際には、効果は空間推論のみで、15分程度で消えてしまうものでした。</p>
+
+<h2>本当に脳を変えるのは「聴く」より「弾く」</h2>
+<p>ノースウエスタン大学のニーナ・クラウス教授の研究チームは、もっと説得力のある発見をしています。楽器を継続的に演奏する人は、聴覚皮質が厚くなり、脳梁（左右の脳をつなぐ神経線維の束）が太くなるのです。</p>
+<p>これは「聴く」ではなく「演奏する」ことで起きる変化です。楽器演奏は、視覚・聴覚・運動・記憶を同時に使う、脳にとって最高レベルの全身運動。神経科学者のアニタ・コリンズは「楽器演奏は脳の筋トレ」と表現しています。</p>
+
+<h2>音楽の科学的に正しい活用法</h2>
+<p>集中したい時は歌詞のないインストゥルメンタル。テンポは60〜70BPMが最適で、これは安静時の心拍数に近い値です。</p>
+<p>運動時はテンポ120〜140BPMの曲が効果的。ブルネル大学のコスタス・カラゲオルギス教授の研究では、テンポの速い音楽がランニングの持久力を最大15%向上させることが確認されています。</p>
+  </div>
+
+  <div class="article-deep">
+    <h2>さらに深く — 音楽療法の最前線</h2>
+<p>音楽が脳に与える影響は、エンターテインメントを超えて医療の領域に入っています。アルツハイマー病の患者が、若い頃に好きだった曲を聴くと一時的に記憶が蘇るという現象は、長期記憶が手続き記憶として音楽と結びついているためです。</p>
+<p>2017年のコクランレビュー（医療エビデンスの最高水準の分析）では、音楽療法がうつ病の症状を有意に改善することが確認されました。効果サイズは中程度で、一部の抗うつ薬と同等とする研究者もいます。</p>
+<p>パーキンソン病のリハビリでは、リズムに合わせて歩行訓練を行う「リズミック聴覚刺激（RAS）」が標準的な理学療法より歩行改善に効果的だという研究結果が複数出ています。</p>
+<p><strong>参考文献:</strong> Rauscher et al. (1993) "Music and spatial task performance", Nature / Kraus & Chandrasekaran (2010) "Music training for the development of auditory skills", Nature Reviews Neuroscience</p>
+  </div>
+
+  <div class="article-nav">
+    <a href="episodes/ep006.html">&larr; 前のエピソード</a>
+    <a href="episodes/ep008.html">次のエピソード &rarr;</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
     </div>
-    <div class="episode-detail__player">
-      <audio controls preload="metadata" style="width:100%;"><source src="https://audio.deepcast-ai.com/ep007.mp3" type="audio/mpeg"></audio>
-    </div>
-    <div class="article-body">
-      <p>ディープフェイクが変える情報戦 — 真実を見極める時代の終わり</p>
-    </div>
-  </article>
-</main>
-<footer class="site-footer">
-  <p>&copy; 2026 DeepCast AI</p>
-  <nav>
-    <a href="/pages/terms.html">利用規約</a>
-    <a href="/pages/privacy.html">プライバシーポリシー</a>
-    <a href="/pages/tokushoho.html">特商法</a>
-    <a href="/pages/contact.html">お問い合わせ</a>
-  </nav>
+  </div>
 </footer>
+
+<script src="/js/main.js?v=20260327"></script>
 <script src="/assets/js/auth.js?v=20260327"></script>
 </body>
 </html>
