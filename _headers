@@ -1,2 +1,6 @@
 https://deepcast-ai.pages.dev/*
   X-Robots-Tag: noindex
+
+/episodes/*.mp3
+  X-Robots-Tag: noindex
+  ! Access-Control-Allow-Origin

@@ -48,3 +48,6 @@ CLAUDE.md
 
 # Audio backup
 音声ファイル/
+
+# Episode mp3 files (served via R2/API only)
+episodes/*.mp3
