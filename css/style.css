@@ -932,6 +932,22 @@ button:disabled,
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     padding: 16px 24px; gap: 12px;
   }
+  /* モバイルメニュー展開時にログインボタン等を表示 */
+  .nav-links.active ~ .nav-actions,
+  .nav-actions.active {
+    display: flex; flex-direction: column; align-items: stretch;
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    padding: 0 24px 16px; gap: 8px;
+    transform: none;
+  }
+  .nav-actions.active .lang-switch {
+    position: static; transform: none;
+  }
+  .nav-actions.active .btn {
+    width: 100%; text-align: center;
+  }
   .hero { min-height: auto; padding: 100px 24px 60px; }
   .hero::before {
     background:

@@ -25,6 +25,33 @@
     return src.split('/').pop().split('?')[0];
   }
 
+  // 認証付き音声URL取得（API経由のPro音声対応）
+  // /api/audio/xxx 形式のURLならJWT付きfetchでBlob URLを作成
+  function resolveAudioSrc(src) {
+    if (!src) return Promise.resolve('');
+    // API経由のURLかチェック
+    if (src.indexOf('/api/audio/') === -1) {
+      return Promise.resolve(src);
+    }
+    // JWTトークンを取得
+    var token = (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.getToken) ? DEEPCAST_AUTH.getToken() : null;
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    return fetch(src, { headers: headers })
+      .then(function(res) {
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            throw new Error('PRO_REQUIRED');
+          }
+          throw new Error('AUDIO_FETCH_FAILED');
+        }
+        return res.blob();
+      })
+      .then(function(blob) {
+        return URL.createObjectURL(blob);
+      });
+  }
+
   function getMiniEl(id) {
     return document.getElementById(id);
   }
@@ -153,13 +180,20 @@
     // 即時フィードバック: ローディング状態を表示
     item.btn.classList.add('playing');
     showLoading(item.btn);
-    audioEl.src = src;
-    audioEl.play().catch(function() {
+    // 認証付き音声取得（API経由の場合Blob URLに変換）
+    resolveAudioSrc(src).then(function(resolvedUrl) {
+      audioEl.src = resolvedUrl;
+      return audioEl.play();
+    }).catch(function(err) {
       var card = item.btn.closest('.episode-card');
       if (card) {
         var timeEl = card.querySelector('.progress-time');
         if (timeEl) {
-          timeEl.innerHTML = '<span class="player-error-msg">エピソードの読み込みに失敗しました。ページを再読み込みしてください。</span>';
+          if (err && err.message === 'PRO_REQUIRED') {
+            timeEl.innerHTML = '<span class="player-error-msg">このエピソードはProプラン限定です。</span>';
+          } else {
+            timeEl.innerHTML = '<span class="player-error-msg">エピソードの読み込みに失敗しました。ページを再読み込みしてください。</span>';
+          }
         }
       }
       item.btn.classList.remove('loading');
@@ -221,11 +255,18 @@
       btn.classList.add('playing');
       showLoading(btn);
       btn.setAttribute('aria-label', '読み込み中: ' + title);
-      audioEl.src = resolvedSrc;
-      // play()をクリック直後に呼ぶ（ユーザージェスチャーコンテキスト内で実行）
-      audioEl.play().catch(function(err) {
+      // 認証付き音声取得（API経由の場合Blob URLに変換）
+      resolveAudioSrc(resolvedSrc).then(function(blobUrl) {
+        audioEl.src = blobUrl;
+        // play()をクリック直後に呼ぶ（ユーザージェスチャーコンテキスト内で実行）
+        return audioEl.play();
+      }).catch(function(err) {
         if (timeEl) {
-          timeEl.innerHTML = '<span class="player-error-msg">エピソードの読み込みに失敗しました。ページを再読み込みしてください。</span>';
+          if (err && err.message === 'PRO_REQUIRED') {
+            timeEl.innerHTML = '<span class="player-error-msg">このエピソードはProプラン限定です。</span>';
+          } else {
+            timeEl.innerHTML = '<span class="player-error-msg">エピソードの読み込みに失敗しました。ページを再読み込みしてください。</span>';
+          }
         }
         btn.classList.remove('loading', 'playing');
         btn.setAttribute('aria-label', '再生: ' + title);

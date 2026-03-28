@@ -10,7 +10,7 @@
       "意思決定"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep010.mp3",
+    "audioId": "ep010",
     "article": "episodes/ep010.html",
     "language": "ja",
     "tier": "pro"
@@ -26,7 +26,7 @@
       "健康科学"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep009.mp3",
+    "audioId": "ep009",
     "article": "episodes/ep009.html",
     "language": "ja",
     "tier": "pro"
@@ -42,7 +42,7 @@
       "認知科学"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep008.mp3",
+    "audioId": "ep008",
     "article": "episodes/ep008.html",
     "language": "ja",
     "tier": "pro"
@@ -58,7 +58,7 @@
       "脳科学"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep007.mp3",
+    "audioId": "ep007",
     "article": "episodes/ep007.html",
     "language": "ja",
     "tier": "pro"
@@ -74,7 +74,7 @@
       "意思決定"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep006.mp3",
+    "audioId": "ep006",
     "article": "episodes/ep006.html",
     "language": "ja",
     "tier": "pro"
@@ -90,7 +90,7 @@
       "サーキュラーエコノミー"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep005.mp3",
+    "audioId": "ep005",
     "article": "episodes/ep005.html",
     "language": "ja",
     "tier": "pro"
@@ -106,7 +106,7 @@
       "損失回避"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep004.mp3",
+    "audioId": "ep004",
     "article": "episodes/ep004.html",
     "language": "ja",
     "tier": "pro"
@@ -122,7 +122,7 @@
       "創造性"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep003.mp3",
+    "audioId": "ep003",
     "article": "episodes/ep003.html",
     "language": "ja",
     "tier": "free"
@@ -138,7 +138,7 @@
       "世界史"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep002.mp3",
+    "audioId": "ep002",
     "article": "episodes/ep002.html",
     "language": "ja",
     "tier": "free"
@@ -154,7 +154,7 @@
       "第一印象"
     ],
     "duration": "3:00",
-    "audio": "https://audio.deepcast-ai.com/episodes/ep001.mp3",
+    "audioId": "ep001",
     "article": "episodes/ep001.html",
     "language": "ja",
     "tier": "free"

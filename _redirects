@@ -1,1 +1,4 @@
 https://deepcast-ai.pages.dev/* https://deepcast-ai.com/:splat 301
+
+# Block direct mp3 access (must go through API)
+/episodes/*.mp3  /404  404
