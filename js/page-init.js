@@ -180,7 +180,8 @@
 
     // Pro判定: DEEPCAST_AUTHが読み込まれていればisPro()を使い、なければfalse
     var userIsPro = (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isPro());
-    var isLocked = !userIsPro && (typeof episodeIndex === 'number') && episodeIndex >= 3;
+    // episodes.jsonのtierフィールドに基づいてロック判定（tier === 'pro' かつユーザーがPro未加入ならロック）
+    var isLocked = !userIsPro && ep.tier === 'pro';
     var lockedClass = isLocked ? ' locked' : '';
     var lockedAttr = isLocked ? ' data-locked="true"' : '';
     var proBadge = isLocked ? '<span class="episode-badge pro-badge">Pro</span>' : '';
@@ -455,9 +456,9 @@
       })
       .catch(function() {
         var fallback = [
-          { id: 3, title: "GPT-5 vs Gemini 2.5：次世代AIの覇権争い", description: "OpenAIとGoogleの最新モデル比較。", date: "2026.03.02", category: "tech", tags: ["AI", "テクノロジー"], duration: "5:12", free: true, audio: "" },
-          { id: 2, title: "スタートアップ資金調達の新常識 2026", description: "VC市場の変化、AIスタートアップへの投資トレンド。", date: "2026.03.01", category: "business", tags: ["ビジネス"], duration: "4:58", free: true, audio: "" },
-          { id: 1, title: "量子コンピュータの実用化が見えてきた", description: "IBMとGoogleの量子超越性競争。実用化のユースケース。", date: "2026.02.28", category: "science", tags: ["サイエンス"], duration: "5:31", free: false, audio: "" }
+          { id: 3, title: "GPT-5 vs Gemini 2.5：次世代AIの覇権争い", description: "OpenAIとGoogleの最新モデル比較。", date: "2026.03.02", category: "tech", tags: ["AI", "テクノロジー"], duration: "5:12", tier: "free", audio: "" },
+          { id: 2, title: "スタートアップ資金調達の新常識 2026", description: "VC市場の変化、AIスタートアップへの投資トレンド。", date: "2026.03.01", category: "business", tags: ["ビジネス"], duration: "4:58", tier: "free", audio: "" },
+          { id: 1, title: "量子コンピュータの実用化が見えてきた", description: "IBMとGoogleの量子超越性競争。実用化のユースケース。", date: "2026.02.28", category: "science", tags: ["サイエンス"], duration: "5:31", tier: "pro", audio: "" }
         ];
         episodeList.innerHTML = fallback.map(function(ep, idx) { return renderEpisode(ep, idx); }).join('');
         episodeList.querySelectorAll('.play-btn').forEach(function(btn) {
