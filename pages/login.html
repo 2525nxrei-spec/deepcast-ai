@@ -234,11 +234,11 @@
   <script src="../assets/js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // 既にログイン済みならリダイレクト
+      // 既にログイン済みならリダイレクト（ただしフォーム初期化はスキップしない）
       if (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isLoggedIn()) {
         var returnUrl = new URLSearchParams(window.location.search).get('return');
         window.location.href = returnUrl || '../';
-        return;
+        // returnせず、フォームハンドラも設定する（リダイレクト失敗時に操作可能にする）
       }
 
       var loginForm = document.getElementById('login-form');
@@ -295,6 +295,10 @@
         });
         loginError.style.display = 'none';
       }
+
+      // ページ読み込み時にボタンを確実に有効化（ブラウザの状態復元対策）
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtn.classList.remove('btn-loading');
 
       tabLogin.addEventListener('click', function() { setMode('login'); });
       tabRegister.addEventListener('click', function() { setMode('register'); });

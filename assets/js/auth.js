@@ -57,9 +57,17 @@ const DEEPCAST_AUTH = (() => {
 
     let response;
     try {
+      // 15秒タイムアウト（ボタンが永久にスタックするのを防止）
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      options.signal = controller.signal;
       response = await fetch(`${API_BASE}${endpoint}`, options);
+      clearTimeout(timeoutId);
     } catch (err) {
       console.error('[DEEPCAST_AUTH] ネットワークエラー:', err);
+      if (err.name === 'AbortError') {
+        throw new Error('サーバーからの応答がありません。しばらく時間をおいて再度お試しください。');
+      }
       throw new Error('インターネット接続を確認してください。接続に問題がない場合は、しばらく時間をおいて再度お試しください。');
     }
 
@@ -307,8 +315,11 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('deepcast_token');
         localStorage.removeItem('deepcast_user');
         localStorage.removeItem(LAST_KEY);
-        alert('長時間操作がなかったため、セキュリティのためログアウトしました。');
-        window.location.href = '/pages/login.html';
+        // ログインページ自身にいる場合はリダイレクトしない（ループ防止）
+        if (window.location.pathname !== '/pages/login.html') {
+          alert('長時間操作がなかったため、セキュリティのためログアウトしました。');
+          window.location.href = '/pages/login.html';
+        }
       }
     }
     if (DEEPCAST_AUTH.isLoggedIn()) {
