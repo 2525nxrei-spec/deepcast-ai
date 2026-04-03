@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'pro')),
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,
+  cancel_at_period_end INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

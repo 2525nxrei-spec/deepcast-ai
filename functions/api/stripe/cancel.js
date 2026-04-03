@@ -10,13 +10,10 @@ import { stripeRequest } from '../../lib/stripe.js';
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  // 環境変数チェック（502 Bad Gateway防止）
+  // 環境変数チェック
   if (!env.STRIPE_SECRET_KEY) {
-    return jsonResponse({
-      canceled: true,
-      mock: true,
-      message: 'モックモード: 解約処理が完了しました',
-    });
+    console.error('STRIPE_SECRET_KEY が設定されていません');
+    return errorResponse('決済システムの設定エラーが発生しました。管理者にお問い合わせください。', 500);
   }
 
   let user;
@@ -36,7 +33,7 @@ export async function onRequestPost(context) {
     // DBにない場合はStripe APIから取得
     if (!subscriptionId) {
       const subsData = await stripeRequest(
-        `subscriptions?customer=${user.stripe_customer_id}&status=active&limit=1`,
+        `subscriptions?customer=${encodeURIComponent(user.stripe_customer_id)}&status=active&limit=1`,
         'GET',
         null,
         env.STRIPE_SECRET_KEY

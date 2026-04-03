@@ -14,7 +14,8 @@ export async function onRequestPost(context) {
     const { email, password, display_name } = body;
 
     if (!email || !password) return errorResponse('メールアドレスとパスワードは必須です');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errorResponse('メールアドレスの形式が正しくありません');
+    // メールバリデーション: ローカル部64文字以内、ドメイン部にドット含む、全体254文字以内
+    if (email.length > 254 || !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(email)) return errorResponse('メールアドレスの形式が正しくありません');
     if (password.length < 8) return errorResponse('パスワードは8文字以上で設定してください');
     if (display_name && display_name.length > 50) return errorResponse('表示名は50文字以内にしてください');
 

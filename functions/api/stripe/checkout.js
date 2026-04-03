@@ -28,7 +28,10 @@ export async function onRequestPost(context) {
 
   try {
     const priceId = env.STRIPE_PRICE_PRO;
-    if (!priceId) return errorResponse('Price IDが設定されていません', 500);
+    if (!priceId) {
+      console.error('Checkout: STRIPE_PRICE_PROが未設定。Cloudflareダッシュボードで環境変数を設定してください。');
+      return errorResponse('決済サービスの設定が不完全です。管理者にお問い合わせください。', 500);
+    }
 
     // Stripe顧客の確認/作成（初回のみ）
     let stripeCustomerId = user.stripe_customer_id;
@@ -45,22 +48,21 @@ export async function onRequestPost(context) {
         .run();
     }
 
-    // Embedded Checkout: ページ内埋め込み決済（リダイレクトなし）
+    // リダイレクト型 Stripe Checkout
     const frontendUrl = env.FRONTEND_URL || 'https://deepcast-ai.com';
     const session = await stripeRequest('checkout/sessions', 'POST', {
       mode: 'subscription',
-      ui_mode: 'embedded',
       customer: stripeCustomerId,
       locale: 'ja',
-      'line_items[0][price]': priceId,
-      'line_items[0][quantity]': '1',
-      return_url: `${frontendUrl}/pages/account.html?session_id={CHECKOUT_SESSION_ID}`,
+      line_items: [{ price: priceId, quantity: '1' }],
+      success_url: `${frontendUrl}/pages/account.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${frontendUrl}/pages/account.html?payment=cancel`,
       metadata: { user_id: user.id },
       subscription_data: { metadata: { user_id: user.id } },
     }, env.STRIPE_SECRET_KEY);
 
     console.log(`Checkout作成: session=${session.id}, user=${user.id}`);
-    return jsonResponse({ clientSecret: session.client_secret });
+    return jsonResponse({ url: session.url });
   } catch (err) {
     console.error('Checkoutエラー:', err.message);
     return errorResponse('決済セッションの作成に失敗しました', 500);

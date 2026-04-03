@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepcast-v20';
+const CACHE_NAME = 'deepcast-v23';
 const ASSETS = [
   '/',
   '/css/style.css',
@@ -19,7 +19,8 @@ const ASSETS = [
   '/copyright.html',
   '/assets/icon.svg',
   '/assets/cover-podcast.svg',
-  '/assets/og-image.png'
+  '/assets/og-image.png',
+  '/assets/js/auth.js'
 ];
 
 // Install: cache shell assets
@@ -52,6 +53,12 @@ self.addEventListener('fetch', (e) => {
 
   // Skip audio files — let browser handle Range Requests natively
   if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav')) return;
+
+  // APIリクエストはキャッシュ対象外 → 常にネットワークリクエストを返す
+  if (url.pathname.startsWith('/api/')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
 
   e.respondWith(
     fetch(e.request)

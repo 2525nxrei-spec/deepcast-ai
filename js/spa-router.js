@@ -12,6 +12,11 @@
   // SPA対象外のファイル拡張子
   var NON_SPA_EXT = ['.mp3', '.wav', '.ogg', '.mp4', '.pdf', '.zip', '.xml', '.json', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'];
 
+  // SPA対象外のパス（独自スクリプトを持つ独立ページ）
+  // pages/ 配下: login, pricing, account — nav.navbar構造を持たず、
+  // auth.js / Stripe.js 等の独自スクリプトが必要なため通常遷移させる
+  var NON_SPA_PATHS = ['/pages/'];
+
   function isSPALink(anchor) {
     try {
       var url = new URL(anchor.href, location.origin);
@@ -20,6 +25,10 @@
     if (anchor.target && anchor.target !== '_self') return false;
     if (anchor.hasAttribute('download')) return false;
     var pathname = new URL(anchor.href, location.origin).pathname;
+    // pages/ 配下は独自スクリプトを持つ独立ページのため SPA 対象外
+    for (var i = 0; i < NON_SPA_PATHS.length; i++) {
+      if (pathname.indexOf(NON_SPA_PATHS[i]) !== -1) return false;
+    }
     for (var i = 0; i < NON_SPA_EXT.length; i++) {
       if (pathname.toLowerCase().endsWith(NON_SPA_EXT[i])) return false;
     }

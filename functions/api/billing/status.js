@@ -10,7 +10,13 @@ import { stripeRequest } from '../../lib/stripe.js';
 export async function onRequestGet(context) {
   const { request, env } = context;
 
-  const user = await authenticateUser(request, env);
+  let user;
+  try {
+    user = await authenticateUser(request, env);
+  } catch (err) {
+    console.error('billing/status 認証エラー:', err.message);
+    return errorResponse('認証処理でエラーが発生しました', 500);
+  }
   if (!user) return errorResponse('認証が必要です', 401);
 
   const status = {

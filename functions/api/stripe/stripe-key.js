@@ -5,12 +5,17 @@
 import { errorResponse, jsonResponse } from '../../lib/response.js';
 
 export async function onRequestGet(context) {
-  const { env } = context;
+  try {
+    const { env } = context;
 
-  const publishableKey = env.STRIPE_PUBLISHABLE_KEY || '';
-  if (!publishableKey) {
-    return errorResponse('Stripe公開鍵が設定されていません', 500);
+    // 空文字の場合もnullとして扱う（wrangler.tomlで空文字定義された場合の対策）
+    const publishableKey = env.STRIPE_PUBLISHABLE_KEY && env.STRIPE_PUBLISHABLE_KEY.trim() !== ''
+      ? env.STRIPE_PUBLISHABLE_KEY
+      : null;
+
+    return jsonResponse({ publishableKey });
+  } catch (err) {
+    console.error('stripe-key エラー:', err);
+    return errorResponse('サーバー内部エラーが発生しました', 500);
   }
-
-  return jsonResponse({ publishableKey });
 }

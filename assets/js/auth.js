@@ -4,6 +4,8 @@
  */
 
 const DEEPCAST_AUTH = (() => {
+  // 空文字 = 同一オリ���ン（Cloudflare Pages Functions）への相対パスリクエスト
+  // 本番: deepcast-ai.com/api/... / ローカル: localhost:8788/api/...
   const API_BASE = '';
   const TOKEN_KEY = 'deepcast_token';
   const USER_KEY = 'deepcast_user';
@@ -37,7 +39,24 @@ const DEEPCAST_AUTH = (() => {
   }
 
   function isLoggedIn() {
-    return !!getToken();
+    const token = getToken();
+    if (!token) return false;
+
+    // JWTのexp（有効期限）を検証
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        // 期限切れ → トークンを削除してfalseを返す
+        removeToken();
+        return false;
+      }
+    } catch {
+      // デコード失敗 → 不正なトークンとして削除
+      removeToken();
+      return false;
+    }
+
+    return true;
   }
 
   function isPro() {
@@ -92,7 +111,9 @@ const DEEPCAST_AUTH = (() => {
     }
 
     if (response.status >= 500) {
-      throw new Error('サーバーに一時的な問題が発生しています。しばらく時間をおいて再度お試しください。');
+      const serverMsg = data && data.error ? data.error : '';
+      console.error('[DEEPCAST_AUTH] サーバーエラー:', response.status, serverMsg);
+      throw new Error(serverMsg || 'サーバーに一時的な問題が発生しています。しばらく時間をおいて再度お試しください。');
     }
 
     if (!response.ok || data.ok === false) {
@@ -123,6 +144,9 @@ const DEEPCAST_AUTH = (() => {
 
   function logout() {
     if (!confirm('ログアウトしますか？')) return;
+    // ステートレスJWT方式のため、クライアント側のトークン削除で無効化
+    // サーバーサイドのトークン無効化リスト（ブラックリスト）は未実装
+    // httpOnly cookieは使用していないため、localStorage削除のみで十分
     removeToken();
     localStorage.removeItem('deepcast_last_activity');
     window.location.href = '/';
@@ -143,48 +167,11 @@ const DEEPCAST_AUTH = (() => {
 
   async function startCheckout() {
     const data = await apiRequest('/api/stripe/checkout', 'POST');
-    if (data.clientSecret) {
-      // Stripe公開鍵を取得
-      const keyRes = await fetch('/api/stripe/stripe-key');
-      const keyData = await keyRes.json();
-      if (!keyData.publishableKey) throw new Error('Stripe公開鍵が取得できませんでした');
-
-      // Stripe.js読み込み確認
-      if (typeof Stripe === 'undefined') throw new Error('Stripe.jsが読み込まれていません');
-      const stripe = Stripe(keyData.publishableKey);
-
-      // 既存モーダルがあれば削除
-      const existing = document.getElementById('deepcast-checkout-modal');
-      if (existing) existing.remove();
-
-      // モーダルを作成
-      const modal = document.createElement('div');
-      modal.id = 'deepcast-checkout-modal';
-      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;';
-      modal.innerHTML = '<div style="background:#fff;border-radius:8px;width:100%;max-width:500px;max-height:90vh;overflow:auto;position:relative;">' +
-        '<button id="deepcast-checkout-close" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;z-index:1;">&times;</button>' +
-        '<div id="deepcast-checkout-container" style="padding:16px;"></div>' +
-      '</div>';
-      document.body.appendChild(modal);
-
-      // 閉じるイベント
-      const closeModal = () => {
-        if (window._deepcast_embedded_checkout) {
-          window._deepcast_embedded_checkout.destroy();
-          window._deepcast_embedded_checkout = null;
-        }
-        modal.remove();
-      };
-      document.getElementById('deepcast-checkout-close').addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-      document.addEventListener('keydown', function checkoutEsc(e) {
-        if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', checkoutEsc); }
-      });
-
-      // Embedded Checkoutをマウント
-      const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
-      window._deepcast_embedded_checkout = checkout;
-      checkout.mount('#deepcast-checkout-container');
+    // リダイレクト型: サーバーから返されたStripe Checkout URLに遷移
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error('決済セッションの作成に失敗しました。しばらく時間をおいて再度お試しください。');
     }
   }
 
@@ -290,18 +277,25 @@ const DEEPCAST_AUTH = (() => {
     updateNavUI();
   }
 
+  // init()のPromiseを保持（他スクリプトがawaitで完了待ちできるように）
+  let _initPromise = null;
+
   return {
     getToken, getUser, isLoggedIn, isPro,
     register, login, logout, fetchMe,
     startCheckout, openPortal, getBillingStatus,
     canAccessEpisode, showUpgradeGate,
     updateNavUI, init,
+    /** init()完了を待つためのPromise。init()呼び出し後に利用可能 */
+    get ready() { return _initPromise || Promise.resolve(); },
+    _setInitPromise(p) { _initPromise = p; },
   };
 })();
 
 // ページロード時に自動初期化
 document.addEventListener('DOMContentLoaded', () => {
-  DEEPCAST_AUTH.init();
+  const p = DEEPCAST_AUTH.init();
+  DEEPCAST_AUTH._setInitPromise(p);
 
   // セッションタイムアウト（24時間操作なしでログアウト）
   // 全ページで動作するようauth.jsに配置

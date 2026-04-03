@@ -234,11 +234,16 @@
   <script src="../assets/js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // 既にログイン済みならリダイレクト（ただしフォーム初期化はスキップしない）
+      // 既にログイン済みならリダイレクト
       if (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isLoggedIn()) {
         var returnUrl = new URLSearchParams(window.location.search).get('return');
-        window.location.href = returnUrl || '../';
-        // returnせず、フォームハンドラも設定する（リダイレクト失敗時に操作可能にする）
+        // セキュリティ: 同一オリジンの相対パスのみ許可（オープンリダイレクト防止）
+        if (returnUrl && (/^\/[^\/\\]/.test(returnUrl) || returnUrl === '/')) {
+          window.location.href = returnUrl;
+        } else {
+          window.location.href = '../';
+        }
+        return; // リダイレクト後の後続コード実行を防止
       }
 
       var loginForm = document.getElementById('login-form');
@@ -337,7 +342,12 @@
           loginSubmitBtn.style.background = '#16a34a';
           await new Promise(function(r) { setTimeout(r, 600); });
           var returnUrl = new URLSearchParams(window.location.search).get('return');
-          window.location.href = returnUrl || '../';
+          // セキュリティ: 同一オリジンの相対パスのみ許可（オープンリダイレクト防止）
+          if (returnUrl && (/^\/[^\/\\]/.test(returnUrl) || returnUrl === '/')) {
+            window.location.href = returnUrl;
+          } else {
+            window.location.href = '../';
+          }
         } catch (err) {
           // エラーメッセージを親切に変換
           var msg = err.message || '';

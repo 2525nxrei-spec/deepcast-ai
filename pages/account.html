@@ -165,7 +165,7 @@
     </div>
   </nav>
 
-  <div class="account-page">
+  <div class="account-page" id="account-page-content" style="opacity:0;transition:opacity 0.2s ease;">
     <h1 class="account-title">アカウント</h1>
 
     <div class="account-card">
@@ -265,6 +265,11 @@
   <script src="../assets/js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
+      // auth.jsのinit()完了を待ってからログイン判定する
+      if (typeof DEEPCAST_AUTH !== 'undefined') {
+        await DEEPCAST_AUTH.ready;
+      }
+
       // 未ログインならリダイレクト
       if (typeof DEEPCAST_AUTH === 'undefined' || !DEEPCAST_AUTH.isLoggedIn()) {
         window.location.href = 'pricing.html';
@@ -286,6 +291,10 @@
           hamburger.classList.toggle('open');
         });
       }
+
+      // 認証完了後にページを表示（ちらつき防止）
+      var pageContent = document.getElementById('account-page-content');
+      if (pageContent) pageContent.style.opacity = '1';
 
       // ユーザー情報取得
       var user;

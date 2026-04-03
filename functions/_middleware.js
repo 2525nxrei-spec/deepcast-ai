@@ -103,8 +103,17 @@ export async function onRequest(context) {
   // 定期クリーンアップ
   if (Math.random() < 0.01) cleanupRateLimit();
 
-  // 次のハンドラを実行
-  const response = await context.next();
+  // 次のハンドラを実行（例外発生時もCORSヘッダーを付与）
+  let response;
+  try {
+    response = await context.next();
+  } catch (err) {
+    console.error('ハンドラ例外:', err);
+    response = new Response(JSON.stringify({ ok: false, error: 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    });
+  }
 
   // Webhookはストライプから直接呼ばれるのでCORS不要
   if (url.pathname === '/api/stripe/webhook') {

@@ -385,7 +385,7 @@
             広告なし
           </li>
         </ul>
-        <button class="plan-btn plan-btn--pro" id="btn-pro-upgrade" onclick="(function(){var s=document.getElementById('auth-section');if(s){s.classList.add('is-visible');s.scrollIntoView({behavior:'smooth',block:'center'})}})()">Proプランを始める — 月額150円</button>
+        <button class="plan-btn plan-btn--pro" id="btn-pro-upgrade">Proプランを始める — 月額150円</button>
       </div>
     </div>
 
@@ -405,6 +405,12 @@
         <div class="auth-field">
           <label for="input-password">パスワード（8文字以上）</label>
           <input type="password" id="input-password" placeholder="8文字以上" minlength="8" required>
+        </div>
+        <div class="auth-field" id="field-terms" style="display:none;">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;cursor:pointer;">
+            <input type="checkbox" id="input-terms" style="margin-top:3px;flex-shrink:0;">
+            <span><a href="../terms.html" target="_blank" style="color:var(--green);text-decoration:underline;">利用規約</a>と<a href="../privacy.html" target="_blank" style="color:var(--green);text-decoration:underline;">プライバシーポリシー</a>に同意する</span>
+          </label>
         </div>
         <button type="submit" class="auth-submit" id="auth-submit-btn">登録してProを始める</button>
         <div class="auth-error" id="auth-error"></div>
@@ -461,7 +467,7 @@
   <script src="https://js.stripe.com/v3/"></script>
   <script src="../assets/js/auth.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       var authSection = document.getElementById('auth-section');
       var authForm = document.getElementById('auth-form');
       var authError = document.getElementById('auth-error');
@@ -475,6 +481,7 @@
       var btnProUpgrade = document.getElementById('btn-pro-upgrade');
 
       var mode = 'register';
+      var fieldTerms = document.getElementById('field-terms');
 
       // #plan-pro ハッシュがある場合、Proカードまでスクロール
       if (window.location.hash === '#plan-pro') {
@@ -486,7 +493,12 @@
         }
       }
 
-      // 認証状態チェック（DEEPCAST_AUTHが読み込まれている前提）
+      // auth.jsのinit()完了を待ってから認証状態を判定（レースコンディション防止）
+      if (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.ready) {
+        try { await DEEPCAST_AUTH.ready; } catch (e) { /* init失敗は無視 */ }
+      }
+
+      // 認証状態チェック（init()完了後の正確な状態で判定）
       if (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isLoggedIn()) {
         if (DEEPCAST_AUTH.isPro()) {
           // Proユーザーはアカウントページへリダイレクト
@@ -521,6 +533,9 @@
         authSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
 
+      // 初期表示: registerモードなので利用規約を表示
+      if (fieldTerms) fieldTerms.style.display = 'block';
+
       function setMode(m) {
         mode = m;
         if (mode === 'register') {
@@ -530,6 +545,7 @@
           authSub.textContent = 'Pro契約にはアカウントが必要です';
           authSubmitBtn.textContent = '登録してProを始める';
           authToggle.innerHTML = '既にアカウントをお持ちの方は<a id="toggle-link">ログイン</a>';
+          if (fieldTerms) fieldTerms.style.display = 'block';
         } else {
           tabLogin.classList.add('is-active');
           tabRegister.classList.remove('is-active');
@@ -537,6 +553,7 @@
           authSub.textContent = 'メールアドレスとパスワードを入力';
           authSubmitBtn.textContent = 'ログインしてProを始める';
           authToggle.innerHTML = 'アカウントをお持ちでない方は<a id="toggle-link">新規登録</a>';
+          if (fieldTerms) fieldTerms.style.display = 'none';
         }
         document.getElementById('toggle-link').addEventListener('click', function() {
           setMode(mode === 'register' ? 'login' : 'register');
@@ -566,12 +583,29 @@
           }
 
           if (mode === 'register') {
+            var termsCheck = document.getElementById('input-terms');
+            if (termsCheck && !termsCheck.checked) { throw new Error('利用規約への同意が必要です'); }
             await DEEPCAST_AUTH.register(email, password);
           } else {
             await DEEPCAST_AUTH.login(email, password);
           }
+
           // 登録/ログイン成功 → Checkout開始
-          await DEEPCAST_AUTH.startCheckout();
+          try {
+            await DEEPCAST_AUTH.startCheckout();
+          } catch (checkoutErr) {
+            // 認証は成功したがCheckoutに失敗した場合
+            // ユーザーにはアカウント作成済みであることを伝え、アカウントページへ誘導
+            console.error('[Pricing] Checkoutエラー:', checkoutErr);
+            authError.textContent = '決済の準備中にエラーが発生しました。アカウントは作成済みです。アカウントページからProプランへのアップグレードをお試しください。';
+            authError.style.display = 'block';
+            authSubmitBtn.disabled = false;
+            authSubmitBtn.classList.remove('btn-loading');
+            authSubmitBtn.textContent = origText;
+            // 3秒後にアカウントページへ遷移
+            setTimeout(function() { window.location.href = 'account.html'; }, 3000);
+            return;
+          }
         } catch (err) {
           var msg = err.message || '';
           if (msg.includes('network') || msg.includes('fetch') || msg.includes('Failed to fetch')) {

@@ -5,6 +5,7 @@
 import { errorResponse, jsonResponse } from '../../lib/response.js';
 import { authenticateUser } from '../../lib/auth.js';
 import { hashPassword } from '../../lib/crypto.js';
+import { stripeRequest } from '../../lib/stripe.js';
 
 export async function onRequestDelete(context) {
   const { request, env } = context;
@@ -32,6 +33,40 @@ export async function onRequestDelete(context) {
   const hash = await hashPassword(password, dbUser.password_salt);
   if (hash !== dbUser.password_hash) {
     return errorResponse('パスワードが正しくありません', 401);
+  }
+
+  // Stripeサブスクリプションのキャンセル（存在する場合）
+  if (env.STRIPE_SECRET_KEY) {
+    const userRecord = await env.DB.prepare(
+      'SELECT stripe_customer_id FROM users WHERE id = ?'
+    ).bind(user.id).first();
+
+    if (userRecord?.stripe_customer_id) {
+      try {
+        // アクティブなサブスクリプションを取得してキャンセル
+        const subsData = await stripeRequest(
+          `subscriptions?customer=${userRecord.stripe_customer_id}&status=active&limit=10`,
+          'GET',
+          null,
+          env.STRIPE_SECRET_KEY
+        );
+
+        if (subsData.data && subsData.data.length > 0) {
+          for (const sub of subsData.data) {
+            await stripeRequest(
+              `subscriptions/${sub.id}`,
+              'DELETE',
+              null,
+              env.STRIPE_SECRET_KEY
+            );
+            console.log(`サブスクリプション即時キャンセル: user=${user.id}, subscription=${sub.id}`);
+          }
+        }
+      } catch (err) {
+        console.error('アカウント削除時のStripeキャンセルエラー:', err.message);
+        return errorResponse('サブスクリプションの解約に失敗しました。再度お試しください。', 500);
+      }
+    }
   }
 
   // アカウント削除

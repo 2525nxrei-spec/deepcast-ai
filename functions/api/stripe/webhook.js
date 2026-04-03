@@ -69,6 +69,13 @@ export async function onRequestPost(context) {
             `UPDATE users SET plan = 'pro', cancel_at_period_end = ?, stripe_subscription_id = ?, updated_at = datetime('now')
              WHERE stripe_customer_id = ?`
           ).bind(sub.cancel_at_period_end ? 1 : 0, sub.id, sub.customer).run();
+        } else if (sub.status === 'past_due' || sub.status === 'unpaid') {
+          // 支払い遅延・未払い: Proプランをfreeにダウングレード
+          await env.DB.prepare(
+            `UPDATE users SET plan = 'free', updated_at = datetime('now')
+             WHERE stripe_customer_id = ?`
+          ).bind(sub.customer).run();
+          console.log(`ダウングレード(${sub.status}): customer=${sub.customer}`);
         }
         break;
       }
