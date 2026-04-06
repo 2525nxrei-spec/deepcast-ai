@@ -54,4 +54,40 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+<url>
+  <loc>https://deepcast-ai.com/episodes/ep001.html</loc>
+  <lastmod>2026-03-18</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.7</priority>
+</url>
+<url>
+  <loc>https://deepcast-ai.com/episodes/ep002.html</loc>
+  <lastmod>2026-03-18</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.7</priority>
+</url>
+<url>
+  <loc>https://deepcast-ai.com/episodes/ep003.html</loc>
+  <lastmod>2026-03-19</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.7</priority>
+</url>
+<url>
+  <loc>https://deepcast-ai.com/episodes/ep004.html</loc>
+  <lastmod>2026-03-19</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.7</priority>
+</url>
+<url>
+  <loc>https://deepcast-ai.com/episodes/ep005.html</loc>
+  <lastmod>2026-03-23</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.7</priority>
+</url>
+<url>
+  <loc>https://deepcast-ai.com/episodes/ep006.html</loc>
+  <lastmod>2026-03-23</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.7</priority>
+</url>
 </urlset>
