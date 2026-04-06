@@ -8,14 +8,15 @@
 import { errorResponse } from '../../lib/response.js';
 import { authenticateUser } from '../../lib/auth.js';
 
-// エピソードのティア定義（episodes.jsonと同期）
-// Proエピソードのリスト（ここに含まれないものはfree扱い）
-const PRO_EPISODES = ['ep004', 'ep005', 'ep006', 'ep007', 'ep008', 'ep009', 'ep010'];
+// エピソードのティア定義
+// 無料エピソードをホワイトリストで管理（ep001-003 + 最新3話 ep008-010）
+const FREE_EPISODES = new Set([1, 2, 3, 8, 9, 10]);
 
 function getEpisodeTier(episodeId) {
-  // ep001〜ep003はfree、ep004以降はpro
   const baseId = episodeId.replace(/\.mp3$/, '');
-  return PRO_EPISODES.includes(baseId) ? 'pro' : 'free';
+  const num = parseInt(baseId.replace('ep', ''), 10);
+  if (isNaN(num)) return 'pro'; // 不明なIDはpro扱い（安全側に倒す）
+  return FREE_EPISODES.has(num) ? 'free' : 'pro';
 }
 
 export async function onRequestGet(context) {

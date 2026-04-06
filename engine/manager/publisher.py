@@ -688,24 +688,103 @@ class Publisher:
         return max_id + 1
 
     # ------------------------------------------------------------------
-    # 8. git_stage_and_commit
+    # 8. R2アップロード (wrangler CLI)
+    # ------------------------------------------------------------------
+
+    async def upload_to_r2(self, local_path: str, remote_key: str) -> bool:
+        """音声ファイルをCloudflare R2にアップロードする.
+
+        Args:
+            local_path: ローカルのMP3ファイルパス.
+            remote_key: R2上のオブジェクトキー (例: "episodes/ep001.mp3").
+
+        Returns:
+            成功した場合True.
+        """
+        bucket = settings.R2_BUCKET
+        logger.info(
+            "publish.r2_upload.start",
+            local_path=local_path,
+            remote_key=remote_key,
+            bucket=bucket,
+        )
+
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                "npx", "wrangler", "r2", "object", "put",
+                f"{bucket}/{remote_key}",
+                "--file", local_path,
+                "--content-type", "audio/mpeg",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+
+            if proc.returncode == 0:
+                public_url = f"{settings.R2_PUBLIC_URL}/{remote_key}"
+                logger.info(
+                    "publish.r2_upload.done",
+                    remote_key=remote_key,
+                    public_url=public_url,
+                )
+                return True
+            else:
+                error_msg = stderr.decode(errors="replace")
+                logger.error(
+                    "publish.r2_upload.failed",
+                    returncode=proc.returncode,
+                    stderr=error_msg[:500],
+                )
+                return False
+        except Exception as exc:
+            logger.error("publish.r2_upload.error", error=str(exc))
+            return False
+
+    # ------------------------------------------------------------------
+    # 9. git_stage_commit_push (自動デプロイ用)
     # ------------------------------------------------------------------
 
     async def git_stage_and_commit(
         self, episode_title: str, episode_number: int
     ) -> bool:
-        """変更を git add & commit する (push はしない)."""
+        """ブランチを切って変更を git add & commit する.
+
+        masterへの直接pushは禁止のため、autopilot/ep{番号}ブランチを作成する。
+        """
         if not settings.AUTO_GIT_PUSH:
             logger.info(
                 "publish.git_skipped",
-                reason="AUTO_GIT_PUSH is False - changes are ready for manual commit/push",
+                reason="AUTO_GIT_PUSH is False",
                 episode_number=episode_number,
             )
             return False
 
         try:
             cwd = str(self.site_root)
-            commit_msg = f"EP#{episode_number}: {episode_title}（記事+SEO）"
+            branch_name = f"autopilot/ep{episode_number:03d}"
+            commit_msg = f"EP#{episode_number}: {episode_title}（自動公開）"
+
+            # masterに戻ってから新ブランチを切る
+            proc = await asyncio.create_subprocess_exec(
+                "git", "checkout", "master",
+                cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            )
+            await proc.wait()
+
+            proc = await asyncio.create_subprocess_exec(
+                "git", "checkout", "-b", branch_name,
+                cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+            if proc.returncode != 0:
+                # ブランチが既に存在する場合は切り替え
+                proc = await asyncio.create_subprocess_exec(
+                    "git", "checkout", branch_name,
+                    cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                )
+                await proc.wait()
+
+            self._current_branch = branch_name
 
             proc_add = await asyncio.create_subprocess_exec(
                 "git", "add", "-A",
@@ -727,6 +806,7 @@ class Publisher:
                 logger.info(
                     "publish.git_committed",
                     message=commit_msg,
+                    branch=branch_name,
                     episode_number=episode_number,
                 )
                 return True
@@ -738,6 +818,74 @@ class Publisher:
                 return False
         except Exception as exc:
             logger.error("publish.git_error", error=str(exc))
+            return False
+
+    async def git_push(self) -> bool:
+        """ブランチをpushしてPRを自動作成する."""
+        if not settings.AUTO_GIT_PUSH:
+            logger.info("publish.git_push_skipped", reason="AUTO_GIT_PUSH is False")
+            return False
+
+        branch = getattr(self, "_current_branch", None)
+        if not branch:
+            logger.warning("publish.git_push_skipped", reason="no branch set")
+            return False
+
+        try:
+            cwd = str(self.site_root)
+
+            # ブランチをpush
+            proc = await asyncio.create_subprocess_exec(
+                "git", "push", "-u", "origin", branch,
+                cwd=cwd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+
+            if proc.returncode != 0:
+                logger.error(
+                    "publish.git_push.failed",
+                    stderr=stderr.decode(errors="replace"),
+                )
+                return False
+
+            logger.info("publish.git_push.done", branch=branch)
+
+            # gh CLIでPR作成
+            pr_title = branch.replace("autopilot/", "Autopilot: ").upper()
+            proc_pr = await asyncio.create_subprocess_exec(
+                "gh", "pr", "create",
+                "--title", pr_title,
+                "--body", "Autopilotによる自動エピソード公開。CIパス後にマージしてください。",
+                "--base", "master",
+                "--head", branch,
+                cwd=cwd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            pr_stdout, pr_stderr = await proc_pr.communicate()
+
+            if proc_pr.returncode == 0:
+                pr_url = pr_stdout.decode(errors="replace").strip()
+                logger.info("publish.pr_created", url=pr_url)
+            else:
+                # PR作成失敗はpush成功に影響しない（手動でPR作成可能）
+                logger.warning(
+                    "publish.pr_create_failed",
+                    stderr=pr_stderr.decode(errors="replace"),
+                )
+
+            # masterに戻る
+            proc = await asyncio.create_subprocess_exec(
+                "git", "checkout", "master",
+                cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            )
+            await proc.wait()
+
+            return True
+        except Exception as exc:
+            logger.error("publish.git_push.error", error=str(exc))
             return False
 
     # ------------------------------------------------------------------
