@@ -223,7 +223,8 @@ class SelfManager:
         )
 
         # prompts.json を更新
-        updated_prompts = json.loads(json.dumps(self._prompts))  # deep copy
+        import copy
+        updated_prompts = copy.deepcopy(self._prompts)
         updated_prompts[prompt_key]["content"] = new_prompt_text.strip()
         self._save_prompts(updated_prompts)
 
@@ -402,7 +403,7 @@ class SelfManager:
                 content_id=content_id,
                 score=score,
                 feedback=evaluation.feedback,
-                evaluator_model=settings.OLLAMA_MODEL_EVALUATE,
+                evaluator_model="gemini-2.5-flash",
             )
 
             elapsed = (datetime.now(timezone.utc) - cycle_start).total_seconds()
@@ -514,8 +515,8 @@ class SelfManager:
             lines.append("  今日のエラー数: 取得不可")
 
         lines.append(f"  品質閾値: {settings.QUALITY_THRESHOLD}")
-        lines.append(f"  生成モデル: {settings.OLLAMA_MODEL_GENERATE}")
-        lines.append(f"  評価モデル: {settings.OLLAMA_MODEL_EVALUATE}")
+        lines.append("  生成モデル: gemini-2.5-flash")
+        lines.append("  評価モデル: gemini-2.5-flash")
         lines.append("=" * 50)
 
         report = "\n".join(lines)

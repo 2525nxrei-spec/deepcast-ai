@@ -39,7 +39,6 @@ class Settings(BaseSettings):
     # --- Voice ---
     TTS_BACKEND: str = "gemini"
     TTS_OUTPUT_DIR: str = "./data/audio"
-    STYLE_BERT_URL: str = "http://localhost:5000"
     GEMINI_API_KEY: str = ""
 
     # --- Cloudflare R2 ---
@@ -50,7 +49,7 @@ class Settings(BaseSettings):
     R2_PUBLIC_URL: str = "https://audio.deepcast-ai.com"
 
     # --- Publisher ---
-    SITE_ROOT: str = os.environ.get("SITE_ROOT", "G:/マイドライブ/0_deep cast")
+    SITE_ROOT: str = os.environ.get("SITE_ROOT", "G:/マイドライブ/株式会社　礼/運用中/8_ディープキャスト")
     SITE_URL: str = "https://deepcast-ai.com"
     AUTO_GIT_PUSH: bool = False  # Safety: manual push by default
 
