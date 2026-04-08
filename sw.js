@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepcast-v25';
+const CACHE_NAME = 'deepcast-v27';
 const ASSETS = [
   '/',
   '/css/style.css',
@@ -56,6 +56,13 @@ self.addEventListener('fetch', (e) => {
 
   // APIリクエストはキャッシュ対象外 → 常にネットワークリクエストを返す
   if (url.pathname.startsWith('/api/')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+
+  // 認証が必要なページ（pages/）はキャッシュ対象外
+  // ログアウト後にSWキャッシュから認証済みページが返されるのを防止
+  if (url.pathname.startsWith('/pages/')) {
     e.respondWith(fetch(e.request));
     return;
   }
