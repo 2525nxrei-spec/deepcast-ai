@@ -129,16 +129,23 @@
   }
 
   // オーディオファイル名 → 記事URLマッピングを構築
-  // audioIdからAPI経由の音声URLを生成
-  function audioUrlFromId(audioId) {
-    if (!audioId) return '';
-    return '/api/audio/' + audioId;
+  // 音声URLを生成
+  // audioIdがある場合はAPI経由（認証付き、Proアクセス制御あり）
+  // audioIdがない場合: proエピソードならaudioフィールドからIDを抽出してAPI経由に、freeならaudioフィールド直接参照
+  function resolveAudioUrl(ep) {
+    if (ep.audioId) return '/api/audio/' + ep.audioId;
+    // audioIdがないproエピソード: audioフィールドからep0XXパターンを抽出
+    if (ep.tier === 'pro' && ep.audio) {
+      var match = ep.audio.match(/ep(\d{3})/);
+      if (match) return '/api/audio/ep' + match[1];
+    }
+    return ep.audio || '';
   }
 
   function buildArticleMap(episodes) {
     var audioToArticle = DA.audioToArticle;
     episodes.forEach(function(ep) {
-      var audioUrl = audioUrlFromId(ep.audioId);
+      var audioUrl = resolveAudioUrl(ep);
       if (audioUrl && ep.article) {
         audioToArticle[DA.audioFileName(audioUrl)] = ep.article;
       }
@@ -206,7 +213,7 @@
       '</div>' +
       '<div class="episode-embed">' +
         '<div class="episode-player" role="group" aria-label="オーディオプレイヤー: ' + safeTitle + '">' +
-          '<button class="play-btn" data-audio="' + audioUrlFromId(ep.audioId) + '" data-title="' + safeTitle + '"' + lockedAttr + ' role="button" aria-label="' + (isLocked ? 'Proプラン限定: ' : '再生: ') + safeTitle + '" tabindex="0">' +
+          '<button class="play-btn" data-audio="' + resolveAudioUrl(ep) + '" data-title="' + safeTitle + '"' + lockedAttr + ' role="button" aria-label="' + (isLocked ? 'Proプラン限定: ' : '再生: ') + safeTitle + '" tabindex="0">' +
             '<span class="play-icon">&#9654;</span>' +
             lockIconHtml +
           '</button>' +
@@ -596,19 +603,40 @@
     var title = btn.dataset.title;
     if (!audioSrc) return;
 
-    // SPA遷移時のゲーティング: episodes.jsonからインデックスを確認
     var userIsPro = (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isPro());
+
+    // body data-tier="pro" による判定（静的HTMLに埋め込み済み）
+    var pageTier = document.body.dataset.tier || 'free';
+    if (!userIsPro && pageTier === 'pro') {
+      // Proページかつ非Proユーザー → ロック
+      btn.dataset.locked = 'true';
+      btn.innerHTML = '<span class="play-icon">&#9654;</span><span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>';
+      btn.addEventListener('click', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        if (typeof DEEPCAST_AUTH !== 'undefined') DEEPCAST_AUTH.showUpgradeGate();
+      });
+      return;
+    }
+
     if (!userIsPro) {
+      // episodes.jsonでもインデックスベースの判定（フォールバック）
       fetch('/episodes/episodes.json')
         .then(function(r) { return r.json(); })
         .then(function(episodes) {
+          if (!episodes || !episodes.length) {
+            // episodes.jsonが空の場合、pageTierで判定済みなのでbindしてOK
+            DA.bindPlayer(btn, audioSrc, title);
+            return;
+          }
           var audioIdFromSrc = audioSrc.split('/').pop().split('?')[0];
           var idx = -1;
           for (var i = 0; i < episodes.length; i++) {
             var epAudioId = (episodes[i].audioId || '');
             if (epAudioId === audioIdFromSrc) { idx = i; break; }
           }
-          if (idx >= 3) {
+          // tierフィールドでもチェック（episodes.jsonにtier: 'pro'があればロック）
+          var epTier = (idx >= 0 && episodes[idx].tier) ? episodes[idx].tier : 'free';
+          if (epTier === 'pro' || idx >= 3) {
             btn.dataset.locked = 'true';
             btn.innerHTML = '<span class="play-icon">&#9654;</span><span class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>';
             btn.addEventListener('click', function(e) {
@@ -620,7 +648,7 @@
           }
         })
         .catch(function() {
-          // fallback: bindする
+          // episodes.json取得失敗時はpageTierで判定済みなのでbind
           DA.bindPlayer(btn, audioSrc, title);
         });
     } else {

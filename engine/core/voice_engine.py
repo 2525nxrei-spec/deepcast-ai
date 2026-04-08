@@ -365,13 +365,23 @@ class VoiceEngine:
         backend = TTSBackend(settings.TTS_BACKEND)
 
         # Gemini TTS: 台本分割方式で合成（長尺の品質劣化を防止）
-        # Gemini TTSが失敗/タイムアウトした場合はEdge TTSにフォールバック
+        # Gemini TTSが失敗した場合はリトライ（Edge TTSフォールバック無効）
         if backend == TTSBackend.GEMINI and "山口:" in full_script:
-            try:
-                return await self._synthesize_gemini_chunked(full_script, language, title=title)
-            except (asyncio.TimeoutError, Exception) as e:
-                logger.warning("voice_engine.gemini_fallback_to_edge", error=str(e))
-                return await self._synthesize_edge_dialogue(full_script, language, title=title)
+            max_tts_retries = 3
+            for attempt in range(max_tts_retries):
+                try:
+                    return await self._synthesize_gemini_chunked(full_script, language, title=title)
+                except (asyncio.TimeoutError, Exception) as e:
+                    logger.warning(
+                        "voice_engine.gemini_retry",
+                        error=str(e),
+                        attempt=attempt + 1,
+                        max_retries=max_tts_retries,
+                    )
+                    if attempt < max_tts_retries - 1:
+                        await asyncio.sleep(5)
+                    else:
+                        raise RuntimeError(f"Gemini TTS failed after {max_tts_retries} attempts: {e}")
 
         # Edge-TTS対話モード: 山口/田中を別ボイスで合成
         if backend == TTSBackend.EDGE and "山口:" in full_script:
@@ -694,7 +704,8 @@ class VoiceEngine:
             )
             if result.returncode != 0:
                 error_msg = result.stderr.decode("utf-8", errors="replace")
-                raise RuntimeError(f"ffmpeg concat failed: {error_msg[:300]}")
+                logger.error("voice_engine.ffmpeg_concat_failed", error=error_msg[-500:], concat_list=str(concat_list_path))
+                raise RuntimeError(f"ffmpeg concat failed: {error_msg[-500:]}")
 
         finally:
             for p in temp_paths:
@@ -771,44 +782,60 @@ class VoiceEngine:
             + script
         )
 
-        # --- Gemini TTS 1リクエスト ---
+        # --- Gemini TTS 1リクエスト（リトライ付き） ---
         client = genai.Client(api_key=settings.GEMINI_API_KEY)
         wav_path = out_dir / f"_gemtts_{ts}_full.wav"
+        _TTS_MAX_RETRIES = 3
 
         try:
             def _tts_full() -> None:
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash-preview-tts",
-                    contents=tts_prompt,
-                    config=genai.types.GenerateContentConfig(
-                        response_modalities=["AUDIO"],
-                        speech_config=genai.types.SpeechConfig(
-                            voice_config=genai.types.VoiceConfig(
-                                prebuilt_voice_config=genai.types.PrebuiltVoiceConfig(
-                                    voice_name="Enceladus",
-                                )
-                            )
-                        ),
-                    ),
-                )
-                if (
-                    not response.candidates
-                    or not response.candidates[0].content
-                    or not response.candidates[0].content.parts
-                ):
-                    raise RuntimeError("Gemini TTS returned empty response")
-                audio_data = response.candidates[0].content.parts[0].inline_data.data
-                data_size = len(audio_data)
-                header = struct.pack(
-                    '<4sI4s4sIHHIIHH4sI',
-                    b'RIFF', 36 + data_size, b'WAVE',
-                    b'fmt ', 16, 1, 1, 24000, 24000 * 2, 2, 16,
-                    b'data', data_size,
-                )
-                wav_path.write_bytes(header + audio_data)
+                for _retry in range(_TTS_MAX_RETRIES):
+                    try:
+                        response = client.models.generate_content(
+                            model="gemini-2.5-flash-preview-tts",
+                            contents=tts_prompt,
+                            config=genai.types.GenerateContentConfig(
+                                response_modalities=["AUDIO"],
+                                speech_config=genai.types.SpeechConfig(
+                                    voice_config=genai.types.VoiceConfig(
+                                        prebuilt_voice_config=genai.types.PrebuiltVoiceConfig(
+                                            voice_name="Enceladus",
+                                        )
+                                    )
+                                ),
+                            ),
+                        )
+                        if (
+                            not response.candidates
+                            or not response.candidates[0].content
+                            or not response.candidates[0].content.parts
+                        ):
+                            if _retry < _TTS_MAX_RETRIES - 1:
+                                import time as _time
+                                _time.sleep(5)
+                                continue
+                            raise RuntimeError("Gemini TTS returned empty response")
+                        audio_data = response.candidates[0].content.parts[0].inline_data.data
+                        data_size = len(audio_data)
+                        header = struct.pack(
+                            '<4sI4s4sIHHIIHH4sI',
+                            b'RIFF', 36 + data_size, b'WAVE',
+                            b'fmt ', 16, 1, 1, 24000, 24000 * 2, 2, 16,
+                            b'data', data_size,
+                        )
+                        wav_path.write_bytes(header + audio_data)
+                        return
+                    except RuntimeError:
+                        raise
+                    except Exception as e:
+                        if _retry < _TTS_MAX_RETRIES - 1:
+                            import time as _time
+                            _time.sleep(5)
+                            continue
+                        raise
 
-            # 180秒タイムアウト付きで実行
-            await asyncio.wait_for(asyncio.to_thread(_tts_full), timeout=180)
+            # 300秒タイムアウト付きで実行（リトライ含むため延長）
+            await asyncio.wait_for(asyncio.to_thread(_tts_full), timeout=300)
 
             # --- ffmpeg: WAV → MP3 (loudnorm + highpass + lowpass + atempo) ---
             result = await asyncio.to_thread(

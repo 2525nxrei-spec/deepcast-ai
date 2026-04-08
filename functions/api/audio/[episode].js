@@ -8,14 +8,14 @@
 import { errorResponse } from '../../lib/response.js';
 import { authenticateUser } from '../../lib/auth.js';
 
-// エピソードのティア定義（episodes.jsonと同期）
-// Proエピソードのリスト（ここに含まれないものはfree扱い）
-const PRO_EPISODES = ['ep004', 'ep005', 'ep006', 'ep007', 'ep008', 'ep009', 'ep010'];
+// エピソードのティア定義（episodes.jsonと同期必須）
+// Freeエピソードのホワイトリスト（ここに含まれるもののみfree、それ以外は全てpro扱い）
+// 安全側設計: リストに漏れがあってもpro扱いになるため、無料ユーザーに有料コンテンツが漏れない
+const FREE_EPISODES = ['ep002', 'ep003'];
 
 function getEpisodeTier(episodeId) {
-  // ep001〜ep003はfree、ep004以降はpro
   const baseId = episodeId.replace(/\.mp3$/, '');
-  return PRO_EPISODES.includes(baseId) ? 'pro' : 'free';
+  return FREE_EPISODES.includes(baseId) ? 'free' : 'pro';
 }
 
 export async function onRequestGet(context) {

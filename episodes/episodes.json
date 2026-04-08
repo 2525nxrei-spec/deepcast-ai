@@ -57,6 +57,7 @@
     "duration": "3:43",
     "audio": "episodes/ep001.mp3",
     "article": "episodes/ep001.html",
-    "language": "ja"
+    "language": "ja",
+    "tier": "pro"
   }
 ]
