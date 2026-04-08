@@ -95,7 +95,7 @@ class ContentEvaluator:
     def __init__(self, llm: LLMClient, db: DatabaseManager) -> None:
         self._llm = llm
         self._db = db
-        self._model = settings.OLLAMA_MODEL_EVALUATE
+        self._model = "gemini-2.5-flash"  # Gemini Flashで評価
         self._max_retries = settings.MAX_RETRIES
 
     # ------------------------------------------------------------------

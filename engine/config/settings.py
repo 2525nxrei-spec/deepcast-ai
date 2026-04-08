@@ -39,7 +39,6 @@ class Settings(BaseSettings):
     # --- Voice ---
     TTS_BACKEND: str = "gemini"
     TTS_OUTPUT_DIR: str = "./data/audio"
-    STYLE_BERT_URL: str = "http://localhost:5000"
     GEMINI_API_KEY: str = ""
 
     # --- Cloudflare R2 ---

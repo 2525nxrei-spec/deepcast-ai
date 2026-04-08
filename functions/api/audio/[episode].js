@@ -11,11 +11,13 @@ import { authenticateUser } from '../../lib/auth.js';
 // エピソードのティア定義（episodes.jsonと同期必須）
 // Freeエピソードのホワイトリスト（ここに含まれるもののみfree、それ以外は全てpro扱い）
 // 安全側設計: リストに漏れがあってもpro扱いになるため、無料ユーザーに有料コンテンツが漏れない
-const FREE_EPISODES = ['ep002', 'ep003'];
+const FREE_EPISODES = new Set([1, 2, 3, 8, 9, 10]);
 
 function getEpisodeTier(episodeId) {
   const baseId = episodeId.replace(/\.mp3$/, '');
-  return FREE_EPISODES.includes(baseId) ? 'free' : 'pro';
+  const num = parseInt(baseId.replace('ep', ''), 10);
+  if (isNaN(num)) return 'pro'; // 不明なIDはpro扱い（安全側に倒す）
+  return FREE_EPISODES.has(num) ? 'free' : 'pro';
 }
 
 export async function onRequestGet(context) {

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#10 ゲーム理論で読み解く日常の駆け引き — 囚人のジレンマは毎日起きている｜DeepCast AI</title>
+<meta name="description" content="ジョン・ナッシュが提唱したナッシュ均衡は、各プレイヤーが相手の戦略を前提に最適な戦略を取っている状態。値引き交渉、職場の会議、渋滞の車線変更——日常のあらゆる場面にゲーム理論は潜んでいる。協力を引き出す最強戦略「しっぺ返し」の教訓とは。">
+<link rel="canonical" href="https://deepcast-ai.com/episodes/ep010.html">
+<link rel="stylesheet" href="/css/style.css?v=20260327">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+.article-page { max-width: 720px; margin: 0 auto; padding: 80px 24px 60px; }
+.article-back { display: inline-block; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.article-back:hover { color: var(--text); }
+.article-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); }
+.article-title { font-family: var(--serif); font-size: 24px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; letter-spacing: -0.01em; }
+.article-player { background: var(--bg-card); border-radius: 8px; padding: 16px; margin-bottom: 32px; }
+.article-player audio { width: 100%; }
+
+.article-summary { background: var(--bg-alt); border-left: 3px solid var(--text); padding: 20px 24px; margin-bottom: 32px; border-radius: 0 8px 8px 0; }
+.article-summary h2 { font-size: 14px; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.04em; color: var(--text-muted); }
+.article-summary p { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+
+.article-body h2 { font-family: var(--serif); font-size: 18px; font-weight: 600; margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.article-body p { font-size: 15px; line-height: 1.9; margin-bottom: 16px; color: var(--text); }
+
+.article-deep { background: var(--bg-card); border-radius: 8px; padding: 24px; margin-top: 40px; }
+.article-deep h2 { font-family: var(--serif); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text); border: none; padding: 0; }
+.article-deep p { font-size: 14px; line-height: 1.8; margin-bottom: 12px; color: var(--text-secondary); }
+.article-deep p strong { color: var(--text-muted); font-size: 12px; }
+
+.article-nav { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+.article-nav a { font-size: 13px; color: var(--text-muted); }
+.article-nav a:hover { color: var(--text); }
+</style>
+</head>
+<body data-tier="free">
+<nav class="navbar scrolled" id="navbar">
+  <div class="container nav-container">
+    <a href="/" class="logo">
+      <span class="logo-text">DeepCast<span class="logo-ai">AI</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/#episodes">エピソード</a></li>
+      <li><a href="/all-episodes.html">全エピソード</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/all-episodes.html" class="btn btn-primary btn-sm">エピソードを聴く</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="article-page">
+  <a href="/all-episodes.html" class="article-back">&larr; 全エピソード一覧</a>
+
+  <div class="article-meta">
+    <span>#10</span>
+    <span>2026.03.27</span>
+    <span>2:30</span>
+  </div>
+  <h1 class="article-title">ゲーム理論で読み解く日常の駆け引き — 囚人のジレンマは毎日起きている</h1>
+
+  <div class="article-player">
+    <!-- 音声はJS動的ロード（認証経由） -->
+    <div id="articleAudioPlayer" data-episode="ep010"></div>
+
+  </div>
+
+  <div class="article-summary">
+    <h2>SUMMARY</h2>
+    <p>ジョン・ナッシュが提唱したナッシュ均衡は、各プレイヤーが相手の戦略を前提に最適な戦略を取っている状態。値引き交渉、職場の会議、渋滞の車線変更——日常のあらゆる場面にゲーム理論は潜んでいる。協力を引き出す最強戦略「しっぺ返し」の教訓とは。</p>
+  </div>
+
+  <div class="article-body">
+    <h2>渋滞は全員が「合理的」だから起きる</h2>
+<p>高速道路で渋滞に遭遇した時、空いている車線に移りたくなりますよね。実際に車線変更する人が多いから、結果的にどの車線も同じ速度になり、全体の渋滞は悪化する。</p>
+<p>これは「ナッシュ均衡」の典型例です。各ドライバーが自分にとって最適な行動（空いた車線に移る）を取った結果、全員にとって最悪の結果（渋滞悪化）が生まれる。数学者ジョン・ナッシュが1950年に証明したこの概念は、映画『ビューティフル・マインド』で有名になりました。</p>
+
+<h2>囚人のジレンマが職場で毎日起きている</h2>
+<p>同僚と協力してプロジェクトを進めるべきか、自分の成果を優先すべきか。これは「囚人のジレンマ」そのものです。全員が協力すれば最高の結果が出るのに、誰かが裏切ると裏切った側だけが得をする。</p>
+<p>だから会議では、情報を出し惜しみしたり、リスクのある提案を避けたりする。これも一種のナッシュ均衡で、全員が「合理的に」振る舞った結果、組織全体のパフォーマンスが下がるのです。</p>
+
+<h2>最強戦略「しっぺ返し」の教訓</h2>
+<p>1984年、政治学者ロバート・アクセルロッドは、繰り返し囚人のジレンマのトーナメントを開催しました。世界中の研究者が複雑な戦略を投入した中、優勝したのは最もシンプルな戦略「しっぺ返し（Tit for Tat）」でした。</p>
+<p>ルールはたった2つ。「最初は協力する」「次からは相手の前回の行動をそのまま返す」。この戦略が勝つ理由は、「善良（最初は協力）」「報復する（裏切られたら裏切る）」「寛容（相手が協力に戻れば自分も戻る）」「明快（相手が行動を予測できる）」の4要素を兼ね備えているからです。</p>
+<p>日常への応用は明確です。新しい関係は信頼から始める。裏切られたら毅然と対応する。しかし相手が態度を改めたら、すぐに協力に戻る。シンプルだけど、これが最も持続可能な人間関係の戦略なのです。</p>
+  </div>
+
+  <div class="article-deep">
+    <h2>さらに深く — 進化とゲーム理論</h2>
+<p>「しっぺ返し」戦略の成功は、進化生物学にも大きな影響を与えました。リチャード・ドーキンスは『利己的な遺伝子』の中で、利他的行動が自然選択で生き残る理由をゲーム理論で説明しています。</p>
+<p>2012年のハーバード大学のマーティン・ノーワック教授の研究では、「しっぺ返し」をさらに改良した「寛大なしっぺ返し」（一定確率で相手の裏切りを許す）が長期的に最も高い成果を出すことが示されました。完璧な報復は関係を破壊し、ある程度の寛容さが協力の持続に不可欠なのです。</p>
+<p>ゲーム理論は現在、気候変動交渉、核抑止戦略、プラットフォーム企業の価格競争など、グローバルな問題の分析に不可欠なツールとなっています。あなたの日常の小さな駆け引きの裏には、ノーベル賞級の数学が潜んでいるのです。</p>
+<p><strong>参考文献:</strong> Axelrod, Robert (1984) "The Evolution of Cooperation" / Nowak, Martin (2006) "Five Rules for the Evolution of Cooperation", Science</p>
+  </div>
+
+  <div class="article-nav">
+    <a href="episodes/ep009.html">&larr; 前のエピソード</a>
+    <span></span>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <p>&copy; 2026 DeepCast AI. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/auth.js?v=20260406"></script>
+<script src="/js/audio-player.js?v=20260406"></script>
+<script src="/js/page-init.js?v=20260406"></script>
+<script src="/js/pro-gate.js?v=20260406"></script>
+<script src="/js/spa-router.js?v=20260406"></script>
+<script src="/js/main.js?v=20260406"></script>
+</body>
+</html>

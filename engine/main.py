@@ -9,6 +9,7 @@ Usage:
     python main.py voice            # 音声未生成コンテンツの音声を生成
     python main.py trends           # トレンド分析とコンテンツカレンダーを表示
     python main.py publish          # 最新コンテンツをサイトに公開
+    python main.py autopilot        # 自律パイプライン（生成→音声→公開→R2→git push）
 """
 
 from __future__ import annotations
@@ -429,6 +430,24 @@ async def cmd_publish() -> None:
         await db.close()
 
 
+async def cmd_autopilot(both: bool, dry_run: bool, count: int, lang: str) -> None:
+    """自律パイプライン: 生成→音声→公開→R2→git pushを一括実行する."""
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    from autopilot import run_autopilot, _print_results
+
+    if both:
+        for language in ("ja", "en"):
+            results = await run_autopilot(
+                language=language, dry_run=dry_run, episode_count=count,
+            )
+            _print_results(results)
+    else:
+        results = await run_autopilot(
+            language=lang, dry_run=dry_run, episode_count=count,
+        )
+        _print_results(results)
+
+
 async def cmd_init() -> None:
     """DB 初期化のみ."""
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -486,6 +505,13 @@ def build_parser() -> argparse.ArgumentParser:
     # publish
     sub.add_parser("publish", help="Publish latest content to the website")
 
+    # autopilot
+    auto_p = sub.add_parser("autopilot", help="Run full autonomous pipeline (generate->voice->publish->R2->git)")
+    auto_p.add_argument("--both", action="store_true", help="Generate both ja and en episodes")
+    auto_p.add_argument("--dry-run", action="store_true", help="Test run without publish/upload/push")
+    auto_p.add_argument("--count", type=int, default=1, help="Episodes to generate per language (default: 1)")
+    auto_p.add_argument("--lang", type=str, default="ja", choices=["ja", "en"], help="Language (if --both not set)")
+
     return parser
 
 
@@ -523,6 +549,13 @@ def main() -> None:
         asyncio.run(cmd_trends())
     elif command == "publish":
         asyncio.run(cmd_publish())
+    elif command == "autopilot":
+        asyncio.run(cmd_autopilot(
+            both=args.both,
+            dry_run=args.dry_run,
+            count=args.count,
+            lang=args.lang,
+        ))
     else:
         parser.print_help()
         sys.exit(1)

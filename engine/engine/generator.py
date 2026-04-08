@@ -32,6 +32,21 @@ class TopicIdea(BaseModel):
     target_audience: str
     angle: str  # unique perspective
 
+    @field_validator("keywords", mode="before")
+    @classmethod
+    def _coerce_keywords(cls, v: object) -> list[str]:
+        """LLM がJSON文字列で返す場合があるため、リストに変換する."""
+        if isinstance(v, str):
+            try:
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    return [str(item) for item in parsed]
+            except (json.JSONDecodeError, ValueError):
+                pass
+            # カンマ区切りの場合
+            return [k.strip() for k in v.split(",") if k.strip()]
+        return v
+
     @field_validator("target_audience", mode="before")
     @classmethod
     def _coerce_target_audience(cls, v: object) -> str:

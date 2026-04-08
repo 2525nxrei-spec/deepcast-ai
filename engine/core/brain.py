@@ -445,7 +445,7 @@ class Brain:
                 content_id=content_id,
                 score=score,
                 feedback=evaluation.get("feedback", ""),
-                evaluator_model=settings.OLLAMA_MODEL_EVALUATE,
+                evaluator_model="gemini-2.5-flash",
             )
 
             # 公開イベントをシステムログに記録

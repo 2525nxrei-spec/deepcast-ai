@@ -6,7 +6,6 @@ Brain + Voice + Trends + Publisher を統合し、
 
 from __future__ import annotations
 
-import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, TYPE_CHECKING

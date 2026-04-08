@@ -1,5 +1,85 @@
 [
   {
+    "id": 10,
+    "title": "囚人のジレンマは毎日起きている",
+    "description": "ナッシュ均衡が渋滞、職場、交渉に潜んでいる。最強戦略しっぺ返しの教訓。",
+    "date": "2026.03.27",
+    "category": "business",
+    "tags": [
+      "ゲーム理論",
+      "意思決定"
+    ],
+    "duration": "3:00",
+    "audioId": "ep010",
+    "article": "episodes/ep010.html",
+    "language": "ja",
+    "tier": "free"
+  },
+  {
+    "id": 9,
+    "title": "孤独は1日15本の喫煙に匹敵する",
+    "description": "308万人のメタ分析。社会的孤立が免疫系に与える分子レベルの影響。",
+    "date": "2026.03.27",
+    "category": "science",
+    "tags": [
+      "孤独",
+      "健康科学"
+    ],
+    "duration": "3:00",
+    "audioId": "ep009",
+    "article": "episodes/ep009.html",
+    "language": "ja",
+    "tier": "free"
+  },
+  {
+    "id": 8,
+    "title": "言語が思考を制限する",
+    "description": "サピア=ウォーフ仮説の最新研究。言語が色の認識や道徳判断にまで影響を与える。",
+    "date": "2026.03.27",
+    "category": "society",
+    "tags": [
+      "言語学",
+      "認知科学"
+    ],
+    "duration": "3:00",
+    "audioId": "ep008",
+    "article": "episodes/ep008.html",
+    "language": "ja",
+    "tier": "free"
+  },
+  {
+    "id": 7,
+    "title": "音楽が脳を書き換える",
+    "description": "モーツァルト効果の真実と嘘。楽器演奏が脳構造を変えるメカニズム。",
+    "date": "2026.03.27",
+    "category": "science",
+    "tags": [
+      "音楽",
+      "脳科学"
+    ],
+    "duration": "3:00",
+    "audioId": "ep007",
+    "article": "episodes/ep007.html",
+    "language": "ja",
+    "tier": "pro"
+  },
+  {
+    "id": 6,
+    "title": "あなたの直感はなぜ当たるのか",
+    "description": "ギーゲレンツァーの研究。シンプルなヒューリスティクスが複雑な分析を上回る条件。",
+    "date": "2026.03.27",
+    "category": "science",
+    "tags": [
+      "直感",
+      "意思決定"
+    ],
+    "duration": "3:00",
+    "audioId": "ep006",
+    "article": "episodes/ep006.html",
+    "language": "ja",
+    "tier": "pro"
+  },
+  {
     "id": 5,
     "title": "AIが仕事を奪う論争に終止符を 歴史が教える真実",
     "description": "AIが仕事を奪うという不安は根強いが、これは歴史が繰り返してきた懸念です。本記事は、過去の産業革命が労働市場に与えた影響を詳細に分析。AIがもたらす変化の本質を解き明かし、個人・企業・社会がどう適応すべきかを歴史的視点から解説します。",
