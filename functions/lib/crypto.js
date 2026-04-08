@@ -1,7 +1,7 @@
 /**
  * 暗号・JWT ユーティリティ
  * PBKDF2 SHA-256（100,000回イテレーション）でパスワードハッシュ化
- * HS256 JWT生成・検証（有効期限30日）
+ * HS256 JWT生成・検証（有効期限は呼び出し側でexp指定、現在は24時間）
  */
 
 export async function hashPassword(password, salt) {

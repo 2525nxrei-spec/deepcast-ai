@@ -355,6 +355,25 @@ class VoiceEngine:
             logger.warning("voice_engine.no_segments, using whole script as host")
             segments = [("host", full_script)]
 
+        # Gemini TTS: 台本分割方式で合成（長尺の品質劣化を防止）
+        # Gemini TTSが失敗した場合はリトライ（Edge TTSフォールバック無効）
+        if backend == TTSBackend.GEMINI and "山口:" in full_script:
+            max_tts_retries = 3
+            for attempt in range(max_tts_retries):
+                try:
+                    return await self._synthesize_gemini_chunked(full_script, language, title=title)
+                except (asyncio.TimeoutError, Exception) as e:
+                    logger.warning(
+                        "voice_engine.gemini_retry",
+                        error=str(e),
+                        attempt=attempt + 1,
+                        max_retries=max_tts_retries,
+                    )
+                    if attempt < max_tts_retries - 1:
+                        await asyncio.sleep(5)
+                    else:
+                        raise RuntimeError(f"Gemini TTS failed after {max_tts_retries} attempts: {e}")
+
         # 同一話者の連続セリフをバッチ化
         batched: list[tuple[str, str]] = []
         for role, text in segments:
@@ -439,7 +458,367 @@ class VoiceEngine:
             )
 
             # concat リスト作成
-            concat_list_path = out_dir / f"_seg_{ts}_concat.txt"
+            concat_list_path = out_dir / f"_gemchunk_{ts}_concat.txt"
+            concat_lines: list[str] = []
+            for j, mp3_path in enumerate(temp_paths):
+                concat_lines.append(f"file '{mp3_path.resolve().as_posix()}'")
+                if j < len(temp_paths) - 1:
+                    concat_lines.append(f"file '{silence_path.resolve().as_posix()}'")
+            concat_list_path.write_text("\n".join(concat_lines), encoding="utf-8")
+
+            # 結合（loudnormなし — 各パートで既に適用済み）
+            result = await asyncio.to_thread(
+                subprocess.run,
+                [
+                    "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+                    "-i", str(concat_list_path),
+                    "-c", "copy",
+                    str(final_path),
+                ],
+                capture_output=True,
+            )
+            if result.returncode != 0:
+                error_msg = result.stderr.decode("utf-8", errors="replace")
+                logger.error("voice_engine.ffmpeg_concat_failed", error=error_msg[-500:], concat_list=str(concat_list_path))
+                raise RuntimeError(f"ffmpeg concat failed: {error_msg[-500:]}")
+
+        finally:
+            for p in temp_paths:
+                p.unlink(missing_ok=True)
+            silence_path.unlink(missing_ok=True) if 'silence_path' in dir() else None
+            concat_list_path.unlink(missing_ok=True) if 'concat_list_path' in dir() else None
+
+        logger.info(
+            "voice_engine.gemini_chunked.done",
+            path=str(final_path),
+            chunks=len(chunks),
+        )
+        return final_path
+
+    @staticmethod
+    def _split_script_at_dialogue(script: str, max_chars: int) -> list[str]:
+        """台本を対話の区切り（山口:/田中:）で分割する."""
+        lines = script.split("\n")
+        chunks: list[str] = []
+        current_chunk: list[str] = []
+        current_len = 0
+
+        for line in lines:
+            line_len = len(line) + 1  # +1 for newline
+            # チャンクサイズ超過 & 話者ラベルの行で分割
+            if (current_len + line_len > max_chars
+                    and current_len > 0
+                    and (line.startswith("山口:") or line.startswith("山口：")
+                         or line.startswith("田中:") or line.startswith("田中："))):
+                chunks.append("\n".join(current_chunk))
+                current_chunk = []
+                current_len = 0
+            current_chunk.append(line)
+            current_len += line_len
+
+        if current_chunk:
+            chunks.append("\n".join(current_chunk))
+
+        return chunks
+
+    async def _synthesize_gemini_single(
+        self, script: str, language: str, title: str = "",
+    ) -> Path:
+        """Gemini TTS で短い台本を1リクエストで合成する.
+
+        1500文字以内の台本をEnceladusボイスで一括読み上げ。
+        山口と田中の演じ分けはプロンプトで指示。
+        """
+        logger.info(
+            "voice_engine.gemini_single.start",
+            language=language,
+            script_length=len(script),
+        )
+
+        # --- 出力パス ---
+        out_dir = self._ensure_output_dir(settings.TTS_OUTPUT_DIR)
+        ts = int(time.time() * 1000)
+        if title:
+            safe_title = re.sub(r'[\\/*?:"<>|]', '', title)[:40].strip()
+            final_filename = f"{safe_title}_{ts}.mp3"
+        else:
+            final_filename = f"podcast_{ts}.mp3"
+        final_path = out_dir / final_filename
+
+        # --- TTS プロンプト ---
+        tts_prompt = (
+            "以下のポッドキャスト台本を自然に読み上げてください。\n"
+            "【重要】全体的にゆっくりめのペースで話してください。急がず、一文一文丁寧に。\n"
+            "2人の登場人物がいます。はっきり声を変えて演じ分けてください。\n"
+            "山口：40代男性。低く太い声で、特にゆっくり落ち着いて話す。渋みのあるトーン。文と文の間に十分な間を取る。\n"
+            "田中：20代男性。明るく高めの声で、やや元気に話す。ただし早口にならず聴き取りやすい速度で。\n"
+            "「山口:」「田中:」のラベルは読み上げず、声の高さ・テンポ・トーンで2人を明確に区別してください。\n"
+            "会話の間を多めに取り、リラックスして聴けるテンポで読んでください。\n\n"
+            + script
+        )
+
+        # --- Gemini TTS 1リクエスト（リトライ付き） ---
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        wav_path = out_dir / f"_gemtts_{ts}_full.wav"
+        _TTS_MAX_RETRIES = 3
+
+        try:
+            def _tts_full() -> None:
+                for _retry in range(_TTS_MAX_RETRIES):
+                    try:
+                        response = client.models.generate_content(
+                            model="gemini-2.5-flash-preview-tts",
+                            contents=tts_prompt,
+                            config=genai.types.GenerateContentConfig(
+                                response_modalities=["AUDIO"],
+                                speech_config=genai.types.SpeechConfig(
+                                    voice_config=genai.types.VoiceConfig(
+                                        prebuilt_voice_config=genai.types.PrebuiltVoiceConfig(
+                                            voice_name="Enceladus",
+                                        )
+                                    )
+                                ),
+                            ),
+                        )
+                        if (
+                            not response.candidates
+                            or not response.candidates[0].content
+                            or not response.candidates[0].content.parts
+                        ):
+                            if _retry < _TTS_MAX_RETRIES - 1:
+                                import time as _time
+                                _time.sleep(5)
+                                continue
+                            raise RuntimeError("Gemini TTS returned empty response")
+                        audio_data = response.candidates[0].content.parts[0].inline_data.data
+                        data_size = len(audio_data)
+                        header = struct.pack(
+                            '<4sI4s4sIHHIIHH4sI',
+                            b'RIFF', 36 + data_size, b'WAVE',
+                            b'fmt ', 16, 1, 1, 24000, 24000 * 2, 2, 16,
+                            b'data', data_size,
+                        )
+                        wav_path.write_bytes(header + audio_data)
+                        return
+                    except RuntimeError:
+                        raise
+                    except Exception as e:
+                        if _retry < _TTS_MAX_RETRIES - 1:
+                            import time as _time
+                            _time.sleep(5)
+                            continue
+                        raise
+
+            # 300秒タイムアウト付きで実行（リトライ含むため延長）
+            await asyncio.wait_for(asyncio.to_thread(_tts_full), timeout=300)
+
+            # --- ffmpeg: WAV → MP3 (loudnorm + highpass + lowpass + atempo) ---
+            result = await asyncio.to_thread(
+                subprocess.run,
+                [
+                    "ffmpeg", "-y", "-i", str(wav_path),
+                    "-af", "aresample=resampler=soxr,highpass=f=50,lowpass=f=15000,loudnorm=I=-16:TP=-3:LRA=13,atempo=1.0",
+                    "-ar", "48000", "-b:a", "256k",
+                    str(final_path),
+                ],
+                capture_output=True,
+            )
+            if result.returncode != 0:
+                error_msg = result.stderr.decode("utf-8", errors="replace")
+                raise RuntimeError(f"ffmpeg failed: {error_msg[:300]}")
+
+        finally:
+            wav_path.unlink(missing_ok=True)
+
+        logger.info(
+            "voice_engine.gemini_single.done",
+            path=str(final_path),
+            size=final_path.stat().st_size if final_path.exists() else 0,
+        )
+        return final_path
+
+    async def _synthesize_gemini_dialogue(
+        self, script: str, language: str, title: str = "",
+    ) -> Path:
+        """Gemini TTS で対話形式の台本を2ボイスで合成する.
+
+        山口 → Enceladus（低め渋い40代男性DJ）、
+        田中 → Zephyr（明るく好奇心旺盛な若い男性）で
+        各セリフを個別に合成し、loudnorm + silence挿入 + atempo で仕上げる。
+        """
+        # --- 台本をセリフ単位にパース ---
+        segments: list[tuple[str, str]] = []  # (role, text)
+        for line in script.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith("山口:") or line.startswith("山口："):
+                text = line.split(":", 1)[-1].split("：", 1)[-1].strip()
+                if text:
+                    segments.append(("host", text))
+            elif line.startswith("田中:") or line.startswith("田中："):
+                text = line.split(":", 1)[-1].split("：", 1)[-1].strip()
+                if text:
+                    segments.append(("assistant", text))
+            else:
+                # ラベルなし行は直前の話者を継続、なければ山口
+                role = segments[-1][0] if segments else "host"
+                segments.append((role, line))
+
+        if not segments:
+            logger.warning("voice_engine.gemini_dialogue.no_lines")
+            segments = [("host", script)]
+
+        # --- 同一話者の連続セリフをバッチ化（リクエスト数削減） ---
+        batched: list[tuple[str, str]] = []
+        for role, text in segments:
+            if batched and batched[-1][0] == role:
+                batched[-1] = (role, batched[-1][1] + "\n" + text)
+            else:
+                batched.append((role, text))
+
+        # --- 話者ごとにボイスを使い分け（山口=Enceladus, 田中=Zephyr） ---
+        # 同一話者の連続セリフはバッチ化済み。各バッチを話者のボイスで合成。
+        segments = batched
+
+        logger.info(
+            "voice_engine.gemini_dialogue.start",
+            lines=len(segments),
+            language=language,
+        )
+
+        # --- 出力パス ---
+        out_dir = self._ensure_output_dir(settings.TTS_OUTPUT_DIR)
+        ts = int(time.time() * 1000)
+        if title:
+            safe_title = re.sub(r'[\\/*?:"<>|]', '', title)[:40].strip()
+            final_filename = f"{safe_title}_{ts}.mp3"
+        else:
+            final_filename = f"dialogue_{ts}.mp3"
+        final_path = out_dir / final_filename
+
+        # --- 話者ごとのボイス・プロンプト設定 ---
+        voice_config = {
+            "host": {
+                "voice_name": "Enceladus",
+                "prompt_prefix": "以下のセリフを、低めで渋い40代男性のラジオDJのように、落ち着いてゆっくり語りかけるように読んでください。急がず、一文一文丁寧に間を取って。\n\n",
+            },
+            "assistant": {
+                "voice_name": "Zephyr",
+                "prompt_prefix": "以下のセリフを、明るく好奇心旺盛な20代男性として、元気にテンポよく読んでください。ただし早口にならず聴き取りやすい速度で。\n\n",
+            },
+        }
+
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        temp_wav_paths: list[Path] = []
+        temp_mp3_paths: list[Path] = []
+
+        try:
+            # --- 各セグメントを話者ごとのボイスでTTS合成 ---
+            for i, (role, text) in enumerate(segments):
+                vc = voice_config[role]
+                tts_prompt = vc["prompt_prefix"] + text
+
+                def _tts_segment(prompt: str, vname: str, seg_path: Path) -> None:
+                    response = client.models.generate_content(
+                        model="gemini-2.5-flash-preview-tts",
+                        contents=prompt,
+                        config=genai.types.GenerateContentConfig(
+                            response_modalities=["AUDIO"],
+                            speech_config=genai.types.SpeechConfig(
+                                voice_config=genai.types.VoiceConfig(
+                                    prebuilt_voice_config=genai.types.PrebuiltVoiceConfig(
+                                        voice_name=vname,
+                                    )
+                                )
+                            ),
+                        ),
+                    )
+                    if not response.candidates or not response.candidates[0].content or not response.candidates[0].content.parts:
+                        raise RuntimeError(f"Gemini TTS returned empty response for segment {i}")
+                    audio_data = response.candidates[0].content.parts[0].inline_data.data
+                    # PCM 24000Hz mono 16bit → WAV
+                    data_size = len(audio_data)
+                    header = struct.pack(
+                        '<4sI4s4sIHHIIHH4sI',
+                        b'RIFF', 36 + data_size, b'WAVE',
+                        b'fmt ', 16, 1, 1, 24000, 24000 * 2, 2, 16,
+                        b'data', data_size,
+                    )
+                    seg_path.write_bytes(header + audio_data)
+
+                wav_path = out_dir / f"_gemtts_{ts}_{i:04d}.wav"
+
+                # リトライ付きTTS呼び出し（空レスポンス対策）
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        await asyncio.to_thread(
+                            _tts_segment, tts_prompt, vc["voice_name"], wav_path,
+                        )
+                        break
+                    except RuntimeError as e:
+                        if attempt < max_retries - 1:
+                            logger.warning(
+                                "voice_engine.gemini_dialogue.retry",
+                                segment=i, attempt=attempt + 1, error=str(e),
+                            )
+                            await asyncio.sleep(3)
+                        else:
+                            raise
+
+                temp_wav_paths.append(wav_path)
+
+                logger.debug(
+                    "voice_engine.gemini_dialogue.segment_done",
+                    segment=i,
+                    role=role,
+                )
+
+                # レート制限防止: セグメント間に2秒待機
+                if i < len(segments) - 1:
+                    await asyncio.sleep(2)
+
+            # --- ffmpeg: 各WAVセグメントをMP3に変換（loudnorm + フィルタ） ---
+            for wav_path in temp_wav_paths:
+                mp3_path = wav_path.with_suffix(".mp3")
+                result = await asyncio.to_thread(
+                    subprocess.run,
+                    [
+                        "ffmpeg", "-y", "-i", str(wav_path),
+                        "-af", "highpass=f=50,lowpass=f=15000",
+                        "-ar", "48000", "-b:a", "256k",
+                        str(mp3_path),
+                    ],
+                    capture_output=True,
+                )
+                if result.returncode != 0:
+                    logger.warning(
+                        "voice_engine.gemini_dialogue.ffmpeg_convert_failed",
+                        error=result.stderr.decode("utf-8", errors="replace")[:500],
+                    )
+                temp_mp3_paths.append(mp3_path)
+
+            # --- 0.5秒の無音MP3を生成 ---
+            silence_path = out_dir / f"_gemtts_{ts}_silence.mp3"
+            result = await asyncio.to_thread(
+                subprocess.run,
+                [
+                    "ffmpeg", "-y",
+                    "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono",
+                    "-t", "0.3", "-b:a", "256k",
+                    str(silence_path),
+                ],
+                capture_output=True,
+            )
+            if result.returncode != 0:
+                logger.warning(
+                    "voice_engine.gemini_dialogue.silence_failed",
+                    error=result.stderr.decode("utf-8", errors="replace")[:500],
+                )
+
+            # --- concat リスト作成（セグメント間に無音挿入） ---
+            concat_list_path = out_dir / f"_gemtts_{ts}_concat.txt"
             concat_lines: list[str] = []
             for j, mp3_path in enumerate(temp_mp3_paths):
                 concat_lines.append(f"file '{mp3_path.resolve().as_posix()}'")

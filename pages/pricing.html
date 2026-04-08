@@ -318,8 +318,10 @@
         <li><a href="../#episodes">エピソード</a></li>
         <li><a href="../#request">リクエスト</a></li>
         <li><a href="pricing.html">料金</a></li>
+        <li><a href="login.html" id="navLoginLink">ログイン</a></li>
       </ul>
       <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost btn-sm" id="navLoginBtn">ログイン</a>
         <a href="../#episodes" class="btn btn-primary btn-sm">エピソードを聴く</a>
       </div>
       <button class="hamburger" id="hamburger" aria-label="メニュー">
@@ -406,6 +408,7 @@
           <label for="input-password">パスワード（8文字以上）</label>
           <input type="password" id="input-password" placeholder="8文字以上" minlength="8" required>
         </div>
+        <div id="pw-strength-pricing" style="font-size:11px;color:var(--text-muted);margin-bottom:8px;display:none;"></div>
         <div class="auth-field" id="field-terms" style="display:none;">
           <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;cursor:pointer;">
             <input type="checkbox" id="input-terms" style="margin-top:3px;flex-shrink:0;">
@@ -482,6 +485,18 @@
 
       var mode = 'register';
       var fieldTerms = document.getElementById('field-terms');
+      var pwStrengthPricing = document.getElementById('pw-strength-pricing');
+
+      // パスワード強度リアルタイムチェック
+      document.getElementById('input-password').addEventListener('input', function() {
+        if (mode !== 'register') return;
+        var pw = this.value;
+        var el = pwStrengthPricing;
+        if (pw.length === 0) { el.textContent = ''; }
+        else if (pw.length < 8) { el.textContent = 'あと' + (8 - pw.length) + '文字必要です'; el.style.color = '#dc2626'; }
+        else if (!/[a-zA-Z]/.test(pw) || !/[0-9]/.test(pw)) { el.textContent = '英字と数字の両方を含めてください'; el.style.color = '#d97706'; }
+        else { el.textContent = 'OK'; el.style.color = '#16a34a'; }
+      });
 
       // #plan-pro ハッシュがある場合、Proカードまでスクロール
       if (window.location.hash === '#plan-pro') {
@@ -533,8 +548,9 @@
         authSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
 
-      // 初期表示: registerモードなので利用規約を表示
+      // 初期表示: registerモードなので利用規約とパスワード強度を表示
       if (fieldTerms) fieldTerms.style.display = 'block';
+      if (pwStrengthPricing) pwStrengthPricing.style.display = 'block';
 
       function setMode(m) {
         mode = m;
@@ -546,6 +562,7 @@
           authSubmitBtn.textContent = '登録してProを始める';
           authToggle.innerHTML = '既にアカウントをお持ちの方は<a id="toggle-link">ログイン</a>';
           if (fieldTerms) fieldTerms.style.display = 'block';
+          if (pwStrengthPricing) pwStrengthPricing.style.display = 'block';
         } else {
           tabLogin.classList.add('is-active');
           tabRegister.classList.remove('is-active');
@@ -554,6 +571,7 @@
           authSubmitBtn.textContent = 'ログインしてProを始める';
           authToggle.innerHTML = 'アカウントをお持ちでない方は<a id="toggle-link">新規登録</a>';
           if (fieldTerms) fieldTerms.style.display = 'none';
+          if (pwStrengthPricing) pwStrengthPricing.style.display = 'none';
         }
         document.getElementById('toggle-link').addEventListener('click', function() {
           setMode(mode === 'register' ? 'login' : 'register');
@@ -583,6 +601,8 @@
           }
 
           if (mode === 'register') {
+            if (password.length < 8) { throw new Error('パスワードは8文字以上で入力してください'); }
+            if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) { throw new Error('パスワードは英字と数字の両方を含めてください'); }
             var termsCheck = document.getElementById('input-terms');
             if (termsCheck && !termsCheck.checked) { throw new Error('利用規約への同意が必要です'); }
             await DEEPCAST_AUTH.register(email, password);

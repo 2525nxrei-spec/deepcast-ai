@@ -14,6 +14,9 @@
   <title>アカウント - DeepCast AI</title>
   <meta name="description" content="DeepCast AI アカウント管理ページ。プラン確認、お支払い管理、ログアウト。">
   <meta name="robots" content="noindex">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="theme-color" content="#ffffff">
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
@@ -264,6 +267,15 @@
   <script src="https://js.stripe.com/v3/" defer></script>
   <script src="../assets/js/auth.js"></script>
   <script>
+    // bfcache復元時（ブラウザの戻るボタン等）にログイン状態を再チェック
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        if (typeof DEEPCAST_AUTH === 'undefined' || !DEEPCAST_AUTH.isLoggedIn()) {
+          window.location.href = 'login.html?return=/pages/account.html';
+        }
+      }
+    });
+
     document.addEventListener('DOMContentLoaded', async function() {
       // auth.jsのinit()完了を待ってからログイン判定する
       if (typeof DEEPCAST_AUTH !== 'undefined') {
@@ -272,7 +284,7 @@
 
       // 未ログインならリダイレクト
       if (typeof DEEPCAST_AUTH === 'undefined' || !DEEPCAST_AUTH.isLoggedIn()) {
-        window.location.href = 'pricing.html';
+        window.location.href = 'login.html?return=/pages/account.html';
         return;
       }
 
@@ -296,16 +308,37 @@
       var pageContent = document.getElementById('account-page-content');
       if (pageContent) pageContent.style.opacity = '1';
 
+      // Stripe Checkout成功後のメッセージ表示
+      var urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('payment') === 'success') {
+        var successBanner = document.createElement('div');
+        successBanner.style.cssText = 'background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:16px 20px;margin-bottom:14px;font-size:14px;color:#166534;text-align:center;';
+        successBanner.textContent = 'Proプランへのアップグレードが完了しました！全エピソードをお楽しみください。';
+        var titleEl = document.querySelector('.account-title');
+        if (titleEl) titleEl.insertAdjacentElement('afterend', successBanner);
+        // URLからパラメータを除去（リロード時に再表示しないため）
+        window.history.replaceState({}, '', window.location.pathname);
+        // サーバーからユーザー情報を再取得してプラン反映
+        try { await DEEPCAST_AUTH.fetchMe(); } catch(e) {}
+      } else if (urlParams.get('payment') === 'cancel') {
+        var cancelBanner = document.createElement('div');
+        cancelBanner.style.cssText = 'background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px 20px;margin-bottom:14px;font-size:14px;color:#92400e;text-align:center;';
+        cancelBanner.textContent = '決済がキャンセルされました。プランの変更をご希望の場合は、もう一度お試しください。';
+        var titleEl2 = document.querySelector('.account-title');
+        if (titleEl2) titleEl2.insertAdjacentElement('afterend', cancelBanner);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
       // ユーザー情報取得
       var user;
       try {
         user = await DEEPCAST_AUTH.fetchMe();
       } catch (err) {
-        window.location.href = 'pricing.html';
+        window.location.href = 'login.html?return=/pages/account.html';
         return;
       }
       if (!user) {
-        window.location.href = 'pricing.html';
+        window.location.href = 'login.html?return=/pages/account.html';
         return;
       }
 

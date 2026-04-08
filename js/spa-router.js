@@ -169,6 +169,14 @@
 
         applySwap(contentNodes, pageStyles, title, navHTML, meta);
 
+        // 遷移先のbody属性を反映（Pro記事ゲーティング用）
+        var newTier = doc.body.dataset.tier || '';
+        if (newTier) {
+          document.body.dataset.tier = newTier;
+        } else {
+          delete document.body.dataset.tier;
+        }
+
         if (pushState !== false) {
           history.pushState({ spa: true }, title, url);
         }
@@ -177,6 +185,11 @@
         isNavigating = false;
 
         DP.reinitPage();
+
+        // Pro記事ゲーティングを再適用
+        if (window.DeepCastProGate) {
+          window.DeepCastProGate.apply();
+        }
       })
       .catch(function(err) {
         document.body.style.opacity = '1';

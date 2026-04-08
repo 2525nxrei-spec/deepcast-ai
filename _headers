@@ -1,6 +1,10 @@
 https://deepcast-ai.pages.dev/*
   X-Robots-Tag: noindex
 
+/pages/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+
 /episodes/*.mp3
   X-Robots-Tag: noindex
   ! Access-Control-Allow-Origin

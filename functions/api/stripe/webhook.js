@@ -36,13 +36,19 @@ export async function onRequestPost(context) {
     }
 
     // 冪等性チェック: webhooks_logテーブルでイベントID重複を確認
-    const existing = await env.DB
-      .prepare('SELECT id FROM webhooks_log WHERE stripe_event_id = ?')
-      .bind(event.id)
-      .first();
-    if (existing) {
-      console.log(`Webhook冪等性: ${event.id} は処理済み`);
-      return jsonResponse({ received: true });
+    // テーブル未作成でもWebhook処理を止めない（フェイルセーフ）
+    try {
+      const existing = await env.DB
+        .prepare('SELECT id FROM webhooks_log WHERE stripe_event_id = ?')
+        .bind(event.id)
+        .first();
+      if (existing) {
+        console.log(`Webhook冪等性: ${event.id} は処理済み`);
+        return jsonResponse({ received: true });
+      }
+    } catch (idempotencyErr) {
+      console.warn('冪等性チェックスキップ（テーブル未作成の可能性）:', idempotencyErr.message);
+      // テーブルが無い場合でも処理を続行する
     }
 
     console.log(`Webhook受信: type=${event.type}, id=${event.id}`);
@@ -54,21 +60,41 @@ export async function onRequestPost(context) {
         const subscriptionId = session.subscription;
         const customerId = session.customer;
         if (userId) {
-          await env.DB.prepare(
+          const result = await env.DB.prepare(
             `UPDATE users SET plan = 'pro', cancel_at_period_end = 0, stripe_customer_id = COALESCE(stripe_customer_id, ?),
              stripe_subscription_id = ?, updated_at = datetime('now') WHERE id = ?`
           ).bind(customerId, subscriptionId, userId).run();
-          console.log(`Pro開始: user=${userId}`);
+          if (result.meta?.changes === 0) {
+            console.error(`Pro開始失敗: user=${userId} がDBに見つかりません（customer=${customerId}）`);
+          } else {
+            console.log(`Pro開始: user=${userId}, customer=${customerId}, subscription=${subscriptionId}`);
+          }
+        } else {
+          // metadataにuser_idがない場合、customer_idから逆引きを試みる
+          console.warn(`checkout.session.completed: metadataにuser_idなし（session=${session.id}）`);
+          if (customerId) {
+            const result = await env.DB.prepare(
+              `UPDATE users SET plan = 'pro', cancel_at_period_end = 0,
+               stripe_subscription_id = ?, updated_at = datetime('now')
+               WHERE stripe_customer_id = ?`
+            ).bind(subscriptionId, customerId).run();
+            if (result.meta?.changes > 0) {
+              console.log(`Pro開始（customer_id逆引き）: customer=${customerId}`);
+            } else {
+              console.error(`Pro開始失敗: customer=${customerId} もDBに見つかりません`);
+            }
+          }
         }
         break;
       }
       case 'customer.subscription.updated': {
         const sub = event.data.object;
         if (sub.status === 'active' || sub.status === 'trialing') {
-          await env.DB.prepare(
+          const result = await env.DB.prepare(
             `UPDATE users SET plan = 'pro', cancel_at_period_end = ?, stripe_subscription_id = ?, updated_at = datetime('now')
              WHERE stripe_customer_id = ?`
           ).bind(sub.cancel_at_period_end ? 1 : 0, sub.id, sub.customer).run();
+          console.log(`サブスク更新(${sub.status}): customer=${sub.customer}, changes=${result.meta?.changes || 0}`);
         } else if (sub.status === 'past_due' || sub.status === 'unpaid') {
           // 支払い遅延・未払い: Proプランをfreeにダウングレード
           await env.DB.prepare(
@@ -76,16 +102,25 @@ export async function onRequestPost(context) {
              WHERE stripe_customer_id = ?`
           ).bind(sub.customer).run();
           console.log(`ダウングレード(${sub.status}): customer=${sub.customer}`);
+        } else if (sub.status === 'incomplete_expired') {
+          // 支払い未完了のまま期限切れ
+          await env.DB.prepare(
+            `UPDATE users SET plan = 'free', stripe_subscription_id = NULL, updated_at = datetime('now')
+             WHERE stripe_customer_id = ?`
+          ).bind(sub.customer).run();
+          console.log(`サブスク期限切れ(incomplete_expired): customer=${sub.customer}`);
+        } else {
+          console.log(`サブスク更新（処理不要）: status=${sub.status}, customer=${sub.customer}`);
         }
         break;
       }
       case 'customer.subscription.deleted': {
         const sub = event.data.object;
-        await env.DB.prepare(
-          `UPDATE users SET plan = 'free', stripe_subscription_id = NULL, updated_at = datetime('now')
+        const result = await env.DB.prepare(
+          `UPDATE users SET plan = 'free', cancel_at_period_end = 0, stripe_subscription_id = NULL, updated_at = datetime('now')
            WHERE stripe_customer_id = ?`
         ).bind(sub.customer).run();
-        console.log(`解約: customer=${sub.customer}`);
+        console.log(`解約: customer=${sub.customer}, changes=${result.meta?.changes || 0}`);
         break;
       }
       case 'invoice.payment_succeeded': {
@@ -123,7 +158,7 @@ export async function onRequestPost(context) {
 
     return jsonResponse({ received: true });
   } catch (err) {
-    console.error('Webhookエラー:', err.message);
+    console.error('Webhookエラー:', err.message, err.stack);
     return errorResponse('Webhook処理エラー', 500);
   }
 }

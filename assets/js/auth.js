@@ -157,8 +157,13 @@ const DEEPCAST_AUTH = (() => {
       const data = await apiRequest('/api/auth/me');
       setUser(data.user);
       return data.user;
-    } catch {
-      removeToken();
+    } catch (err) {
+      // 401（トークン無効/期限切れ）はapiRequest内でremoveToken済み
+      // ネットワークエラー等ではトークンを消さない（一時的な接続障害で強制ログアウトしない）
+      const msg = err.message || '';
+      if (msg.includes('セッションの有効期限が切れました')) {
+        // 既にapiRequestでremoveToken済み
+      }
       return null;
     }
   }
@@ -243,7 +248,7 @@ const DEEPCAST_AUTH = (() => {
   function updateNavUI() {
     const user = getUser();
 
-    // index.html の navLoginBtn を更新
+    // navLoginBtn（ボタン型）の更新
     const navLoginBtn = document.getElementById('navLoginBtn');
     if (navLoginBtn) {
       if (user) {
@@ -256,6 +261,18 @@ const DEEPCAST_AUTH = (() => {
         navLoginBtn.href = '/pages/login.html';
         navLoginBtn.textContent = 'ログイン';
         navLoginBtn.style.cssText = '';
+      }
+    }
+
+    // navLoginLink（モバイルメニュー用テキストリンク）の更新
+    const navLoginLink = document.getElementById('navLoginLink');
+    if (navLoginLink) {
+      if (user) {
+        navLoginLink.href = '/pages/account.html';
+        navLoginLink.textContent = user.plan === 'pro' ? 'Pro' : 'アカウント';
+      } else {
+        navLoginLink.href = '/pages/login.html';
+        navLoginLink.textContent = 'ログイン';
       }
     }
   }
