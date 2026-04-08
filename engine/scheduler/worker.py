@@ -197,7 +197,7 @@ class AutonomousWorker:
                         avg_score=avg_score,
                         threshold=settings.QUALITY_THRESHOLD,
                     )
-                    # TODO: 自動プロンプト改善ロジックを追加
+                    # SelfManager.optimize_prompts() がこの機能を担当
 
             logger.info("job.prompt_optimization.done")
         except Exception:
