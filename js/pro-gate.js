@@ -18,6 +18,13 @@
 
     // auth.jsの初期化を待ってから判定
     var checkAccess = function () {
+      // 未ログイン → ログインページにリダイレクト（Proページ自体に入れない）
+      var isLoggedIn = (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isLoggedIn());
+      if (!isLoggedIn) {
+        window.location.href = '/pages/login.html?return=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+
       var userIsPro = (typeof DEEPCAST_AUTH !== 'undefined' && DEEPCAST_AUTH.isPro());
       if (userIsPro) return; // Proユーザーはそのまま
 
