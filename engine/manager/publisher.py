@@ -400,7 +400,6 @@ class Publisher:
       </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="../#episodes">エピソード</a></li>
-        <li><a href="../#request">リクエスト</a></li>
         <li><a href="../#services">サービス</a></li>
         <li><a href="../#faq">FAQ</a></li>
       </ul>
@@ -470,7 +469,6 @@ class Publisher:
           <h4>サービス</h4>
           <ul>
             <li><a href="../#episodes">エピソード一覧</a></li>
-            <li><a href="../#request">トピックリクエスト</a></li>
           </ul>
         </div>
         <div class="footer-links-group">

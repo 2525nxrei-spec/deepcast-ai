@@ -277,7 +277,7 @@
 
   function initReveal() {
     var els = document.querySelectorAll(
-      '.episode-card,.service-card,.step-card,.pricing-card,.testimonial-card,.faq-item,.request-form-card,.request-info-card'
+      '.episode-card,.service-card,.step-card,.pricing-card,.testimonial-card,.faq-item'
     );
     if (!els.length) return;
     var obs = new IntersectionObserver(function(entries) {
@@ -360,52 +360,6 @@
         });
       });
     }
-  }
-
-  function initRequestForm() {
-    var reqForm = document.getElementById('requestForm');
-    if (!reqForm) return;
-    reqForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      var btn = reqForm.querySelector('button[type="submit"]');
-      // 二重クリック防止
-      if (btn.disabled) return;
-      var data = new FormData(reqForm);
-      var body = {
-        topic: data.get('topic'), category: data.get('category'), depth: data.get('depth'),
-        detail: data.get('detail'), email: data.get('email'),
-        _subject: 'DeepCast AI 新規リクエスト', _captcha: 'false'
-      };
-      var origText = btn.textContent;
-      btn.classList.add('btn-loading');
-      btn.disabled = true;
-      fetch('https://formsubmit.co/ajax/2525nxrei@gmail.com', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(body)
-      })
-      .then(function(r) { return r.json(); })
-      .then(function() {
-        btn.classList.remove('btn-loading');
-        btn.textContent = '受付完了!';
-        btn.style.background = '#3a8a44';
-        setTimeout(function() { reqForm.reset(); btn.textContent = origText; btn.style.background = ''; btn.disabled = false; }, 3000);
-      })
-      .catch(function() {
-        btn.classList.remove('btn-loading');
-        btn.textContent = 'ネットワークエラー。接続を確認してください。';
-        setTimeout(function() { btn.textContent = origText; btn.disabled = false; }, 3000);
-      });
-    });
-  }
-
-  function initPopularTags() {
-    document.querySelectorAll('.popular-tag').forEach(function(tag) {
-      tag.addEventListener('click', function() {
-        var f = document.getElementById('requestTopic');
-        if (f) { f.value = tag.dataset.topic; f.focus(); f.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-      });
-    });
   }
 
   function initIndexEpisodes() {
@@ -792,12 +746,6 @@
 
     // モーダル
     initModal();
-
-    // リクエストフォーム
-    initRequestForm();
-
-    // 人気タグ
-    initPopularTags();
 
     // 言語切替
     initLangSwitch();

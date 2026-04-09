@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepcast-v27';
+const CACHE_NAME = 'deepcast-v28';
 const ASSETS = [
   '/',
   '/css/style.css',
@@ -12,7 +12,6 @@ const ASSETS = [
   '/feed.xml',
   '/about.html',
   '/contact.html',
-  '/request.html',
   '/privacy.html',
   '/terms.html',
   '/tokushoho.html',
