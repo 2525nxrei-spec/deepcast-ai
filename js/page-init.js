@@ -222,7 +222,8 @@
             '<span class="progress-time" aria-live="off">0:00 / ' + ep.duration + '</span>' +
           '</div>' +
         '</div>' +
-        (ep.article ? '<a href="' + ep.article + '" class="read-article-btn" aria-label="' + safeTitle + ' の要約を読む">要約を読む &rarr;</a>' : '') +
+        (ep.article && !isLocked ? '<a href="' + ep.article + '" class="read-article-btn" aria-label="' + safeTitle + ' の要約を読む">要約を読む &rarr;</a>' : '') +
+        (isLocked ? '<span class="read-article-btn" style="color:var(--text-muted);cursor:default;opacity:0.6;">Proプラン限定</span>' : '') +
       '</div>' +
     '</article>';
   }
