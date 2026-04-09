@@ -264,6 +264,7 @@
 
     if (!nav || !miniPlayer) {
       DA.bindMiniPlayer();
+      DP.reinitPage();
       return;
     }
 
