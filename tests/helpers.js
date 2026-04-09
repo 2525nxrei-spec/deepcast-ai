@@ -38,10 +38,18 @@ export async function createTestEnv() {
     await db.prepare(stmt).run();
   }
 
-  // episodes.jsonを読み込み、ASSETSバインディングをモック
-  // [episode].jsがepisodes.jsonからtierを動的に判定するために必要
-  const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-  const episodesJson = readFileSync(resolve(projectRoot, 'episodes', 'episodes.json'), 'utf-8');
+  // テスト用エピソードデータ（固定）
+  // 本番のepisodes.jsonとは独立させ、準備中状態でもテストが安定動作するようにする
+  const testEpisodes = [
+    { "id": 1, "title": "テストエピソード1", "tier": "pro", "audio": "episodes/ep001.mp3" },
+    { "id": 2, "title": "テストエピソード2", "tier": "free", "audio": "episodes/ep002.mp3" },
+    { "id": 3, "title": "テストエピソード3", "tier": "free", "audio": "episodes/ep003.mp3" },
+    { "id": 4, "title": "テストエピソード4", "tier": "free", "audio": "episodes/ep004.mp3" },
+    { "id": 5, "title": "テストエピソード5", "tier": "free", "audio": "episodes/ep005.mp3" },
+    { "id": 6, "title": "テストエピソード6", "tier": "pro", "audio": "episodes/ep006.mp3" },
+    { "id": 7, "title": "テストエピソード7", "tier": "pro", "audio": "episodes/ep007.mp3" }
+  ];
+  const episodesJson = JSON.stringify(testEpisodes);
   const ASSETS = {
     fetch: async () => new Response(episodesJson, {
       status: 200,

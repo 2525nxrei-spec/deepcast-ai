@@ -305,12 +305,18 @@
         <button class="filter-btn" data-filter="business">ビジネス</button>
       </div>
 
-      <!-- JSONから動的に生成される -->
-      <div class="episode-list" id="episodeList">
+      <!-- 準備中メッセージ -->
+      <div class="preparing-notice" style="text-align:center; padding:48px 24px; background:var(--bg-card); border-radius:var(--radius-lg); margin:24px 0;">
+        <p style="font-family:var(--serif); font-size:20px; font-weight:600; color:var(--text); margin-bottom:12px;">コンテンツ準備中</p>
+        <p style="font-size:15px; color:var(--text-secondary); max-width:400px; margin:0 auto; line-height:1.8;">現在コンテンツを準備中です。<br>もうしばらくお待ちください。</p>
+      </div>
+
+      <!-- JSONから動的に生成される（準備中のため非表示） -->
+      <div class="episode-list" id="episodeList" style="display:none;">
         <p class="loading-text">エピソードを読み込み中...</p>
       </div>
 
-      <div class="episodes-cta">
+      <div class="episodes-cta" style="display:none;">
         <a href="all-episodes.html" class="btn btn-primary btn-lg">すべてのエピソードを聴く</a>
       </div>
     </div>
