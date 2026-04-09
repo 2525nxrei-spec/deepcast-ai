@@ -1,11 +1,12 @@
 /**
  * 音声保護テスト — GET /api/audio/[episode]
  * Pro音声の認証ガード、Freeエピソードの公開アクセス確認
+ * tier判定はepisodes.json（Single Source of Truth）から動的に取得
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { createTestEnv, createTestUser, createContext, parseResponse } from './helpers.js';
-import { onRequestGet as audioHandler } from '../functions/api/audio/[episode].js';
+import { onRequestGet as audioHandler, _resetEpisodesCache } from '../functions/api/audio/[episode].js';
 
 let mf, db, r2, env;
 
@@ -13,8 +14,7 @@ beforeAll(async () => {
   ({ mf, db, r2, env } = await createTestEnv());
 
   // R2にテスト用音声ファイルをアップロード
-  // Freeエピソード: ep002, ep003, ep004, ep005, ep008, ep009, ep010
-  // Proエピソード: ep001, ep006, ep007
+  // tier判定はepisodes.jsonから動的取得（ハードコードなし）
   const fakeAudio = new Uint8Array([0xFF, 0xFB, 0x90, 0x00]); // 最小限のMP3ヘッダー
   await r2.put('episodes/ep001.mp3', fakeAudio);
   await r2.put('episodes/ep002.mp3', fakeAudio);
@@ -28,10 +28,12 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await db.exec('DELETE FROM users');
+  // テスト間でepisodes.jsonのキャッシュをリセット
+  _resetEpisodesCache();
 });
 
 describe('GET /api/audio/[episode]', () => {
-  // --- Freeエピソード (ep002-005, ep008-010) ---
+  // --- Freeエピソード（episodes.jsonでtier:"free"のもの） ---
 
   it('Freeエピソード — 認証なしでアクセス可能', async () => {
     const request = new Request('https://deepcast-ai.com/api/audio/ep002', {
@@ -57,7 +59,7 @@ describe('GET /api/audio/[episode]', () => {
     expect(res.status).toBe(200);
   });
 
-  // --- Proエピソード (ep001, ep006, ep007 — FREE_EPISODESに含まれないもの) ---
+  // --- Proエピソード（episodes.jsonでtier:"pro"のもの: ep001, ep006, ep007） ---
 
   it('Proエピソード + Proユーザー — アクセス可能', async () => {
     const user = await createTestUser(db, { email: 'pro@example.com', plan: 'pro' });

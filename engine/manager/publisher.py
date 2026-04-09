@@ -205,6 +205,8 @@ class Publisher:
         # メタデータからオプション値を取得
         meta = content.get("metadata", {}) if isinstance(content.get("metadata"), dict) else {}
         duration = meta.get("duration", "5:00")
+        # tierはepisodes.jsonと一致させる（Single Source of Truth）
+        tier = meta.get("tier", "free")
         audio_file = meta.get("audio_path", "")
         keywords = meta.get("keywords", ",".join(tags))
         lead = meta.get("lead", description)
@@ -388,7 +390,7 @@ class Publisher:
     .article-share p {{ font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }}
   </style>
 </head>
-<body>
+<body data-tier="{tier}">
   <!-- NAVIGATION -->
   <nav class="navbar scrolled" id="navbar">
     <div class="container nav-container">
@@ -540,6 +542,9 @@ class Publisher:
         category = content.get("category", "society") or "society"
         duration = meta.get("duration", "5:00")
 
+        # tierはcontentのmetadataから取得、未指定時は"free"（新エピソードはデフォルトfree）
+        tier = meta.get("tier", "free")
+
         new_entry = {
             "id": new_id,
             "title": content["title"],
@@ -551,6 +556,7 @@ class Publisher:
             "audio": audio_path or f"episodes/ep{episode_number:03d}.mp3",
             "article": f"episodes/ep{episode_number:03d}.html",
             "language": content.get("language", "ja"),
+            "tier": tier,
         }
 
         episodes.insert(0, new_entry)

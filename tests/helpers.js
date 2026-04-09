@@ -5,7 +5,8 @@
 
 import { Miniflare } from 'miniflare';
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createJWT, hashPassword, generateSalt, generateId } from '../functions/lib/crypto.js';
 
 const SCHEMA_PATH = resolve(import.meta.dirname, '..', 'schema.sql');
@@ -37,9 +38,21 @@ export async function createTestEnv() {
     await db.prepare(stmt).run();
   }
 
+  // episodes.jsonを読み込み、ASSETSバインディングをモック
+  // [episode].jsがepisodes.jsonからtierを動的に判定するために必要
+  const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+  const episodesJson = readFileSync(resolve(projectRoot, 'episodes', 'episodes.json'), 'utf-8');
+  const ASSETS = {
+    fetch: async () => new Response(episodesJson, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  };
+
   const env = {
     DB: db,
     AUDIO_BUCKET: r2,
+    ASSETS,
     JWT_SECRET,
     STRIPE_SECRET_KEY: 'sk_test_fake_key',
     STRIPE_WEBHOOK_SECRET: 'whsec_test_secret',
