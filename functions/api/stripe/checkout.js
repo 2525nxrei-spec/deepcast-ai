@@ -54,6 +54,7 @@ export async function onRequestPost(context) {
       mode: 'subscription',
       customer: stripeCustomerId,
       locale: 'ja',
+      payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: '1' }],
       success_url: `${frontendUrl}/pages/account.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${frontendUrl}/pages/account.html?payment=cancel`,
