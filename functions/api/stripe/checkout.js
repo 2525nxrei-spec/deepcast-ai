@@ -26,6 +26,11 @@ export async function onRequestPost(context) {
   }
   if (!user) return errorResponse('認証が必要です', 401);
 
+  // Pro重複決済ガード
+  if (user.plan === 'pro') {
+    return errorResponse('すでにProプランをご利用中です', 400);
+  }
+
   try {
     const priceId = env.STRIPE_PRICE_PRO;
     if (!priceId) {

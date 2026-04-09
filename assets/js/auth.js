@@ -171,6 +171,10 @@ const DEEPCAST_AUTH = (() => {
   // --- Stripe ---
 
   async function startCheckout() {
+    // Pro重複決済ガード（UIとAPI両方で防止）
+    if (isPro()) {
+      throw new Error('すでにProプランをご利用中です。');
+    }
     const data = await apiRequest('/api/stripe/checkout', 'POST');
     // リダイレクト型: サーバーから返されたStripe Checkout URLに遷移
     if (data.url) {
@@ -189,15 +193,6 @@ const DEEPCAST_AUTH = (() => {
 
   async function getBillingStatus() {
     return await apiRequest('/api/billing/status');
-  }
-
-  // --- エピソード制限 ---
-  // Freeユーザーは最新3本のみ再生可能
-  // episodes.jsonは新しい順ソート前提、index 0が最新
-
-  function canAccessEpisode(episodeIndex) {
-    if (isPro()) return true;
-    return episodeIndex < 3;
   }
 
   function showUpgradeGate() {
@@ -301,7 +296,7 @@ const DEEPCAST_AUTH = (() => {
     getToken, getUser, isLoggedIn, isPro,
     register, login, logout, fetchMe,
     startCheckout, openPortal, getBillingStatus,
-    canAccessEpisode, showUpgradeGate,
+    showUpgradeGate,
     updateNavUI, init,
     /** init()完了を待つためのPromise。init()呼び出し後に利用可能 */
     get ready() { return _initPromise || Promise.resolve(); },

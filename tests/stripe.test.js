@@ -69,6 +69,25 @@ describe('POST /api/stripe/checkout', () => {
     }
   });
 
+  it('Proユーザー — 重複決済を拒否する', async () => {
+    const user = await createTestUser(db, { email: 'already-pro@example.com', plan: 'pro' });
+
+    const request = new Request('https://deepcast-ai.com/api/stripe/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`,
+      },
+    });
+
+    const res = await checkout(createContext(request, env));
+    const { status, body } = await parseResponse(res);
+
+    expect(status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error).toContain('すでにPro');
+  });
+
   it('未認証 — 401を返す', async () => {
     const request = new Request('https://deepcast-ai.com/api/stripe/checkout', {
       method: 'POST',
