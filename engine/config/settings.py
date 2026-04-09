@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     R2_PUBLIC_URL: str = "https://audio.deepcast-ai.com"
 
     # --- Publisher ---
-    SITE_ROOT: str = os.environ.get("SITE_ROOT", "G:/マイドライブ/株式会社　礼/運用中/8_ディープキャスト")
+    SITE_ROOT: str = os.environ.get("SITE_ROOT", "D:/株式会社　礼/運用中/8_ディープキャスト")
     SITE_URL: str = "https://deepcast-ai.com"
     AUTO_GIT_PUSH: bool = False  # Safety: manual push by default
 

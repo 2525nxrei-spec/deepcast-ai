@@ -4,8 +4,8 @@
 # ============================================================
 
 $taskName = "DeepCast_Engine"
-$batPath = "G:\マイドライブ\株式会社　礼\運用中\8_ディープキャスト\engine\deepcast_serve.bat"
-$workDir = "G:\マイドライブ\株式会社　礼\運用中\8_ディープキャスト\engine"
+$batPath = "D:\株式会社　礼\運用中\8_ディープキャスト\engine\deepcast_serve.bat"
+$workDir = "D:\株式会社　礼\運用中\8_ディープキャスト\engine"
 
 # 既存タスクがあれば削除
 $existing = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue

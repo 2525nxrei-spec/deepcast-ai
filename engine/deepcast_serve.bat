@@ -4,7 +4,7 @@ REM DeepCast Engine — 自律スケジューラ起動バッチ
 REM Windowsタスクスケジューラから毎日実行される
 REM ============================================================
 
-cd /d "G:\マイドライブ\株式会社　礼\運用中\8_ディープキャスト\engine"
+cd /d "D:\株式会社　礼\運用中\8_ディープキャスト\engine"
 
 REM ログファイルに日時を記録
 echo [%date% %time%] DeepCast Engine starting... >> deepcast_serve.log

@@ -10,7 +10,7 @@
       "意思決定"
     ],
     "duration": "3:00",
-    "audioId": "ep010",
+    "audio": "episodes/ep010.mp3",
     "article": "episodes/ep010.html",
     "language": "ja",
     "tier": "free"
@@ -26,7 +26,7 @@
       "健康科学"
     ],
     "duration": "3:00",
-    "audioId": "ep009",
+    "audio": "episodes/ep009.mp3",
     "article": "episodes/ep009.html",
     "language": "ja",
     "tier": "free"
@@ -42,7 +42,7 @@
       "認知科学"
     ],
     "duration": "3:00",
-    "audioId": "ep008",
+    "audio": "episodes/ep008.mp3",
     "article": "episodes/ep008.html",
     "language": "ja",
     "tier": "free"
@@ -58,7 +58,7 @@
       "脳科学"
     ],
     "duration": "3:00",
-    "audioId": "ep007",
+    "audio": "episodes/ep007.mp3",
     "article": "episodes/ep007.html",
     "language": "ja",
     "tier": "pro"
@@ -74,7 +74,7 @@
       "意思決定"
     ],
     "duration": "3:00",
-    "audioId": "ep006",
+    "audio": "episodes/ep006.mp3",
     "article": "episodes/ep006.html",
     "language": "ja",
     "tier": "pro"
@@ -89,7 +89,8 @@
     "duration": "5:48",
     "audio": "episodes/ep005.mp3",
     "article": "episodes/ep005.html",
-    "language": "ja"
+    "language": "ja",
+    "tier": "free"
   },
   {
     "id": 4,
@@ -101,7 +102,8 @@
     "duration": "2:28",
     "audio": "episodes/ep004.mp3",
     "article": "episodes/ep004.html",
-    "language": "ja"
+    "language": "ja",
+    "tier": "free"
   },
   {
     "id": 3,
@@ -113,7 +115,8 @@
     "duration": "6:23",
     "audio": "episodes/ep003.mp3",
     "article": "episodes/ep003.html",
-    "language": "ja"
+    "language": "ja",
+    "tier": "free"
   },
   {
     "id": 2,
@@ -125,7 +128,8 @@
     "duration": "4:50",
     "audio": "episodes/ep002.mp3",
     "article": "episodes/ep002.html",
-    "language": "ja"
+    "language": "ja",
+    "tier": "free"
   },
   {
     "id": 1,
