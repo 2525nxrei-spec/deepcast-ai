@@ -65,7 +65,7 @@ _PODCAST_SCRIPT_PROMPT_JA = (
 
 _PODCAST_SCRIPT_PROMPT_EN = (
     "You are a podcast script writer.\n"
-    "Structure: 3 minutes total (intro/outro added separately, write 2:30 of content).\n"
+    "Structure: 3 minutes total (intro/outro added separately, write 3:00 of content).\n"
     "First 75s: Yamaguchi (main host, calm 40s male).\n"
     "Bridge: natural handoff (1 sentence each).\n"
     "Last 75s: Tanaka (sub host, bright 20s male).\n"

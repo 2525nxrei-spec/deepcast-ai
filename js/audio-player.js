@@ -8,8 +8,8 @@
 
   const audioEl = new Audio();
   audioEl.preload = 'metadata';
-  // エピソード再生時間の上限（2分30秒 = 150秒）
-  const MAX_DURATION_SEC = 150;
+  // エピソード再生時間の上限（3分 = 180秒）
+  const MAX_DURATION_SEC = 180;
 
   let currentPlayBtn = null;
   let currentAudioSrc = '';
@@ -328,10 +328,10 @@
     currentPlayBtn = null;
   });
 
-  // --- timeupdate イベント（2:30で強制終了） ---
+  // --- timeupdate イベント（3:00で強制終了） ---
   audioEl.addEventListener('timeupdate', function() {
     if (!audioEl.duration) return;
-    // 2:30制限: 上限に達したら再生終了イベントを発火
+    // 3:00制限: 上限に達したら再生終了イベントを発火
     if (audioEl.currentTime >= MAX_DURATION_SEC) {
       audioEl.pause();
       audioEl.currentTime = 0;

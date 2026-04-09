@@ -204,7 +204,7 @@ class Publisher:
 
         # メタデータからオプション値を取得
         meta = content.get("metadata", {}) if isinstance(content.get("metadata"), dict) else {}
-        duration = meta.get("duration", "5:00")
+        duration = meta.get("duration", "3:00")
         # tierはepisodes.jsonと一致させる（Single Source of Truth）
         tier = meta.get("tier", "free")
         audio_file = meta.get("audio_path", "")
@@ -540,7 +540,7 @@ class Publisher:
         meta = content.get("metadata", {}) if isinstance(content.get("metadata"), dict) else {}
         tags = content.get("tags", []) or []
         category = content.get("category", "society") or "society"
-        duration = meta.get("duration", "5:00")
+        duration = meta.get("duration", "3:00")
 
         # tierはcontentのmetadataから取得、未指定時は"free"（新エピソードはデフォルトfree）
         tier = meta.get("tier", "free")
@@ -612,7 +612,7 @@ class Publisher:
         meta = content.get("metadata", {}) if isinstance(content.get("metadata"), dict) else {}
         tags = content.get("tags", []) or []
         description = meta.get("description", content["body"][:120].replace("\n", " "))
-        duration = meta.get("duration", "5:00")
+        duration = meta.get("duration", "3:00")
         audio_url = f"{self.site_url}/api/audio/ep{episode_number:03d}"
 
         # RFC 2822 形式の日付

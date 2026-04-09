@@ -4,13 +4,13 @@
      xmlns:atom="http://www.w3.org/2005/Atom"
      xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>DeepCast AI - AIが生み出す2分半の深い洞察</title>
+    <title>DeepCast AI - AIが生み出す3分の深い洞察</title>
     <link>https://deepcast-ai.com/</link>
     <language>ja</language>
-    <description>AIが生成する高品質ポッドキャスト。毎日更新、2分半で最新トピックの深い洞察を。登録不要。</description>
+    <description>AIが生成する高品質ポッドキャスト。毎日更新、3分で最新トピックの深い洞察を。登録不要。</description>
     <atom:link href="https://deepcast-ai.com/feed.xml" rel="self" type="application/rss+xml"/>
     <itunes:author>DeepCast AI</itunes:author>
-    <itunes:summary>AIが生成する高品質ポッドキャスト。毎日更新、2分半で最新トピックの深い洞察を。</itunes:summary>
+    <itunes:summary>AIが生成する高品質ポッドキャスト。毎日更新、3分で最新トピックの深い洞察を。</itunes:summary>
     <itunes:owner>
       <itunes:name>DeepCast AI</itunes:name>
       <itunes:email>2525nxrei@gmail.com</itunes:email>
@@ -21,7 +21,61 @@
     <itunes:category text="Business"/>
     <itunes:explicit>false</itunes:explicit>
     <itunes:type>episodic</itunes:type>
-    <itunes:keywords>AIポッドキャスト,AI生成,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,2分半</itunes:keywords>
-    <!-- エピソードは準備中のため一時除外 -->
+    <itunes:keywords>AIポッドキャスト,AI生成,深掘り解説,AI解説,無料ポッドキャスト,ながら聴き,通勤,スキマ時間,3分</itunes:keywords>
+
+    <item>
+      <title>#5 AIが仕事を奪う論争に終止符を 歴史が教える真実</title>
+      <description>AIが仕事を奪うという不安は根強いが、これは歴史が繰り返してきた懸念。過去の産業革命の影響を分析し、AI時代を乗り越える真実を解説。</description>
+      <enclosure url="https://deepcast-ai.com/api/audio/ep005" type="audio/mpeg" length="0"/>
+      <pubDate>Tue, 07 Apr 2026 01:11:12 +0900</pubDate>
+      <itunes:duration>5:48</itunes:duration>
+      <itunes:episode>5</itunes:episode>
+      <itunes:keywords>AI,雇用,技術革新,産業革命</itunes:keywords>
+      <guid isPermaLink="false">deepcast-ep005</guid>
+    </item>
+
+    <item>
+      <title>#4 なぜ円安は止まらないのか 通貨の強さを決める要因</title>
+      <description>為替レートの決定要因、日銀の金融政策、購買力平価など、通貨の強さを決めるメカニズムを経済学・歴史的視点から徹底解説。</description>
+      <enclosure url="https://deepcast-ai.com/api/audio/ep004" type="audio/mpeg" length="0"/>
+      <pubDate>Tue, 07 Apr 2026 01:07:22 +0900</pubDate>
+      <itunes:duration>2:28</itunes:duration>
+      <itunes:episode>4</itunes:episode>
+      <itunes:keywords>円安,為替,経済政策,金融</itunes:keywords>
+      <guid isPermaLink="false">deepcast-ep004</guid>
+    </item>
+
+    <item>
+      <title>#3 睡眠負債が脳を壊す 神経科学が明かした衝撃の事実</title>
+      <description>慢性的な睡眠負債が脳に致命的ダメージを与えることが最新の神経科学研究で判明。脳のメンテナンスと睡眠の真の役割を解明。</description>
+      <enclosure url="https://deepcast-ai.com/api/audio/ep003" type="audio/mpeg" length="0"/>
+      <pubDate>Tue, 07 Apr 2026 01:04:30 +0900</pubDate>
+      <itunes:duration>6:23</itunes:duration>
+      <itunes:episode>3</itunes:episode>
+      <itunes:keywords>睡眠,脳科学,健康,神経科学</itunes:keywords>
+      <guid isPermaLink="false">deepcast-ep003</guid>
+    </item>
+
+    <item>
+      <title>#2 量子コンピュータは世界を変えるか 2026年の現実</title>
+      <description>SFから現実へ進む量子コンピュータ。医療、金融、素材など多岐にわたる分野での可能性と課題を専門的に解説。</description>
+      <enclosure url="https://deepcast-ai.com/api/audio/ep002" type="audio/mpeg" length="0"/>
+      <pubDate>Tue, 07 Apr 2026 01:00:28 +0900</pubDate>
+      <itunes:duration>4:50</itunes:duration>
+      <itunes:episode>2</itunes:episode>
+      <itunes:keywords>量子コンピュータ,テクノロジー,暗号,計算科学</itunes:keywords>
+      <guid isPermaLink="false">deepcast-ep002</guid>
+    </item>
+
+    <item>
+      <title>#1 推し活に全力な若者たち 承認欲求の経済学</title>
+      <description>推し活の背後にある承認欲求が巨大な推し経済を生み出す仕組みを、データと研究に基づき徹底解説。</description>
+      <enclosure url="https://deepcast-ai.com/api/audio/ep001" type="audio/mpeg" length="0"/>
+      <pubDate>Tue, 07 Apr 2026 00:57:06 +0900</pubDate>
+      <itunes:duration>3:43</itunes:duration>
+      <itunes:episode>1</itunes:episode>
+      <itunes:keywords>推し活,経済学,Z世代,承認欲求</itunes:keywords>
+      <guid isPermaLink="false">deepcast-ep001</guid>
+    </item>
   </channel>
 </rss>
