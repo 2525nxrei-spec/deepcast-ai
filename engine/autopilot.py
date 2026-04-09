@@ -250,7 +250,7 @@ async def run_autopilot(
                 episode_result["steps"]["r2"] = {
                     "status": "ok" if r2_ok else "failed",
                     "remote_key": remote_key,
-                    "public_url": f"{settings.R2_PUBLIC_URL}/{remote_key}" if r2_ok else None,
+                    "api_url": f"{settings.SITE_URL}/api/audio/ep{ep_number:03d}" if r2_ok else None,
                 }
 
                 if not r2_ok:

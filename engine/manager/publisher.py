@@ -242,7 +242,7 @@ class Publisher:
                 "url": ep_url,
                 "associatedMedia": {
                     "@type": "MediaObject",
-                    "contentUrl": f"{self.site_url}/{audio_file}" if audio_file else "",
+                    "contentUrl": f"{self.site_url}/api/audio/ep{episode_number:03d}",
                 },
                 "partOfSeries": {
                     "@type": "PodcastSeries",
@@ -607,7 +607,7 @@ class Publisher:
         tags = content.get("tags", []) or []
         description = meta.get("description", content["body"][:120].replace("\n", " "))
         duration = meta.get("duration", "5:00")
-        audio_url = f"{self.site_url}/{audio_path}" if audio_path else f"{self.site_url}/episodes/ep{episode_number:03d}.mp3"
+        audio_url = f"{self.site_url}/api/audio/ep{episode_number:03d}"
 
         # RFC 2822 形式の日付
         now = datetime.now(JST)

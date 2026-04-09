@@ -11,7 +11,7 @@ import { authenticateUser } from '../../lib/auth.js';
 // エピソードのティア定義（episodes.jsonと同期必須）
 // Freeエピソードのホワイトリスト（ここに含まれるもののみfree、それ以外は全てpro扱い）
 // 安全側設計: リストに漏れがあってもpro扱いになるため、無料ユーザーに有料コンテンツが漏れない
-const FREE_EPISODES = new Set([1, 2, 3, 8, 9, 10]);
+const FREE_EPISODES = new Set([2, 3, 4, 5, 8, 9, 10]);
 
 function getEpisodeTier(episodeId) {
   const baseId = episodeId.replace(/\.mp3$/, '');

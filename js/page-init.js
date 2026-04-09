@@ -130,12 +130,12 @@
 
   // オーディオファイル名 → 記事URLマッピングを構築
   // 音声URLを生成
-  // audioIdがある場合はAPI経由（認証付き、Proアクセス制御あり）
-  // audioIdがない場合: proエピソードならaudioフィールドからIDを抽出してAPI経由に、freeならaudioフィールド直接参照
+  // 全エピソードを /api/audio/ 経由に統一（R2パブリックアクセス不要）
+  // Free音声はAPI側で認証不要、Pro音声はJWT認証必須
   function resolveAudioUrl(ep) {
     if (ep.audioId) return '/api/audio/' + ep.audioId;
-    // audioIdがないproエピソード: audioフィールドからep0XXパターンを抽出
-    if (ep.tier === 'pro' && ep.audio) {
+    // audioフィールドからep0XXパターンを抽出してAPI経由に統一
+    if (ep.audio) {
       var match = ep.audio.match(/ep(\d{3})/);
       if (match) return '/api/audio/ep' + match[1];
     }
